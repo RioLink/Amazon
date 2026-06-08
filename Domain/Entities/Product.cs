@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Domain.Models
+namespace Domain.Entities
 {
     public class Product
     {
@@ -11,7 +11,7 @@ namespace Domain.Models
         public decimal Price { get; set; }
         public string Description { get; set; } = string.Empty;
         public int Quantity { get; set; }
-        public string ImageUrl { get; set; } = string.Empty; }
+        public string ImageUrl { get; set; } = string.Empty;
 
         public int CategoryId { get; set; }
         public Category Category { get; set; } = null!;

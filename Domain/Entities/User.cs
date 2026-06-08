@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 
-namespace Domain.Models
+namespace Domain.Entities
 {
     public class User: IdentityUser
     {
