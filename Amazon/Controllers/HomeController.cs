@@ -8,7 +8,7 @@ namespace Amazon.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            return View(DemoCatalog.Products);
         }
 
         public IActionResult Privacy()

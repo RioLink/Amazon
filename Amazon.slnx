@@ -1,6 +1,6 @@
 <Solution>
+  <Project Path="Amazon/Amazon.csproj" />
   <Project Path="BLL/BLL.csproj" Id="b864ba10-8965-4ff8-af74-439be156a1fe" />
   <Project Path="DAL/DAL.csproj" Id="fa98fdf3-6b12-4022-9d1f-7dcedb88dfde" />
   <Project Path="Domain/Domain.csproj" Id="959ec6f1-5281-4d8b-b513-4e61e8fece0d" />
-  <Project Path="Amazon/Amazon.csproj" />
 </Solution>

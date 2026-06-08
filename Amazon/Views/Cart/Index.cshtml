@@ -1,0 +1,12 @@
+@{
+    ViewData["Title"] = "Кошик";
+}
+
+<div class="empty-state">
+    <span class="empty-state__icon" aria-hidden="true">🛒</span>
+    <h1>Ваш кошик поки порожній</h1>
+    <p>Додайте товари з каталогу, і вони з'являться тут.</p>
+    <a class="amazon-button amazon-button--primary" asp-controller="Product" asp-action="Index">
+        Перейти до каталогу
+    </a>
+</div>

@@ -1,8 +1,118 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model IReadOnlyList<ProductCardViewModel>
+
+@{
+    ViewData["Title"] = "Головна";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero" aria-labelledby="hero-title">
+    <div class="hero__content">
+        <span class="hero__eyebrow">Великі літні знижки</span>
+        <h1 id="hero-title">Усе потрібне в одному місці</h1>
+        <p>
+            Відкривайте популярні товари для дому, роботи й відпочинку.
+            Швидка доставка та вигідні пропозиції щодня.
+        </p>
+        <div class="hero__actions">
+            <a class="amazon-button amazon-button--primary"
+               asp-controller="Product" asp-action="Index">
+                Перейти до каталогу
+            </a>
+            <a class="hero__secondary-link" href="#categories">Переглянути категорії</a>
+        </div>
+    </div>
+
+    <div class="hero__visual" aria-hidden="true">
+        <div class="hero__circle hero__circle--large"></div>
+        <div class="hero__circle hero__circle--small"></div>
+        <img src="~/images/hero-shopping.svg" alt="" />
+        <span class="hero__discount">до <strong>40%</strong></span>
+    </div>
+</section>
+
+<section class="home-section" aria-labelledby="popular-title">
+    <div class="section-heading">
+        <div>
+            <span class="section-heading__eyebrow">Обирають покупці</span>
+            <h2 id="popular-title">Популярні товари</h2>
+        </div>
+        <a class="section-heading__link" asp-controller="Product" asp-action="Index">
+            Дивитися всі
+            <span aria-hidden="true">→</span>
+        </a>
+    </div>
+
+    <div class="product-grid">
+        @foreach (var product in Model)
+        {
+            <partial name="_ProductCard" model="product" />
+        }
+    </div>
+</section>
+
+<section id="categories" class="home-section" aria-labelledby="categories-title">
+    <div class="section-heading">
+        <div>
+            <span class="section-heading__eyebrow">Знайдіть своє</span>
+            <h2 id="categories-title">Популярні категорії</h2>
+        </div>
+    </div>
+
+    <div class="category-grid">
+        <a class="category-card category-card--electronics"
+           asp-controller="Product" asp-action="Index" asp-route-search="Електроніка">
+            <span class="category-card__icon" aria-hidden="true">⌁</span>
+            <span>
+                <strong>Електроніка</strong>
+                <small>Навушники, колонки та гаджети</small>
+            </span>
+        </a>
+        <a class="category-card category-card--computers"
+           asp-controller="Product" asp-action="Index" asp-route-search="Комп'ютери">
+            <span class="category-card__icon" aria-hidden="true">⌨</span>
+            <span>
+                <strong>Комп'ютери</strong>
+                <small>Техніка й аксесуари для роботи</small>
+            </span>
+        </a>
+        <a class="category-card category-card--home"
+           asp-controller="Product" asp-action="Index" asp-route-search="Дім">
+            <span class="category-card__icon" aria-hidden="true">⌂</span>
+            <span>
+                <strong>Для дому</strong>
+                <small>Корисні речі для щоденного комфорту</small>
+            </span>
+        </a>
+        <a class="category-card category-card--sport"
+           asp-controller="Product" asp-action="Index" asp-route-search="Спорт">
+            <span class="category-card__icon" aria-hidden="true">◎</span>
+            <span>
+                <strong>Спорт</strong>
+                <small>Товари для активного способу життя</small>
+            </span>
+        </a>
+    </div>
+</section>
+
+<section class="benefits" aria-label="Переваги магазину">
+    <article class="benefit">
+        <span class="benefit__icon" aria-hidden="true">✓</span>
+        <div>
+            <h3>Перевірена якість</h3>
+            <p>Добірні товари від надійних продавців.</p>
+        </div>
+    </article>
+    <article class="benefit">
+        <span class="benefit__icon" aria-hidden="true">→</span>
+        <div>
+            <h3>Швидка доставка</h3>
+            <p>Відправляємо замовлення по всій Україні.</p>
+        </div>
+    </article>
+    <article class="benefit">
+        <span class="benefit__icon" aria-hidden="true">↺</span>
+        <div>
+            <h3>Просте повернення</h3>
+            <p>Зручні умови повернення протягом 14 днів.</p>
+        </div>
+    </article>
+</section>

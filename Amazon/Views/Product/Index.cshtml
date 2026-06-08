@@ -1,0 +1,30 @@
+@model IReadOnlyList<ProductCardViewModel>
+
+@{
+    ViewData["Title"] = "Каталог";
+    var search = ViewData["Search"] as string;
+}
+
+<header class="page-heading">
+    <span class="section-heading__eyebrow">Каталог</span>
+    <h1>@(string.IsNullOrWhiteSpace(search) ? "Усі товари" : $"Результати для «{search}»")</h1>
+    <p>Зараз каталог працює на тестових даних. Пізніше тут будуть товари з BLL і бази даних.</p>
+</header>
+
+@if (Model.Count > 0)
+{
+    <div class="product-grid">
+        @foreach (var product in Model)
+        {
+            <partial name="_ProductCard" model="product" />
+        }
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <h2>Нічого не знайдено</h2>
+        <p>Спробуйте змінити пошуковий запит або переглянути весь каталог.</p>
+        <a class="amazon-button amazon-button--primary" asp-action="Index">Показати всі товари</a>
+    </div>
+}

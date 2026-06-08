@@ -1,47 +1,88 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="uk">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Amazon</title>
-    <script type="importmap"></script>
+    <meta name="description" content="Amazon Clone - навчальний інтернет-магазин на ASP.NET Core MVC" />
+    <title>@ViewData["Title"] - Amazon Clone</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Amazon.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Amazon</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    <header class="site-header">
+        <nav class="main-navigation" aria-label="Головна навігація">
+            <div class="main-navigation__content">
+                <a class="brand" asp-area="" asp-controller="Home" asp-action="Index"
+                   aria-label="Amazon Clone - головна сторінка">
+                    <span class="brand__name">amazon</span>
+                    <span class="brand__label">clone</span>
+                </a>
+
+                <form class="search-form" asp-area="" asp-controller="Product" asp-action="Index" method="get"
+                      role="search">
+                    <label class="visually-hidden" for="header-search">Пошук товарів</label>
+                    <input id="header-search"
+                           class="search-form__input"
+                           type="search"
+                           name="search"
+                           placeholder="Пошук товарів"
+                           autocomplete="off" />
+                    <button class="search-form__button" type="submit" aria-label="Знайти">
+                        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                            <path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" />
+                        </svg>
+                    </button>
+                </form>
+
+                <div class="main-navigation__actions">
+                    <a class="header-link" asp-area="" asp-controller="Profile" asp-action="Index">
+                        <span class="header-link__hint">Вітаємо</span>
+                        <span class="header-link__title">Профіль</span>
+                    </a>
+
+                    <a class="header-link header-link--cart" asp-area="" asp-controller="Cart" asp-action="Index">
+                        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                            <path d="M2.5 3.5h2l2.1 10.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 1.9-1.4L21 7H6m3 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm10 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" />
+                        </svg>
+                        <span class="header-link__title">Кошик</span>
+                        <span class="cart-count" aria-label="Товарів у кошику">0</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="category-navigation">
+                <div class="category-navigation__content">
+                    <a class="category-navigation__catalog" asp-area="" asp-controller="Product" asp-action="Index">
+                        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                            <path d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        Каталог
+                    </a>
+                    <a asp-area="" asp-controller="Home" asp-action="Index">Головна</a>
+                    <a asp-area="" asp-controller="Product" asp-action="Index">Товари</a>
+                    <a asp-area="" asp-controller="Profile" asp-action="Index">Мої замовлення</a>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Amazon - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <main class="site-main" role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
+        <div class="site-footer__content">
+            <a class="site-footer__brand" asp-area="" asp-controller="Home" asp-action="Index">amazon clone</a>
+            <nav class="site-footer__links" aria-label="Навігація у підвалі">
+                <a href="#">Про нас</a>
+                <a href="#">Контакти</a>
+                <a asp-area="" asp-controller="Home" asp-action="Privacy">Політика конфіденційності</a>
+            </nav>
+            <p>&copy; @DateTime.Now.Year Amazon Clone. Навчальний проєкт.</p>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
