@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DAL.Repositories.Interfaces;
+﻿using DAL.Repositories.Interfaces;
 using DAL.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repositories
 {
-<<<<<<< HEAD
-    internal class GenericRepository<T> : IGenericRepository<T> where T : class
-=======
     public class GenericRepository<T> : IGenericRepository<T> where T : class
->>>>>>> Adminka
     {
         protected readonly AppDbContext _context;
         protected readonly DbSet<T> _dbSet;
@@ -38,7 +31,7 @@ namespace DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(T entity) 
+        public async Task UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
             await _context.SaveChangesAsync();
