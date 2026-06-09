@@ -1,90 +1,114 @@
-﻿using AmazonMVC.BLL.Services;
+﻿using Amazon.Models;
 using BLL.Interfaces;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Amazon.Controllers
 {
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
-            private readonly IProductService _productService;
-            private readonly IOrderService _orderService;
-            public AdminController(IProductService productService, IOrderService orderService)
-            {
-                _productService = productService;
-                _orderService = orderService;
-            }
+        private readonly IProductService _productService;
+        private readonly IOrderService _orderService;
+        private readonly ICategoryService _categoryService;
 
-
-            public async Task<IActionResult> Index()
-            {
-                var products = await _productService.GetAllProductsAsync();
-                return View(products); 
-            }
-
-            public IActionResult Create() => View();
-
-
-            [HttpPost]
-            public async Task<IActionResult> Create(Product product)
-            {
-                if (ModelState.IsValid)
-                {
-                    await _productService.AddProductAsync(product);
-                    return RedirectToAction(nameof(Index));
-                }
-                return View(product);
-            }
-
-            
-            public async Task<IActionResult> Delete(int id)
-            {
-                await _productService.DeleteProductAsync(id);
-                return RedirectToAction(nameof(Index));
-            }
-
-        //public async Task<IActionResult> Orders()
-        //{
-        //    var orders = await _orderService.GetAllOrdersAsync(); 
-        //    return View(orders);
-        //}
-        public async Task<IActionResult> Orders()
+        public AdminController(IProductService productService, IOrderService orderService, ICategoryService categoryService)
         {
-            var orders = await _orderService.GetAllOrdersAsync();
-
-            // Временно добавь эту строку для проверки:
-            if (orders == null || !orders.Any())
-            {
-                ViewBag.Message = "База заказов пуста или не подключена!";
-            }
-
-            return View(orders);
+            _productService = productService;
+            _orderService = orderService;
+            _categoryService = categoryService;
         }
+
+        public async Task<IActionResult> Index()
+        {
+            var products = await _productService.GetAllProductsAsync();
+            return View(products);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            var categories = await _categoryService.GetAllCategoriesAsync();
+            ViewBag.Categories = new SelectList(categories, "Id", "Name");
+            return View();
+        }
+
         [HttpPost]
-        public async Task<IActionResult> UpdateStatus(int id, OrderStatus status)
+        public async Task<IActionResult> Create(ProductCreateViewModel model)
+        {
+            var (success, message) = await _productService.AddProductAsync(model.Name, model.Price, model.CategoryId, model.Description, model.ImageUrl, model.Quantity);
+            
+            if (!success)
             {
-                await _orderService.ChangeOrderStatusAsync(id, status);
-                return RedirectToAction(nameof(Orders));
+                ModelState.AddModelError(string.Empty, message);
+                var categories = await _categoryService.GetAllCategoriesAsync();
+                ViewBag.Categories = new SelectList(categories, "Id", "Name");
+                return View(model);
             }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             var product = await _productService.GetProductByIdAsync(id);
             if (product == null) return NotFound();
-            return View(product);
+
+            var model = new ProductEditViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Price = product.Price,
+                CategoryId = product.CategoryId,
+                Description = product.Description,
+                ImageUrl = product.ImageUrl,
+                Quantity = product.Quantity
+            };
+
+            var categories = await _categoryService.GetAllCategoriesAsync();
+            ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Product product)
+        public async Task<IActionResult> Edit(ProductEditViewModel model)
         {
-            if (ModelState.IsValid)
+            var (success, message) = await _productService.UpdateProductAsync(model.Id, model.Name, model.Price, model.CategoryId, model.Description, model.ImageUrl, model.Quantity);
+            
+            if (!success)
             {
-                await _productService.UpdateProductAsync(product);
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError(string.Empty, message);
+                var categories = await _categoryService.GetAllCategoriesAsync();
+                ViewBag.Categories = new SelectList(categories, "Id", "Name", model.CategoryId);
+                return View(model);
             }
-            return View(product);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _productService.DeleteProductAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Orders()
+        {
+            var orders = await _orderService.GetAllOrdersAsync();
+            return View(orders);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateStatus(int id, OrderStatus status)
+        {
+            await _orderService.ChangeOrderStatusAsync(id, status);
+            return RedirectToAction(nameof(Orders));
         }
     }
 }

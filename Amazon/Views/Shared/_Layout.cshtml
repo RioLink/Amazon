@@ -36,6 +36,15 @@
                 </form>
 
                 <div class="main-navigation__actions">
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a class="header-link" asp-controller="Admin" asp-action="Index">
+                            <span class="header-link__hint">Панель</span>
+                            <span class="header-link__title">Адмін</span>
+                        </a>
+                    }
+
                     <a class="header-link" asp-area="" asp-controller="Profile" asp-action="Index">
                         <span class="header-link__hint">Вітаємо</span>
                         <span class="header-link__title">Профіль</span>

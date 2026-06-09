@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Domain.Entities;
-using Domain.Enums;
+﻿using Domain.Entities;
 
 namespace BLL.Interfaces
 {
     public interface IProductService
     {
         Task<IEnumerable<Product>> GetAllProductsAsync();
-        Task<Product> GetProductByIdAsync(int id);
-
-        /// /////////////////////////////////
-        Task AddProductAsync(Product product);
-        Task UpdateProductAsync(Product product);
+        Task<Product?> GetProductByIdAsync(int id);
+        Task<(bool Success, string Message)> AddProductAsync(string name, decimal price, int categoryId, string description, string imageUrl, int quantity);
+        Task<(bool Success, string Message)> UpdateProductAsync(int id, string name, decimal price, int categoryId, string description, string imageUrl, int quantity);
         Task DeleteProductAsync(int id);
-        
     }
 }

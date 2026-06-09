@@ -3,6 +3,7 @@ using BLL.Services;
 using DAL.Data;
 using DAL.Repositories;
 using DAL.Repositories.Interfaces;
+using DAL.Seeders;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Identity;
@@ -18,6 +19,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
@@ -42,6 +44,12 @@ using (var scope = app.Services.CreateScope())
         if (!await roleManager.RoleExistsAsync(role))
             await roleManager.CreateAsync(new IdentityRole(role));
     }
+
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    await AdminSeeder.SeedAsync(userManager);
+
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await CategoriesSeeder.SeedAsync(context);
 }
 
 if (!app.Environment.IsDevelopment())

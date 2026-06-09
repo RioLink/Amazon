@@ -1,44 +1,116 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using BLL.Interfaces;
+﻿using BLL.Interfaces;
+using DAL.Repositories.Interfaces;
 using Domain.Entities;
-using DAL.Repositories.Interfaces; 
 
 namespace BLL.Services
 {
     public class ProductService : IProductService
     {
-        private readonly IGenericRepository<Product> _repo;
+        private readonly IGenericRepository<Product> _productRepo;
+        private readonly IGenericRepository<Category> _categoryRepo;
 
-        public ProductService(IGenericRepository<Product> repo)
+        public ProductService(IGenericRepository<Product> productRepo, IGenericRepository<Category> categoryRepo)
         {
-            _repo = repo;
+            _productRepo = productRepo;
+            _categoryRepo = categoryRepo;
         }
 
         public async Task<IEnumerable<Product>> GetAllProductsAsync()
         {
-            
-            return await _repo.GetAllAsync();
+            return await _productRepo.GetAllAsync();
         }
 
         public async Task<Product?> GetProductByIdAsync(int id)
         {
-            return await _repo.GetByIdAsync(id);
+            return await _productRepo.GetByIdAsync(id);
         }
 
-        public async Task AddProductAsync(Product product)
+        public async Task<(bool Success, string Message)> AddProductAsync(string name, decimal price, int categoryId, string description, string imageUrl, int quantity)
         {
-            await _repo.AddAsync(product);
+            if (string.IsNullOrWhiteSpace(name))
+                return (false, "Назва не може бути порожньою");
+
+            if (price <= 0)
+                return (false, "Ціна має бути більше 0");
+
+            if (quantity < 0)
+                return (false, "Кількість не може бути від'ємною");
+
+            var category = await _categoryRepo.GetByIdAsync(categoryId);
+
+            if (category == null)
+                return (false, "Оберіть категорію");
+            
+            if (string.IsNullOrWhiteSpace(description))
+                return (false, "Опис не може бути порожнім");
+
+
+            if (string.IsNullOrWhiteSpace(imageUrl))
+                return (false, "Посилання на зображення не може бути порожнім");
+
+            if (quantity < 0)
+                return (false, "Кількість не може бути від'ємною");
+
+            var newProduct = new Product 
+            {
+                Name = name.Trim(),
+                Price = price,
+                Category = category,
+                Description = description.Trim(),
+                ImageUrl = imageUrl.Trim(),
+                Quantity = quantity
+            };
+
+            await _productRepo.AddAsync(newProduct);
+            return (true, string.Empty);
         }
 
-        public async Task UpdateProductAsync(Product product)
+        public async Task<(bool Success, string Message)> UpdateProductAsync(int id, string name, decimal price, int categoryId, string description, string imageUrl, int quantity)
         {
-            await _repo.UpdateAsync(product);
+            var product = await _productRepo.GetByIdAsync(id);
+
+            if (product == null)
+                return (false, "Продукт не знайдено.");
+                
+            if (string.IsNullOrWhiteSpace(name))
+                return (false, "Назва не може бути порожньою");
+
+            if (price <= 0)
+                return (false, "Ціна має бути більше 0");
+
+            if (quantity < 0)
+                return (false, "Кількість не може бути від'ємною");
+
+            var category = await _categoryRepo.GetByIdAsync(categoryId);
+
+            if (category == null)
+                return (false, "Оберіть категорію");
+
+            if (string.IsNullOrWhiteSpace(description))
+                return (false, "Опис не може бути порожнім");
+
+
+            if (string.IsNullOrWhiteSpace(imageUrl))
+                return (false, "Посилання на зображення не може бути порожнім");
+
+            if (quantity < 0)
+                return (false, "Кількість не може бути від'ємною");
+
+            product.Name = name.Trim();
+            product.Price = price;
+            product.Category = category;
+            product.CategoryId = categoryId;
+            product.Description = description.Trim();
+            product.ImageUrl = imageUrl.Trim();
+            product.Quantity = quantity;
+
+            await _productRepo.UpdateAsync(product);
+            return (true, string.Empty);
         }
 
         public async Task DeleteProductAsync(int id)
         {
-            await _repo.DeleteAsync(id);
+            await _productRepo.DeleteAsync(id);
         }
     }
 }
