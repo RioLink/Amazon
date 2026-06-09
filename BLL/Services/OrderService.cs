@@ -1,22 +1,56 @@
-﻿using BLL.DTOs;
-using BLL.Interfaces;
+﻿using BLL.Interfaces;
+using DAL.Repositories.Interfaces;
+using Domain.Entities;
+using Domain.Enums;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace BLL.Services
+namespace AmazonMVC.BLL.Services
 {
     public class OrderService : IOrderService
     {
-        public async Task<int> CreateOrderAsync(string userId, CheckoutDto model)
+        private readonly IGenericRepository<Order> _orderRepository;
+
+        public OrderService(IGenericRepository<Order> orderRepository)
         {
-            // Возвращаем ID созданного заказа (пока 0)
-            return 0;
+            _orderRepository = orderRepository;
         }
 
-        public async Task<IEnumerable<OrderDto>> GetUserOrdersAsync(string userId)
+        public async Task<Order> CreateOrderAsync(string userId, IEnumerable<OrderItem> items, decimal totalAmount)
         {
-            return new List<OrderDto>();
+            var newOrder = new Order
+            {
+                UserId = userId,
+                Date = DateTime.UtcNow,
+                TotalAmount = totalAmount,
+                Items = (ICollection<OrderItem>)items
+            };
+
+            await _orderRepository.AddAsync(newOrder);
+            return newOrder;
+        }
+
+        public async Task<IEnumerable<Order>> GetUserOrdersAsync(string userId)
+        {
+            var allOrders = await _orderRepository.GetAllAsync();
+            return allOrders.Where(o => o.UserId == userId).ToList();
+        }
+
+        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
+        {
+            return await _orderRepository.GetAllAsync();
+        }
+
+        public async Task ChangeOrderStatusAsync(int orderId, OrderStatus newStatus)
+        {
+            var order = await _orderRepository.GetByIdAsync(orderId);
+            if (order != null)
+            {
+                order.Status = newStatus;
+                await _orderRepository.UpdateAsync(order);
+            }
         }
     }
 }

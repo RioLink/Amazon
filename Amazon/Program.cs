@@ -1,7 +1,18 @@
+<<<<<<< HEAD
 using DAL.Data;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+=======
+using AmazonMVC.BLL.Services;
+using BLL.Interfaces;
+using DAL.Data;
+using DAL.Repositories;
+using DAL.Repositories.Interfaces;
+using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+>>>>>>> Adminka
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +26,14 @@ builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+<<<<<<< HEAD
+=======
+
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IOrderService, OrderService>(); 
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+>>>>>>> Adminka
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -24,6 +43,8 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

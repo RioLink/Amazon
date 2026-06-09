@@ -7,7 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repositories
 {
+<<<<<<< HEAD
     internal class GenericRepository<T> : IGenericRepository<T> where T : class
+=======
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
+>>>>>>> Adminka
     {
         protected readonly AppDbContext _context;
         protected readonly DbSet<T> _dbSet;
