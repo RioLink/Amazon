@@ -22,9 +22,10 @@ namespace Amazon.Controllers
             _categoryService = categoryService;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var products = await _productService.GetAllProductsAsync();
+            var products = (await _productService.GetAllProductsAsync()).Select(p => new ProductAdminViewModel { Id = p.Id, Name = p.Name, Price = p.Price, Quantity = p.Quantity });
             return View(products);
         }
 
@@ -98,10 +99,36 @@ namespace Amazon.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Detailed(int id)
+        {
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null) return NotFound();
+
+            var model = new ProductDetailedViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Price = product.Price,
+                Category = product.Category.Name,
+                Description = product.Description,
+                ImageUrl = product.ImageUrl,
+                Quantity = product.Quantity
+            };
+
+            return View(model);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Orders()
         {
-            var orders = await _orderService.GetAllOrdersAsync();
-            return View(orders);
+            var orderViewModels = (await _orderService.GetAllOrdersAsync()).Select(o => new OrderViewModel
+            {
+                Id = o.Id,
+                Date = o.Date,
+                TotalAmount = o.TotalAmount,
+                Status = o.Status
+            });
+            return View(orderViewModels);
         }
 
         [HttpPost]
