@@ -1,45 +1,97 @@
-﻿@using Domain.Enums
+@using Domain.Enums
 @using Domain.Entities
 @model IEnumerable<OrderViewModel>
 
 @{
-    ViewData["Title"] = "Управління замовленнями";
+    ViewData["Title"] = "Адмін — Замовлення";
 }
 
-<h1>Список замовлень</h1>
+<div class="admin-page">
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar__brand">
+            <span>⚙</span> Адмін панель
+        </div>
+        <nav class="admin-sidebar__nav">
+            <a asp-action="Index" class="admin-sidebar__link">
+                📦 Товари
+            </a>
+            <a asp-action="Orders" class="admin-sidebar__link admin-sidebar__link--active">
+                📋 Замовлення
+            </a>
+            <a asp-controller="Home" asp-action="Index" class="admin-sidebar__link">
+                🏠 На сайт
+            </a>
+        </nav>
+    </aside>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Дата</th>
-            <th>Сума</th>
-            <th>Статус</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var order in Model)
+    <div class="admin-content">
+        <div class="admin-topbar">
+            <h1 class="admin-topbar__title">Управління замовленнями</h1>
+            <span class="admin-topbar__count">Всього: @Model.Count()</span>
+        </div>
+
+        @if (!Model.Any())
         {
-            <tr>
-                <td>@order.Id</td>
-                <td>@order.Date.ToString("dd.MM.yyyy HH:mm")</td>
-                <td>@order.TotalAmount.ToString("C")</td>
-                <td>
-                    <form asp-action="UpdateStatus" method="post" class="form-inline">
-                        <input type="hidden" name="id" value="@order.Id" />
-                        
-                        <div class="input-group">
-                            <select name="status" class="form-control form-control-sm"
-                                    asp-for="@order.Status"
-                                    asp-items="Html.GetEnumSelectList<OrderStatus>()">
-                            </select>
-                            <div class="input-group-append">
-                                <button type="submit" class="btn btn-sm btn-outline-success">✓</button>
-                            </div>
-                        </div>
-                    </form>
-                </td>
-            </tr>
+            <div class="admin-empty">
+                <p>Замовлень ще немає.</p>
+            </div>
         }
-    </tbody>
-</table>
+        else
+        {
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Дата</th>
+                            <th>Сума</th>
+                            <th>Поточний статус</th>
+                            <th>Змінити статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model)
+                        {
+                            <tr>
+                                <td class="admin-table__id">#@order.Id</td>
+                                <td>@order.Date.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td class="admin-table__price">@order.TotalAmount.ToString("N2") ₴</td>
+                                <td>
+                                    <span class="admin-status admin-status--@order.Status.ToString().ToLower()">
+                                        @(order.Status switch {
+                                            OrderStatus.Pending     => "⏳ Очікує",
+                                            OrderStatus.Processing  => "🔄 Обробляється",
+                                            OrderStatus.Shipped     => "🚚 Відправлено",
+                                            OrderStatus.Delivered   => "✅ Доставлено",
+                                            OrderStatus.Cancelled   => "❌ Скасовано",
+                                            _                       => order.Status.ToString()
+                                        })
+                                    </span>
+                                </td>
+                                <td>
+                                    <form asp-action="UpdateStatus" method="post" class="admin-status-form">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <select name="status" class="admin-form__input admin-form__select admin-form__select--sm">
+                                            @foreach (OrderStatus s in Enum.GetValues(typeof(OrderStatus)))
+                                            {
+                                                if (s == order.Status)
+                                                {
+                                                    <option value="@((int)s)" selected>@s</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@((int)s)">@s</option>
+                                                }
+                                            }
+                                        </select>
+                                        <button type="submit" class="admin-btn admin-btn--save">✓</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
