@@ -33,7 +33,9 @@
                 }
             </div>
             <button class="product-card__cart-button" type="button"
-                    data-add-to-cart="@Model.Id" aria-label="Додати @Model.Name у кошик">
+                    data-add-to-cart="@Model.Id"
+                    data-product="@System.Text.Json.JsonSerializer.Serialize(new { id = Model.Id, name = Model.Name, price = Model.Price, imageUrl = Model.ImageUrl, category = Model.Category })"
+                    aria-label="Додати @Model.Name у кошик">
                 <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
                     <path d="M2.5 3.5h2l2.1 10.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 1.9-1.4L21 7H6m3 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm10 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" />
                 </svg>

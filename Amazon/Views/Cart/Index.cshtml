@@ -2,11 +2,71 @@
     ViewData["Title"] = "Кошик";
 }
 
-<div class="empty-state">
+@* Empty state — shown by JS when cart is empty *@
+<div id="cart-empty-state" class="empty-state" hidden>
     <span class="empty-state__icon" aria-hidden="true">🛒</span>
-    <h1>Ваш кошик поки порожній</h1>
+    <h1>Ваш кошик порожній</h1>
     <p>Додайте товари з каталогу, і вони з'являться тут.</p>
-    <a class="amazon-button amazon-button--primary" asp-controller="Product" asp-action="Index">
+    <a class="amazon-button amazon-button--primary"
+       asp-controller="Product" asp-action="Index">
         Перейти до каталогу
     </a>
+</div>
+
+@* Filled state — shown by JS when cart has items *@
+<div id="cart-filled-state" class="cart-page-layout" hidden>
+
+    @* ── Left column: items list ── *@
+    <section class="cart-panel" aria-label="Товари в кошику">
+        <div class="cart-panel__header">
+            <h1>Кошик</h1>
+            <button id="clear-cart-btn" class="cart-panel__clear" type="button">
+                Очистити кошик
+            </button>
+        </div>
+        <ul class="cart-items-list"
+            id="cart-items-list"
+            aria-live="polite"
+            aria-label="Список товарів у кошику">
+        </ul>
+    </section>
+
+    @* ── Right column: order summary ── *@
+    <aside class="cart-summary" aria-label="Підсумок замовлення">
+        <h2>Підсумок</h2>
+
+        <div class="cart-summary__rows">
+            <div class="cart-summary__row">
+                <span>Товари</span>
+                <span id="cart-subtotal">0 ₴</span>
+            </div>
+            <div class="cart-summary__row" id="cart-shipping-row">
+                <span>Доставка</span>
+                <span id="cart-shipping">0 ₴</span>
+            </div>
+        </div>
+
+        <hr class="cart-summary__divider" />
+
+        <div class="cart-summary__total">
+            <span>Разом</span>
+            <span id="cart-total">0 ₴</span>
+        </div>
+
+        <a class="amazon-button amazon-button--primary cart-summary__checkout-btn"
+           asp-controller="Checkout" asp-action="Index">
+            Оформити замовлення →
+        </a>
+
+        <p class="cart-summary__note">
+            🔒 Безпечна оплата &nbsp;·&nbsp; Повернення протягом 30 днів
+        </p>
+
+        <div class="cart-summary__continue">
+            <a asp-controller="Product" asp-action="Index">
+                ← Продовжити покупки
+            </a>
+        </div>
+    </aside>
+
 </div>

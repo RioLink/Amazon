@@ -24,8 +24,10 @@
             }
         </div>
         <button class="amazon-button amazon-button--primary"
-                type="button" data-add-to-cart="@Model.Id">
-            Додати в кошик
+                type="button"
+                data-add-to-cart="@Model.Id"
+                data-product="@System.Text.Json.JsonSerializer.Serialize(new { id = Model.Id, name = Model.Name, price = Model.Price, imageUrl = Model.ImageUrl, category = Model.Category })">
+            🛒 Додати в кошик
         </button>
     </div>
 </div>

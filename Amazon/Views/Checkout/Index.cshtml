@@ -1,0 +1,158 @@
+@{
+    ViewData["Title"] = "Оформлення замовлення";
+}
+
+<div class="page-heading">
+    <span class="section-heading__eyebrow">Оформлення</span>
+    <h1>Оформлення замовлення</h1>
+    <p>Заповніть дані для доставки та оберіть зручний спосіб оплати.</p>
+</div>
+
+<div class="checkout-layout">
+
+    @* ── Left column: form ── *@
+    <form id="checkout-form" class="checkout-form-panel" novalidate>
+
+        @* Step 1 – Delivery *@
+        <section class="checkout-section">
+            <h2 class="checkout-section__title">
+                <span class="checkout-section__num" aria-hidden="true">1</span>
+                Дані для доставки
+            </h2>
+
+            <div class="form-group">
+                <label for="fullName">Повне ім'я *</label>
+                <input type="text"
+                       id="fullName" name="fullName"
+                       placeholder="Іваненко Іван Іванович"
+                       autocomplete="name"
+                       aria-required="true" />
+                <span class="form-group__error" id="err-fullName" role="alert"></span>
+            </div>
+
+            <div class="form-row form-row--2">
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email"
+                           id="email" name="email"
+                           placeholder="example@email.com"
+                           autocomplete="email"
+                           aria-required="true" />
+                    <span class="form-group__error" id="err-email" role="alert"></span>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Телефон *</label>
+                    <input type="tel"
+                           id="phone" name="phone"
+                           placeholder="+380 99 999 99 99"
+                           autocomplete="tel"
+                           aria-required="true" />
+                    <span class="form-group__error" id="err-phone" role="alert"></span>
+                </div>
+            </div>
+
+            <div class="form-row form-row--2">
+                <div class="form-group">
+                    <label for="city">Місто *</label>
+                    <input type="text"
+                           id="city" name="city"
+                           placeholder="Київ"
+                           autocomplete="address-level2"
+                           aria-required="true" />
+                    <span class="form-group__error" id="err-city" role="alert"></span>
+                </div>
+                <div class="form-group">
+                    <label for="postal">Поштовий індекс *</label>
+                    <input type="text"
+                           id="postal" name="postal"
+                           placeholder="01001"
+                           autocomplete="postal-code"
+                           maxlength="10"
+                           aria-required="true" />
+                    <span class="form-group__error" id="err-postal" role="alert"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="address">Вулиця, будинок, квартира *</label>
+                <input type="text"
+                       id="address" name="address"
+                       placeholder="вул. Хрещатик, 1, кв. 5"
+                       autocomplete="street-address"
+                       aria-required="true" />
+                <span class="form-group__error" id="err-address" role="alert"></span>
+            </div>
+        </section>
+
+        @* Step 2 – Payment *@
+        <section class="checkout-section">
+            <h2 class="checkout-section__title">
+                <span class="checkout-section__num" aria-hidden="true">2</span>
+                Спосіб оплати
+            </h2>
+
+            <div class="payment-methods" role="radiogroup" aria-label="Оберіть спосіб оплати">
+                <div class="payment-method">
+                    <input type="radio" id="pay-card" name="payment" value="card" checked />
+                    <label for="pay-card">
+                        <span class="payment-method__icon" aria-hidden="true">💳</span>
+                        Карткою
+                    </label>
+                </div>
+                <div class="payment-method">
+                    <input type="radio" id="pay-cash" name="payment" value="cash" />
+                    <label for="pay-cash">
+                        <span class="payment-method__icon" aria-hidden="true">💵</span>
+                        Готівкою
+                    </label>
+                </div>
+                <div class="payment-method">
+                    <input type="radio" id="pay-digital" name="payment" value="digital" />
+                    <label for="pay-digital">
+                        <span class="payment-method__icon" aria-hidden="true">📱</span>
+                        Apple / Google Pay
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        @* Submit *@
+        <button class="amazon-button amazon-button--primary checkout-submit-btn"
+                type="submit">
+            Підтвердити замовлення →
+        </button>
+
+    </form>
+
+    @* ── Right column: order summary ── *@
+    <aside class="checkout-summary" aria-label="Ваше замовлення">
+        <h2>Ваше замовлення</h2>
+
+        <ul class="checkout-summary__items"
+            id="checkout-summary-items"
+            aria-live="polite"></ul>
+
+        <hr class="checkout-summary__divider" />
+
+        <div class="checkout-summary__rows">
+            <div class="checkout-summary__row">
+                <span>Товари</span>
+                <span id="checkout-subtotal">—</span>
+            </div>
+            <div class="checkout-summary__row" id="checkout-shipping-row">
+                <span>Доставка</span>
+                <span id="checkout-shipping">—</span>
+            </div>
+        </div>
+
+        <div class="checkout-summary__total">
+            <span>Разом</span>
+            <span id="checkout-total">—</span>
+        </div>
+
+        <p class="checkout-summary__secure">
+            🔒 Захищена транзакція
+        </p>
+    </aside>
+
+</div>

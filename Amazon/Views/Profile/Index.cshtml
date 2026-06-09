@@ -2,17 +2,99 @@
     ViewData["Title"] = "Профіль";
 }
 
-<div class="profile-layout">
-    <section class="profile-card">
-        <div class="profile-card__avatar" aria-hidden="true">A</div>
-        <div>
-            <span class="section-heading__eyebrow">Особистий кабінет</span>
-            <h1>Вітаємо в Amazon Clone</h1>
-            <p>Після підключення авторизації тут з'являться дані користувача.</p>
+<div class="profile-page-layout">
+
+    @* ── Sidebar ── *@
+    <aside class="profile-sidebar">
+
+        <div class="profile-avatar-card">
+            <div class="profile-avatar" aria-hidden="true">👤</div>
+            <h2>Мій акаунт</h2>
+            <p>Гість &nbsp;·&nbsp; Авторизація незабаром</p>
         </div>
-    </section>
-    <section class="profile-panel">
-        <h2>Мої замовлення</h2>
-        <p>Історія замовлень поки порожня.</p>
-    </section>
+
+        <nav aria-label="Меню профілю">
+            <ul class="profile-nav">
+                <li>
+                    <a class="is-active"
+                       asp-controller="Profile" asp-action="Index">
+                        <span class="nav-icon" aria-hidden="true">📦</span>
+                        Мої замовлення
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Product" asp-action="Index">
+                        <span class="nav-icon" aria-hidden="true">🛍️</span>
+                        Каталог товарів
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Cart" asp-action="Index">
+                        <span class="nav-icon" aria-hidden="true">🛒</span>
+                        Кошик
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <span class="nav-icon" aria-hidden="true">🏠</span>
+                        Головна
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+    </aside>
+
+    @* ── Main content ── *@
+    <main class="profile-main">
+
+        @* Orders history *@
+        <section class="profile-section">
+            <div class="profile-section__header">
+                <h2>
+                    Мої замовлення
+                    <span class="profile-section__count">(<span id="orders-count">0</span>)</span>
+                </h2>
+            </div>
+
+            <div id="orders-container">
+                @* Populated by JS from localStorage *@
+                <div class="orders-empty">
+                    <div class="orders-empty__icon" aria-hidden="true">📦</div>
+                    <p>Завантаження замовлень…</p>
+                </div>
+            </div>
+        </section>
+
+        @* Account settings placeholder *@
+        <section class="profile-section">
+            <div class="profile-section__header">
+                <h2>Налаштування акаунту</h2>
+            </div>
+            <p class="profile-section__placeholder">
+                Управління профілем (ім'я, пароль, адреси доставки) буде доступне
+                після підключення системи авторизації.
+            </p>
+            <div class="profile-settings-preview">
+                <div class="profile-setting-row profile-setting-row--disabled">
+                    <span class="profile-setting-row__label">👤 Ім'я та прізвище</span>
+                    <span class="profile-setting-row__hint">Незабаром</span>
+                </div>
+                <div class="profile-setting-row profile-setting-row--disabled">
+                    <span class="profile-setting-row__label">✉️ Email-адреса</span>
+                    <span class="profile-setting-row__hint">Незабаром</span>
+                </div>
+                <div class="profile-setting-row profile-setting-row--disabled">
+                    <span class="profile-setting-row__label">🔒 Пароль</span>
+                    <span class="profile-setting-row__hint">Незабаром</span>
+                </div>
+                <div class="profile-setting-row profile-setting-row--disabled">
+                    <span class="profile-setting-row__label">📍 Адреси доставки</span>
+                    <span class="profile-setting-row__hint">Незабаром</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
 </div>
