@@ -1,34 +1,36 @@
-﻿@model ProductCreateViewModel
+﻿@model ProductEditViewModel
 
-<h1>Додати товар</h1>
+<h1>Редагувати товар</h1>
 
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="All" class="text-danger"></div>
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <div class="form-group">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group mb-3">
         <label>Назва</label>
         <input asp-for="Name" class="form-control" />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
-    <div class="form-group">
+    <div class="form-group mb-3">
         <label>Ціна</label>
         <input asp-for="Price" class="form-control" />
         <span asp-validation-for="Price" class="text-danger"></span>
     </div>
-    <div class="form-group">
+    <div class="form-group mb-3">
         <label>Опис</label>
         <input asp-for="Description" class="form-control" />
     </div>
-    <div class="form-group">
+    <div class="form-group mb-3">
         <label>Кількість</label>
         <input asp-for="Quantity" class="form-control" />
         <span asp-validation-for="Quantity" class="text-danger"></span>
     </div>
-    <div class="form-group">
+    <div class="form-group mb-3">
         <label>Зображення (URL)</label>
         <input asp-for="ImageUrl" class="form-control" />
     </div>
-    <div class="form-group">
+    <div class="form-group mb-3">
         <label>Категорія</label>
         <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-control">
             <option value="">-- Оберіть категорію --</option>
@@ -36,6 +38,6 @@
         <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-success mt-2">Створити</button>
+    <button type="submit" class="btn btn-primary mt-2">Зберегти</button>
     <a asp-action="Index" class="btn btn-secondary mt-2">Скасувати</a>
 </form>
