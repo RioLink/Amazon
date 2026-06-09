@@ -1,0 +1,110 @@
+@{ ViewData["Title"] = "Політика конфіденційності"; }
+
+<div class="policy-page">
+    <a asp-controller="Home" asp-action="Index" class="policy-back">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clip-rule="evenodd"/></svg>
+        На головну
+    </a>
+
+    <div class="policy-hero">
+        <span class="policy-hero__icon">🔒</span>
+        <h1 class="policy-hero__title">Політика конфіденційності</h1>
+        <p class="policy-hero__meta">Остання редакція: <span>01 червня 2026 р.</span></p>
+    </div>
+
+    <div class="policy-toc">
+        <p class="policy-toc__title">Зміст</p>
+        <ul class="policy-toc__list">
+            <li><a href="#s1">1. Які дані ми збираємо</a></li>
+            <li><a href="#s2">2. Як ми використовуємо дані</a></li>
+            <li><a href="#s3">3. Зберігання та захист даних</a></li>
+            <li><a href="#s4">4. Передача даних третім особам</a></li>
+            <li><a href="#s5">5. Файли cookie</a></li>
+            <li><a href="#s6">6. Ваші права</a></li>
+            <li><a href="#s7">7. Зміни до політики</a></li>
+            <li><a href="#s8">8. Контакти</a></li>
+        </ul>
+    </div>
+
+    <div class="policy-body">
+
+        <div class="policy-section" id="s1">
+            <h2 class="policy-section__heading"><span class="policy-section__num">1</span>Які дані ми збираємо</h2>
+            <p>При використанні платформи Amazon ITStep ми можемо збирати такі категорії персональних даних:</p>
+            <ul>
+                <li><strong>Реєстраційні дані:</strong> ім'я користувача, адреса електронної пошти, захешований пароль.</li>
+                <li><strong>Адреси доставки:</strong> ім'я отримувача, номер телефону, місто, вулиця, будинок, квартира, поштовий індекс.</li>
+                <li><strong>Дані замовлень:</strong> перелік товарів, суми, дата, статус замовлення.</li>
+                <li><strong>Аватар:</strong> зображення профілю, яке ви завантажуєте добровільно.</li>
+                <li><strong>Технічні дані:</strong> IP-адреса, тип браузера, дані cookie (мова сайту).</li>
+            </ul>
+            <div class="policy-highlight">Ми не збираємо платіжні дані (номери карток, CVV тощо). Усі платежі обробляються зовнішніми сертифікованими сервісами.</div>
+        </div>
+
+        <div class="policy-section" id="s2">
+            <h2 class="policy-section__heading"><span class="policy-section__num">2</span>Як ми використовуємо дані</h2>
+            <p>Зібрані дані використовуються виключно для таких цілей:</p>
+            <ul>
+                <li>Ідентифікація та автентифікація користувача на платформі.</li>
+                <li>Обробка та доставка замовлень за вказаними адресами.</li>
+                <li>Надсилання листів для відновлення паролю або підтвердження дій.</li>
+                <li>Персоналізація інтерфейсу (збережена мова, регіон доставки).</li>
+                <li>Покращення роботи платформи на основі аналізу поведінки користувачів (в анонімному вигляді).</li>
+            </ul>
+        </div>
+
+        <div class="policy-section" id="s3">
+            <h2 class="policy-section__heading"><span class="policy-section__num">3</span>Зберігання та захист даних</h2>
+            <p>Усі персональні дані зберігаються в захищеній базі даних SQL Server. Паролі ніколи не зберігаються у відкритому вигляді — лише у вигляді криптографічного хешу (ASP.NET Core Identity PBKDF2).</p>
+            <p>Сервери захищені стандартними заходами безпеки: HTTPS (TLS 1.2/1.3), валідація вхідних даних, захист від CSRF-атак (антипідробний токен), захист від XSS через Razor HTML-encoding.</p>
+        </div>
+
+        <div class="policy-section" id="s4">
+            <h2 class="policy-section__heading"><span class="policy-section__num">4</span>Передача даних третім особам</h2>
+            <p>Ми не продаємо та не передаємо ваші персональні дані стороннім організаціям, крім таких випадків:</p>
+            <ul>
+                <li><strong>Служби доставки:</strong> ім'я, телефон і адреса для організації доставки замовлення.</li>
+                <li><strong>Email-провайдери:</strong> SMTP-сервер (Gmail або інший) для надсилання системних листів.</li>
+                <li><strong>Вимоги закону:</strong> за офіційним запитом правоохоронних органів України.</li>
+            </ul>
+        </div>
+
+        <div class="policy-section" id="s5">
+            <h2 class="policy-section__heading"><span class="policy-section__num">5</span>Файли cookie</h2>
+            <p>Ми використовуємо такі файли cookie:</p>
+            <ul>
+                <li><strong>.AspNetCore.Culture</strong> — зберігає обрану мову інтерфейсу (uk/en). Термін дії: 1 рік.</li>
+                <li><strong>.AspNetCore.Cookies</strong> — сесійна cookie авторизації. Термін дії: до закриття браузера або виходу.</li>
+                <li><strong>LocalStorage</strong> — дані кошика та обраний регіон доставки (зберігаються у браузері, не на сервері).</li>
+            </ul>
+            <p>Ми не використовуємо рекламні або відстежувальні cookie третіх сторін.</p>
+        </div>
+
+        <div class="policy-section" id="s6">
+            <h2 class="policy-section__heading"><span class="policy-section__num">6</span>Ваші права</h2>
+            <p>Відповідно до Закону України «Про захист персональних даних» ви маєте право:</p>
+            <ul>
+                <li>🔍 <strong>Доступ:</strong> отримати інформацію про те, які ваші дані ми маємо.</li>
+                <li>✏️ <strong>Виправлення:</strong> оновити або виправити ваші персональні дані в розділі «Профіль».</li>
+                <li>🗑️ <strong>Видалення:</strong> подати запит на видалення акаунту та всіх пов'язаних даних.</li>
+                <li>📦 <strong>Перенесення:</strong> отримати ваші дані у машиночитаному форматі.</li>
+                <li>🚫 <strong>Заперечення:</strong> відмовитись від обробки даних у маркетингових цілях.</li>
+            </ul>
+            <p>Для реалізації прав звертайтесь: <a href="mailto:privacy@amazon-itstep.com" style="color:var(--amazon-orange-dark)">privacy@amazon-itstep.com</a></p>
+        </div>
+
+        <div class="policy-section" id="s7">
+            <h2 class="policy-section__heading"><span class="policy-section__num">7</span>Зміни до політики</h2>
+            <p>Ми залишаємо за собою право змінювати цю Політику конфіденційності. Про суттєві зміни ми повідомимо електронним листом або сповіщенням на сайті не менш ніж за 7 днів до набуття чинності.</p>
+            <p>Продовження користування сайтом після внесення змін означає вашу згоду з новою версією Політики.</p>
+        </div>
+
+        <div class="policy-section" id="s8">
+            <h2 class="policy-section__heading"><span class="policy-section__num">8</span>Контакти</h2>
+            <p>З питань конфіденційності звертайтесь:</p>
+            <p>📧 <a href="mailto:privacy@amazon-itstep.com" style="color:var(--amazon-orange-dark)">privacy@amazon-itstep.com</a></p>
+            <p>🏢 Amazon ITStep, навчальний проєкт ITStep Academy, Україна</p>
+        </div>
+
+    </div>
+</div>

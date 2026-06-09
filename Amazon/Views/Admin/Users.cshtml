@@ -1,0 +1,154 @@
+@model IEnumerable<Amazon.Models.UserAdminViewModel>
+
+@{
+    ViewData["Title"] = "Користувачі";
+    ViewData["ActiveNav"] = "users";
+    var total   = Model.Count();
+    var admins  = Model.Count(u => u.IsAdmin);
+    var locked  = Model.Count(u => u.IsLocked);
+    var withAvatar = Model.Count(u => !string.IsNullOrEmpty(u.AvatarPath));
+}
+
+<!-- Stats -->
+<div class="admin-stats">
+    <div class="admin-stat-card admin-stat-card--blue">
+        <div class="admin-stat-card__icon">👥</div>
+        <div class="admin-stat-card__body">
+            <span class="admin-stat-card__value">@total</span>
+            <span class="admin-stat-card__label">Всього користувачів</span>
+        </div>
+    </div>
+    <div class="admin-stat-card admin-stat-card--orange">
+        <div class="admin-stat-card__icon">⚙️</div>
+        <div class="admin-stat-card__body">
+            <span class="admin-stat-card__value">@admins</span>
+            <span class="admin-stat-card__label">Адміністраторів</span>
+        </div>
+    </div>
+    <div class="admin-stat-card admin-stat-card--red">
+        <div class="admin-stat-card__icon">🔒</div>
+        <div class="admin-stat-card__body">
+            <span class="admin-stat-card__value">@locked</span>
+            <span class="admin-stat-card__label">Заблоковано</span>
+        </div>
+    </div>
+    <div class="admin-stat-card admin-stat-card--green">
+        <div class="admin-stat-card__icon">🖼️</div>
+        <div class="admin-stat-card__body">
+            <span class="admin-stat-card__value">@withAvatar</span>
+            <span class="admin-stat-card__label">З аватаром</span>
+        </div>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="admin-alert admin-alert--success">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+        @TempData["Success"]
+    </div>
+}
+
+<!-- Table -->
+<div class="admin-section">
+    <div class="admin-section__head">
+        <div class="admin-section__head-left">
+            <h2 class="admin-section__title">Список користувачів</h2>
+            <span class="admin-section__count">@total акаунтів</span>
+        </div>
+    </div>
+
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Користувач</th>
+                    <th>Email</th>
+                    <th>Ролі</th>
+                    <th>Адреси</th>
+                    <th>Статус</th>
+                    <th class="admin-table__th--actions">Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model.OrderBy(u => u.UserName))
+                {
+                    <tr class="admin-table__row @(u.IsLocked ? "admin-table__row--locked" : "")">
+                        <td>
+                            <div class="admin-user-cell">
+                                @if (!string.IsNullOrEmpty(u.AvatarPath))
+                                {
+                                    <img class="admin-user-avatar" src="@u.AvatarPath" alt="@u.UserName" />
+                                }
+                                else
+                                {
+                                    <div class="admin-user-avatar admin-user-avatar--letter">
+                                        @u.UserName.Substring(0, 1).ToUpper()
+                                    </div>
+                                }
+                                <span class="admin-table__name">@u.UserName</span>
+                            </div>
+                        </td>
+                        <td class="admin-table__muted">@(string.IsNullOrEmpty(u.Email) ? "—" : u.Email)</td>
+                        <td>
+                            @foreach (var role in u.Roles)
+                            {
+                                <span class="admin-role-badge @(role == "Admin" ? "admin-role-badge--admin" : "admin-role-badge--user")">
+                                    @role
+                                </span>
+                            }
+                            @if (!u.Roles.Any())
+                            {
+                                <span class="admin-role-badge admin-role-badge--user">User</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="admin-badge @(u.AddressCount > 0 ? "admin-badge--success" : "admin-badge--warning")">
+                                @u.AddressCount адр.
+                            </span>
+                        </td>
+                        <td>
+                            @if (u.IsLocked)
+                            {
+                                <span class="admin-order-status admin-order-status--cancelled">🔒 Заблоковано</span>
+                            }
+                            else
+                            {
+                                <span class="admin-order-status admin-order-status--delivered">✅ Активний</span>
+                            }
+                        </td>
+                        <td class="admin-table__actions">
+                            @if (!u.IsAdmin)
+                            {
+                                <form asp-action="ToggleLock" asp-route-id="@u.Id" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="admin-icon-btn @(u.IsLocked ? "admin-icon-btn--view" : "admin-icon-btn--delete")"
+                                            title="@(u.IsLocked ? "Розблокувати" : "Заблокувати")"
+                                            onclick="return confirm('@(u.IsLocked ? $"Розблокувати {u.UserName}?" : $"Заблокувати {u.UserName}?")')">
+                                        @if (u.IsLocked)
+                                        {
+                                            <svg viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M14.5 1A4.5 4.5 0 0 0 10 5.5V9H3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1.5V5.5a3 3 0 1 1 6 0v2.75a.75.75 0 0 0 1.5 0V5.5A4.5 4.5 0 0 0 14.5 1Z" clip-rule="evenodd"/>
+                                            </svg>
+                                        }
+                                        else
+                                        {
+                                            <svg viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clip-rule="evenodd"/>
+                                            </svg>
+                                        }
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="admin-table__muted" title="Адміністраторів не можна заблокувати">—</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

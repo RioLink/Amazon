@@ -1,97 +1,127 @@
 @using Domain.Enums
-@using Domain.Entities
 @model IEnumerable<OrderViewModel>
 
 @{
-    ViewData["Title"] = "Адмін — Замовлення";
+    ViewData["Title"] = "Замовлення";
+    ViewData["ActiveNav"] = "orders";
+    var total     = Model.Count();
+    var pending   = Model.Count(o => o.Status == OrderStatus.Pending);
+    var shipped   = Model.Count(o => o.Status == OrderStatus.Shipped);
+    var delivered = Model.Count(o => o.Status == OrderStatus.Delivered);
+    var revenue   = Model.Where(o => o.Status != OrderStatus.Cancelled).Sum(o => o.TotalAmount);
 }
 
-<div class="admin-page">
-    <aside class="admin-sidebar">
-        <div class="admin-sidebar__brand">
-            <span>⚙</span> Адмін панель
+<!-- Stats cards -->
+<div class="admin-stats">
+    <div class="admin-stat-card admin-stat-card--blue">
+        <div class="admin-stat-card__icon">📋</div>
+        <div class="admin-stat-card__body">
+            <span class="admin-stat-card__value">@total</span>
+            <span class="admin-stat-card__label">Всього замовлень</span>
         </div>
-        <nav class="admin-sidebar__nav">
-            <a asp-action="Index" class="admin-sidebar__link">
-                📦 Товари
-            </a>
-            <a asp-action="Orders" class="admin-sidebar__link admin-sidebar__link--active">
-                📋 Замовлення
-            </a>
-            <a asp-controller="Home" asp-action="Index" class="admin-sidebar__link">
-                🏠 На сайт
-            </a>
-        </nav>
-    </aside>
-
-    <div class="admin-content">
-        <div class="admin-topbar">
-            <h1 class="admin-topbar__title">Управління замовленнями</h1>
-            <span class="admin-topbar__count">Всього: @Model.Count()</span>
-        </div>
-
-        @if (!Model.Any())
-        {
-            <div class="admin-empty">
-                <p>Замовлень ще немає.</p>
-            </div>
-        }
-        else
-        {
-            <div class="admin-table-wrap">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Дата</th>
-                            <th>Сума</th>
-                            <th>Поточний статус</th>
-                            <th>Змінити статус</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var order in Model)
-                        {
-                            <tr>
-                                <td class="admin-table__id">#@order.Id</td>
-                                <td>@order.Date.ToString("dd.MM.yyyy HH:mm")</td>
-                                <td class="admin-table__price">@order.TotalAmount.ToString("N2") ₴</td>
-                                <td>
-                                    <span class="admin-status admin-status--@order.Status.ToString().ToLower()">
-                                        @(order.Status switch {
-                                            OrderStatus.Pending     => "⏳ Очікує",
-                                            OrderStatus.Processing  => "🔄 Обробляється",
-                                            OrderStatus.Shipped     => "🚚 Відправлено",
-                                            OrderStatus.Delivered   => "✅ Доставлено",
-                                            OrderStatus.Cancelled   => "❌ Скасовано",
-                                            _                       => order.Status.ToString()
-                                        })
-                                    </span>
-                                </td>
-                                <td>
-                                    <form asp-action="UpdateStatus" method="post" class="admin-status-form">
-                                        <input type="hidden" name="id" value="@order.Id" />
-                                        <select name="status" class="admin-form__input admin-form__select admin-form__select--sm">
-                                            @foreach (OrderStatus s in Enum.GetValues(typeof(OrderStatus)))
-                                            {
-                                                if (s == order.Status)
-                                                {
-                                                    <option value="@((int)s)" selected>@s</option>
-                                                }
-                                                else
-                                                {
-                                                    <option value="@((int)s)">@s</option>
-                                                }
-                                            }
-                                        </select>
-                                        <button type="submit" class="admin-btn admin-btn--save">✓</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
     </div>
+    <div class="admin-stat-card admin-stat-card--orange">
+        <div class="admin-stat-card__icon">⏳</div>
+        <div class="admin-stat-card__body">
+            <span class="admin-stat-card__value">@pending</span>
+            <span class="admin-stat-card__label">Очікують обробки</span>
+        </div>
+    </div>
+    <div class="admin-stat-card admin-stat-card--purple">
+        <div class="admin-stat-card__icon">🚚</div>
+        <div class="admin-stat-card__body">
+            <span class="admin-stat-card__value">@shipped</span>
+            <span class="admin-stat-card__label">Відправлено</span>
+        </div>
+    </div>
+    <div class="admin-stat-card admin-stat-card--green">
+        <div class="admin-stat-card__icon">💵</div>
+        <div class="admin-stat-card__body">
+            <span class="admin-stat-card__value">@revenue.ToString("N0") ₴</span>
+            <span class="admin-stat-card__label">Виручка</span>
+        </div>
+    </div>
+</div>
+
+<!-- Table section -->
+<div class="admin-section">
+    <div class="admin-section__head">
+        <div class="admin-section__head-left">
+            <h2 class="admin-section__title">Список замовлень</h2>
+            <span class="admin-section__count">@total замовлень</span>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="admin-empty">
+            <div class="admin-empty__icon">📋</div>
+            <p class="admin-empty__title">Замовлень ще немає</p>
+            <p class="admin-empty__sub">Тут з'являться замовлення покупців</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th class="admin-table__th--id">ID</th>
+                        <th>Дата</th>
+                        <th>Сума</th>
+                        <th>Статус</th>
+                        <th class="admin-table__th--actions">Змінити статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr class="admin-table__row">
+                            <td class="admin-table__id">#@order.Id</td>
+                            <td class="admin-table__date">@order.Date.ToString("dd.MM.yyyy")<br/><small>@order.Date.ToString("HH:mm")</small></td>
+                            <td><span class="admin-table__price">@order.TotalAmount.ToString("N2") ₴</span></td>
+                            <td>
+                                @{
+                                    var (statusIcon, statusClass, statusText) = order.Status switch {
+                                        OrderStatus.Pending    => ("⏳", "pending",    "Очікує"),
+                                        OrderStatus.Processing => ("🔄", "processing", "Обробляється"),
+                                        OrderStatus.Shipped    => ("🚚", "shipped",    "Відправлено"),
+                                        OrderStatus.Delivered  => ("✅", "delivered",  "Доставлено"),
+                                        OrderStatus.Cancelled  => ("❌", "cancelled",  "Скасовано"),
+                                        _                      => ("",   "",            order.Status.ToString())
+                                    };
+                                }
+                                <span class="admin-order-status admin-order-status--@statusClass">
+                                    @statusIcon @statusText
+                                </span>
+                            </td>
+                            <td>
+                                <form asp-action="UpdateStatus" method="post" class="admin-status-form">
+                                    <input type="hidden" name="id" value="@order.Id" />
+                                    <select name="status" class="admin-status-select">
+                                        @foreach (OrderStatus s in Enum.GetValues(typeof(OrderStatus)))
+                                        {
+                                            if (s == order.Status)
+                                            {
+                                                <option value="@((int)s)" selected>@s</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@((int)s)">@s</option>
+                                            }
+                                        }
+                                    </select>
+                                    <button type="submit" class="admin-status-save" title="Зберегти">
+                                        <svg viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>

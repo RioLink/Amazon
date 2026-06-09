@@ -1,0 +1,92 @@
+@{ ViewData["Title"] = "Про нас"; }
+
+<div class="policy-page">
+    <a asp-controller="Home" asp-action="Index" class="policy-back">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clip-rule="evenodd"/></svg>
+        На головну
+    </a>
+
+    <div class="policy-hero">
+        <span class="policy-hero__icon">🏢</span>
+        <h1 class="policy-hero__title">Про нас — Amazon ITStep</h1>
+        <p class="policy-hero__meta">Навчальний проєкт · <span>ITStep Academy</span> · 2026</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="policy-body" style="margin-bottom:20px">
+        <div class="about-stats">
+            <div class="about-stat">
+                <span class="about-stat__num">50K+</span>
+                <span class="about-stat__label">Товарів</span>
+            </div>
+            <div class="about-stat">
+                <span class="about-stat__num">120K+</span>
+                <span class="about-stat__label">Покупців</span>
+            </div>
+            <div class="about-stat">
+                <span class="about-stat__num">24/7</span>
+                <span class="about-stat__label">Підтримка</span>
+            </div>
+            <div class="about-stat">
+                <span class="about-stat__num">2026</span>
+                <span class="about-stat__label">Рік заснування</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards -->
+    <div class="policy-body" style="margin-bottom:20px">
+        <div class="about-grid">
+            <div class="about-card">
+                <div class="about-card__icon">🎯</div>
+                <h3 class="about-card__title">Наша місія</h3>
+                <p class="about-card__text">Створити зручну, швидку та безпечну платформу для онлайн-покупок, яка об'єднує покупців та продавців по всій Україні.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card__icon">🚀</div>
+                <h3 class="about-card__title">Наш підхід</h3>
+                <p class="about-card__text">Використовуємо найсучасніші технології (.NET 10, ASP.NET Core MVC, SQL Server) для побудови масштабованої та надійної платформи.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card__icon">🎓</div>
+                <h3 class="about-card__title">Навчальний проєкт</h3>
+                <p class="about-card__text">Amazon ITStep — це дипломний навчальний проєкт студентів ITStep Academy. Ми демонструємо повний цикл розробки сучасного вебзастосунку.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card__icon">🌍</div>
+                <h3 class="about-card__title">Охоплення</h3>
+                <p class="about-card__text">Доставка в усі 25 областей України. Підтримка двох мов — української та англійської. Зручно для кожного покупця.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="policy-body">
+        <div class="policy-section">
+            <h2 class="policy-section__heading"><span class="policy-section__num">1</span>Хто ми</h2>
+            <p>Amazon ITStep — це навчальний інтернет-магазин, розроблений студентами ITStep Academy як дипломний проєкт. Платформа демонструє повний стек сучасної веброзробки на базі <strong>ASP.NET Core MVC (.NET 10)</strong>, Entity Framework Core та SQL Server.</p>
+            <p>Ми прагнемо створити продукт, максимально наближений до реального комерційного рішення, із повноцінною авторизацією, адмін-панеллю, кошиком, замовленнями та профілем користувача.</p>
+        </div>
+        <div class="policy-section">
+            <h2 class="policy-section__heading"><span class="policy-section__num">2</span>Технічний стек</h2>
+            <ul>
+                <li><strong>Backend:</strong> ASP.NET Core MVC (.NET 10), Clean Architecture</li>
+                <li><strong>Database:</strong> SQL Server LocalDB, Entity Framework Core 10</li>
+                <li><strong>Auth:</strong> ASP.NET Core Identity з ролями (Admin / User)</li>
+                <li><strong>Frontend:</strong> Razor Views, власний CSS (без Bootstrap-залежності у дизайні)</li>
+                <li><strong>Email:</strong> MailKit (SMTP) для відновлення паролю</li>
+                <li><strong>Localization:</strong> IStringLocalizer, CookieRequestCultureProvider (UK/EN)</li>
+            </ul>
+        </div>
+        <div class="policy-section">
+            <h2 class="policy-section__heading"><span class="policy-section__num">3</span>Команда</h2>
+            <p>Проєкт розробляється командою студентів ITStep Academy під менторством досвідчених викладачів. Ми вивчаємо реальні підходи до розробки ентерпрайз-застосунків на платформі .NET.</p>
+            <div class="policy-highlight">💡 Хочеш приєднатись до ITStep? Відвідай <strong>itstep.org</strong> та дізнайся про курси з .NET-розробки.</div>
+        </div>
+        <div class="policy-section">
+            <h2 class="policy-section__heading"><span class="policy-section__num">4</span>Контакти</h2>
+            <p>📧 Email: <a href="mailto:support@amazon-itstep.com" style="color:var(--amazon-orange-dark)">support@amazon-itstep.com</a></p>
+            <p>📍 Адреса: Україна, навчальний простір ITStep Academy</p>
+            <p>🌐 Сайт: <a href="https://itstep.org" target="_blank" style="color:var(--amazon-orange-dark)">itstep.org</a></p>
+        </div>
+    </div>
+</div>

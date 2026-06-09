@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Domain.Entities;
-using Domain.Enums;
 
 namespace BLL.Interfaces
 {
     public interface ICategoryService
     {
         Task<IEnumerable<Category>> GetAllCategoriesAsync();
+        Task<Category?> GetByIdAsync(int id);
+        Task<(bool success, string message)> CreateAsync(string name);
+        Task<(bool success, string message)> UpdateAsync(int id, string name);
+        Task<(bool success, string message)> DeleteAsync(int id);
     }
 }

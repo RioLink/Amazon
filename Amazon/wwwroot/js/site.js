@@ -1,5 +1,5 @@
 /**
- * Amazon Clone — Client-side engine
+ * Amazon ITStep — Client-side engine
  * ───────────────────────────────────────────────────────────────
  * Cart, Checkout та Orders повністю зберігаються в localStorage.
  * Коли backend (BLL/DAL) буде готовий — замінити виклики
@@ -14,8 +14,8 @@
   // CONSTANTS & STORAGE HELPERS
   // ──────────────────────────────────────────────────────────────
 
-  const CART_KEY   = 'amazon-clone-cart';
-  const ORDERS_KEY = 'amazon-clone-orders';
+  const CART_KEY   = 'amazon-itstep-cart';
+  const ORDERS_KEY = 'amazon-itstep-orders';
 
   /** @returns {Array} */
   function getCart() {

@@ -1,5 +1,153 @@
-﻿<div class="d-flex flex-column align-items-center justify-content-center gap-3 p-5 bg-secondary-subtle rounded-4 shadow">
-    <h2 class="fw-bold mb-2">Welcome to Amazon!</h2>
-    <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-secondary w-100">Sign in</a>
-    <a asp-controller="Auth" asp-action="Register" class="btn btn-outline-primary w-100">Sign up</a>
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@inject IStringLocalizer<Amazon.SharedResource> L
+
+@{
+    Layout = "_Layout";
+    var isEn = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en";
+    ViewData["Title"] = isEn ? "Sign in or Register" : "Вхід або Реєстрація";
+}
+
+<div class="auth-landing">
+
+    <!-- Back button -->
+    <a asp-controller="Home" asp-action="Index" class="auth-landing__back-btn">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clip-rule="evenodd"/>
+        </svg>
+        @L["AuthBackHome"]
+    </a>
+
+    <!-- Animated background particles -->
+    <div class="auth-landing__bg" aria-hidden="true">
+        <span class="auth-landing__particle auth-landing__particle--1"></span>
+        <span class="auth-landing__particle auth-landing__particle--2"></span>
+        <span class="auth-landing__particle auth-landing__particle--3"></span>
+        <span class="auth-landing__particle auth-landing__particle--4"></span>
+        <span class="auth-landing__particle auth-landing__particle--5"></span>
+    </div>
+
+    <div class="auth-landing__inner">
+
+        <!-- Logo -->
+        <div class="auth-landing__logo">
+            <span class="auth-landing__logo-name">amazon</span>
+            <span class="auth-landing__logo-sub">ITSTEP</span>
+        </div>
+
+        <!-- Headline -->
+        <h1 class="auth-landing__title">@L["AuthWelcome"]</h1>
+        <p class="auth-landing__subtitle">@L["AuthSubtitle"]</p>
+
+        <!-- Cards -->
+        <div class="auth-landing__cards">
+
+            <!-- Sign In card -->
+            <a class="auth-landing__card auth-landing__card--signin"
+               asp-controller="Auth" asp-action="Login">
+                <div class="auth-landing__card-glow auth-landing__card-glow--blue"></div>
+                <div class="auth-landing__card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/>
+                    </svg>
+                </div>
+                <div class="auth-landing__card-body">
+                    <span class="auth-landing__card-hint">@L["AuthSignInHint"]</span>
+                    <span class="auth-landing__card-title">@L["AuthSignIn"]</span>
+                </div>
+                <div class="auth-landing__card-arrow-wrap">
+                    <svg class="auth-landing__card-arrow" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+            </a>
+
+            <!-- Divider -->
+            <div class="auth-landing__divider">
+                <span>@(isEn ? "or" : "або")</span>
+            </div>
+
+            <!-- Register card -->
+            <a class="auth-landing__card auth-landing__card--register"
+               asp-controller="Auth" asp-action="Register">
+                <div class="auth-landing__card-glow auth-landing__card-glow--green"></div>
+                <div class="auth-landing__card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"/>
+                    </svg>
+                </div>
+                <div class="auth-landing__card-body">
+                    <span class="auth-landing__card-hint">@L["AuthRegisterHint"]</span>
+                    <span class="auth-landing__card-title">@L["AuthRegister"]</span>
+                </div>
+                <div class="auth-landing__card-arrow-wrap">
+                    <svg class="auth-landing__card-arrow" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+            </a>
+        </div>
+
+        <!-- Stats strip -->
+        <div class="auth-landing__stats">
+            <div class="auth-landing__stat">
+                <span class="auth-landing__stat-num">50K+</span>
+                <span class="auth-landing__stat-label">@(isEn ? "Products" : "Товарів")</span>
+            </div>
+            <div class="auth-landing__stat-sep"></div>
+            <div class="auth-landing__stat">
+                <span class="auth-landing__stat-num">120K+</span>
+                <span class="auth-landing__stat-label">@(isEn ? "Happy customers" : "Задоволених покупців")</span>
+            </div>
+            <div class="auth-landing__stat-sep"></div>
+            <div class="auth-landing__stat">
+                <span class="auth-landing__stat-num">24/7</span>
+                <span class="auth-landing__stat-label">@(isEn ? "Support" : "Підтримка")</span>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="auth-landing__features">
+            <div class="auth-landing__feature">
+                <div class="auth-landing__feature-icon">🚀</div>
+                <span>@(isEn ? "Fast delivery across Ukraine" : "Швидка доставка по Україні")</span>
+            </div>
+            <div class="auth-landing__feature">
+                <div class="auth-landing__feature-icon">🔒</div>
+                <span>@(isEn ? "Secure payments" : "Безпечні платежі")</span>
+            </div>
+            <div class="auth-landing__feature">
+                <div class="auth-landing__feature-icon">↩️</div>
+                <span>@(isEn ? "30-day returns" : "Повернення за 30 днів")</span>
+            </div>
+            <div class="auth-landing__feature">
+                <div class="auth-landing__feature-icon">💎</div>
+                <span>@(isEn ? "Verified sellers" : "Перевірені продавці")</span>
+            </div>
+        </div>
+
+    </div>
 </div>
+
+@section Scripts {
+<script>
+// Tilt effect on cards
+document.querySelectorAll('.auth-landing__card').forEach(card => {
+    card.addEventListener('mousemove', function(e) {
+        const rect = this.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+        const rotX = ((y - cy) / cy) * 4;
+        const rotY = ((x - cx) / cx) * -4;
+        this.style.transform = `perspective(600px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-3px)`;
+    });
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = '';
+    });
+});
+</script>
+}

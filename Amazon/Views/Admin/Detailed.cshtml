@@ -1,58 +1,57 @@
-﻿@model ProductDetailedViewModel
+@model ProductDetailedViewModel
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fw-bold">@Model.Name</h1>
-        <a asp-action="Index" class="btn btn-secondary">Назад</a>
+@{
+    ViewData["Title"] = "Деталі товару";
+    ViewData["ActiveNav"] = "products";
+}
+
+<div class="admin-topbar">
+    <h1 class="admin-topbar__title">Деталі товару #@Model.Id</h1>
+    <a asp-action="Index" class="admin-btn admin-btn--back">← Назад до списку</a>
+</div>
+
+<div class="admin-detail-card">
+    <div class="admin-detail-card__image">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl" alt="@Model.Name" class="admin-detail-card__img" />
+        }
+        else
+        {
+            <div class="admin-table__img-placeholder admin-detail-card__no-img">📷<br /><span>Немає фото</span></div>
+        }
     </div>
 
-    <div class="card shadow rounded-4">
-        <div class="row g-0">
+    <div class="admin-detail-card__info">
+        <h2 class="admin-detail-card__name">@Model.Name</h2>
 
-            <div class="col-md-4 d-flex align-items-center justify-content-center p-4">
-                @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                {
-                    <img src="@Model.ImageUrl" alt="@Model.Name"
-                         class="img-fluid rounded-3" style="max-height: 300px; object-fit: contain;" />
-                }
-                else
-                {
-                    <div class="text-muted">Зображення відсутнє</div>
-                }
+        <dl class="admin-detail-card__dl">
+            <div class="admin-detail-card__row">
+                <dt>Категорія</dt>
+                <dd>@Model.Category</dd>
             </div>
-
-            <div class="col-md-8">
-                <div class="card-body p-4">
-
-                    <div class="mb-3">
-                        <span class="text-muted small">Категорія</span>
-                        <p class="fw-semibold mb-0">@Model.Category</p>
-                    </div>
-
-                    <div class="mb-3">
-                        <span class="text-muted small">Опис</span>
-                        <p class="mb-0">@Model.Description</p>
-                    </div>
-
-                    <div class="mb-3">
-                        <span class="text-muted small">Ціна</span>
-                        <p class="mb-0">@Model.Price.ToString("C")</p>
-                    </div>
-
-                    <div class="mb-4">
-                        <span class="text-muted small">Кількість</span>
-                        <p class="mb-0">@Model.Quantity шт.</p>
-                    </div>
-
-                    <div class="d-flex gap-2">
-                        <a asp-action="Edit" asp-route-id="@Model.Id"
-                           class="btn btn-warning">Редагувати</a>
-                        <a asp-action="Delete" asp-route-id="@Model.Id"
-                           class="btn btn-danger">Видалити</a>
-                    </div>
-
-                </div>
+            <div class="admin-detail-card__row">
+                <dt>Ціна</dt>
+                <dd class="admin-table__price">@Model.Price.ToString("N2") ₴</dd>
             </div>
+            <div class="admin-detail-card__row">
+                <dt>На складі</dt>
+                <dd>
+                    <span class="admin-table__qty @(Model.Quantity == 0 ? "admin-table__qty--empty" : "")">
+                        @Model.Quantity шт.
+                    </span>
+                </dd>
+            </div>
+            <div class="admin-detail-card__row admin-detail-card__row--full">
+                <dt>Опис</dt>
+                <dd>@Model.Description</dd>
+            </div>
+        </dl>
+
+        <div class="admin-form__actions">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="admin-btn admin-btn--edit">✏ Редагувати</a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="admin-btn admin-btn--delete"
+               onclick="return confirm('Видалити товар «@Model.Name»?')">🗑 Видалити</a>
         </div>
     </div>
 </div>

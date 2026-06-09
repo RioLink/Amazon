@@ -1,46 +1,148 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Amazon Clone - навчальний інтернет-магазин на ASP.NET Core MVC" />
-    <title>@ViewData["Title"] - Amazon Clone</title>
-
+    <title>@ViewData["Title"] — Адмін | Amazon ITStep</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
-    <header class="site-header">
-        <nav class="main-navigation" aria-label="Головна навігація">
-            <div class="category-navigation">
-                <div class="category-navigation__content">
-                    <a asp-controller="Home" asp-action="Index">Головна</a>
-                    <a asp-controller="Admin" asp-action="Index">Товари</a>
-                    <a asp-controller="Admin" asp-action="Orders">Замовлення</a>
+<body class="admin-body">
+
+    <div class="admin-shell">
+
+        <!-- ── Sidebar ───────────────────────────────────────── -->
+        <aside class="admin-sidebar">
+
+            <!-- Brand -->
+            <div class="admin-sidebar__brand">
+                <a class="admin-sidebar__brand-logo" asp-controller="Home" asp-action="Index">
+                    <span class="admin-sidebar__brand-name">amazon</span>
+                    <span class="admin-sidebar__brand-sub">itstep</span>
+                </a>
+                <div class="admin-sidebar__brand-role">
+                    <svg viewBox="0 0 16 16" fill="currentColor" style="width:10px;height:10px;margin-right:4px">
+                        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1Zm0 2a5 5 0 1 1 0 10A5 5 0 0 1 8 3Z"/>
+                        <path d="M8 6.5A1.5 1.5 0 0 0 6.5 8 1.5 1.5 0 0 0 8 9.5 1.5 1.5 0 0 0 9.5 8 1.5 1.5 0 0 0 8 6.5Z"/>
+                    </svg>
+                    Адміністратор
                 </div>
             </div>
-        </nav>
-    </header>
 
-    <main class="site-main" role="main">
-        @RenderBody()
-    </main>
+            <!-- Nav -->
+            <nav class="admin-sidebar__nav" aria-label="Адмін навігація">
 
-    <footer class="site-footer">
-        <div class="site-footer__content">
-            <a class="site-footer__brand" asp-area="" asp-controller="Home" asp-action="Index">amazon clone</a>
-            <nav class="site-footer__links" aria-label="Навігація у підвалі">
-                <a href="#">Про нас</a>
-                <a href="#">Контакти</a>
-                <a asp-area="" asp-controller="Home" asp-action="Privacy">Політика конфіденційності</a>
+                <div class="admin-sidebar__section">Контент</div>
+
+                <a asp-controller="Admin" asp-action="Index"
+                   class="admin-sidebar__link @(ViewData["ActiveNav"]?.ToString() == "products" ? "admin-sidebar__link--active" : "")">
+                    <span class="admin-sidebar__link-icon">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M4 3a1 1 0 0 0-1 1v.01a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4ZM3 8a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.01a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8ZM3 13a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.01a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V13Z"/>
+                        </svg>
+                    </span>
+                    Товари
+                </a>
+
+                <a asp-controller="Admin" asp-action="Categories"
+                   class="admin-sidebar__link @(ViewData["ActiveNav"]?.ToString() == "categories" ? "admin-sidebar__link--active" : "")">
+                    <span class="admin-sidebar__link-icon">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.5 3A2.5 2.5 0 0 0 3 5.5v2.879a2.5 2.5 0 0 0 .732 1.767l6.5 6.5a2.5 2.5 0 0 0 3.536 0l2.878-2.878a2.5 2.5 0 0 0 0-3.536l-6.5-6.5A2.5 2.5 0 0 0 8.38 3H5.5ZM6 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd"/>
+                        </svg>
+                    </span>
+                    Категорії
+                </a>
+
+                <div class="admin-sidebar__section">Продажі</div>
+
+                <a asp-controller="Admin" asp-action="Orders"
+                   class="admin-sidebar__link @(ViewData["ActiveNav"]?.ToString() == "orders" ? "admin-sidebar__link--active" : "")">
+                    <span class="admin-sidebar__link-icon">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M6 5v1H4.667a1.75 1.75 0 0 0-1.743 1.598l-.826 9.14A1.75 1.75 0 0 0 3.84 18.5h12.32a1.75 1.75 0 0 0 1.742-1.762l-.826-9.14A1.75 1.75 0 0 0 15.333 6H14V5a4 4 0 0 0-8 0Zm4-2.5A2.5 2.5 0 0 0 7.5 5v1h5V5A2.5 2.5 0 0 0 10 2.5ZM7.5 10a2.5 2.5 0 0 0 5 0V8.75a.75.75 0 0 1 1.5 0V10a4 4 0 0 1-8 0V8.75a.75.75 0 0 1 1.5 0V10Z" clip-rule="evenodd"/>
+                        </svg>
+                    </span>
+                    Замовлення
+                </a>
+
+                <div class="admin-sidebar__section">Система</div>
+
+                <a asp-controller="Admin" asp-action="Users"
+                   class="admin-sidebar__link @(ViewData["ActiveNav"]?.ToString() == "users" ? "admin-sidebar__link--active" : "")">
+                    <span class="admin-sidebar__link-icon">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M7 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM14.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM1.615 16.428a1.224 1.224 0 0 1-.569-1.175 6.002 6.002 0 0 1 11.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 0 1 7 17a9.953 9.953 0 0 1-5.385-1.572ZM14.5 16h-.106c.07-.297.088-.611.048-.933a7.47 7.47 0 0 0-1.588-3.755 4.502 4.502 0 0 1 5.874 2.636.818.818 0 0 1-.36.98A7.465 7.465 0 0 1 14.5 16Z"/>
+                        </svg>
+                    </span>
+                    Користувачі
+                </a>
+
             </nav>
-            <p>&copy; @DateTime.Now.Year Amazon Clone. Навчальний проєкт.</p>
+
+            <!-- Footer -->
+            <div class="admin-sidebar__footer">
+                <a asp-controller="Home" asp-action="Index" class="admin-sidebar__link">
+                    <span class="admin-sidebar__link-icon">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" clip-rule="evenodd"/>
+                        </svg>
+                    </span>
+                    На сайт
+                </a>
+                <form asp-controller="Auth" asp-action="Logout" method="post" style="display:contents">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="admin-sidebar__link admin-sidebar__logout">
+                        <span class="admin-sidebar__link-icon">
+                            <svg viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M17 4.25A2.25 2.25 0 0 0 14.75 2h-5.5A2.25 2.25 0 0 0 7 4.25v2a.75.75 0 0 0 1.5 0v-2a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v11.5a.75.75 0 0 1-.75.75h-5.5a.75.75 0 0 1-.75-.75v-2a.75.75 0 0 0-1.5 0v2A2.25 2.25 0 0 0 9.25 18h5.5A2.25 2.25 0 0 0 17 15.75V4.25Z" clip-rule="evenodd"/>
+                                <path fill-rule="evenodd" d="M1 10a.75.75 0 0 1 .75-.75h9.546l-1.048-1.16a.75.75 0 1 1 1.112-1.004l2.5 2.75a.75.75 0 0 1 0 1.008l-2.5 2.75a.75.75 0 0 1-1.112-1.004l1.048-1.16H1.75A.75.75 0 0 1 1 10Z" clip-rule="evenodd"/>
+                            </svg>
+                        </span>
+                        Вийти
+                    </button>
+                </form>
+            </div>
+
+        </aside>
+
+        <!-- ── Main content ───────────────────────────────────── -->
+        <div class="admin-main">
+
+            <header class="admin-header">
+                <div class="admin-header__left">
+                    <!-- Breadcrumb path -->
+                    <nav class="admin-breadcrumb" aria-label="breadcrumb">
+                        <a asp-controller="Admin" asp-action="Index" class="admin-breadcrumb__home">
+                            <svg viewBox="0 0 16 16" fill="currentColor" style="width:14px;height:14px">
+                                <path d="M8.543 2.232a.75.75 0 0 0-1.085 0l-5.25 5.5A.75.75 0 0 0 2.75 9H4v4.75A1.25 1.25 0 0 0 5.25 15h1.5a.75.75 0 0 0 .75-.75v-3h1v3c0 .414.336.75.75.75h1.5A1.25 1.25 0 0 0 12 13.75V9h1.25a.75.75 0 0 0 .543-1.268l-5.25-5.5Z"/>
+                            </svg>
+                        </a>
+                        <span class="admin-breadcrumb__sep">/</span>
+                        <span class="admin-breadcrumb__current">@ViewData["Title"]</span>
+                    </nav>
+                </div>
+                <div class="admin-header__right">
+                    <div class="admin-header__avatar">
+                        <svg viewBox="0 0 20 20" fill="currentColor" style="width:16px;color:#fff">
+                            <path d="M10 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.465 14.493a1.23 1.23 0 0 0 .41 1.412A9.957 9.957 0 0 0 10 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 0 0-13.074.003Z"/>
+                        </svg>
+                    </div>
+                    <span class="admin-header__user">@User.Identity?.Name</span>
+                    <span class="admin-header__badge">Admin</span>
+                </div>
+            </header>
+
+            <main class="admin-content">
+                @RenderBody()
+            </main>
+
         </div>
-    </footer>
+
+    </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

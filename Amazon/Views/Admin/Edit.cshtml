@@ -1,81 +1,61 @@
 @model ProductEditViewModel
 
 @{
-    ViewData["Title"] = "Адмін — Редагувати товар";
+    ViewData["Title"] = "Редагувати товар";
+    ViewData["ActiveNav"] = "products";
 }
 
-<div class="admin-page">
-    <aside class="admin-sidebar">
-        <div class="admin-sidebar__brand">
-            <span>⚙</span> Адмін панель
+<div class="admin-topbar">
+    <h1 class="admin-topbar__title">Редагувати товар #@Model.Id</h1>
+    <a asp-action="Index" class="admin-btn admin-btn--back">← Назад</a>
+</div>
+
+<div class="admin-form-wrap">
+    <form asp-action="Edit" method="post" class="admin-form">
+        <div asp-validation-summary="ModelOnly" class="admin-form__errors"></div>
+        <input type="hidden" asp-for="Id" />
+
+        <div class="admin-form__row admin-form__row--two">
+            <div class="admin-form__group">
+                <label asp-for="Name" class="admin-form__label">Назва товару</label>
+                <input asp-for="Name" class="admin-form__input" />
+                <span asp-validation-for="Name" class="admin-form__field-error"></span>
+            </div>
+            <div class="admin-form__group">
+                <label asp-for="Price" class="admin-form__label">Ціна (₴)</label>
+                <input asp-for="Price" class="admin-form__input" type="number" step="0.01" min="0" />
+                <span asp-validation-for="Price" class="admin-form__field-error"></span>
+            </div>
         </div>
-        <nav class="admin-sidebar__nav">
-            <a asp-action="Index" class="admin-sidebar__link">
-                📦 Товари
-            </a>
-            <a asp-action="Orders" class="admin-sidebar__link">
-                📋 Замовлення
-            </a>
-            <a asp-controller="Home" asp-action="Index" class="admin-sidebar__link">
-                🏠 На сайт
-            </a>
-        </nav>
-    </aside>
 
-    <div class="admin-content">
-        <div class="admin-topbar">
-            <h1 class="admin-topbar__title">Редагувати товар #@Model.Id</h1>
-            <a asp-action="Index" class="admin-btn admin-btn--back">← Назад</a>
+        <div class="admin-form__row admin-form__row--two">
+            <div class="admin-form__group">
+                <label asp-for="CategoryId" class="admin-form__label">Категорія</label>
+                <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="admin-form__input admin-form__select">
+                    <option value="">-- Оберіть категорію --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="admin-form__field-error"></span>
+            </div>
+            <div class="admin-form__group">
+                <label asp-for="Quantity" class="admin-form__label">Кількість (шт.)</label>
+                <input asp-for="Quantity" class="admin-form__input" type="number" min="0" />
+                <span asp-validation-for="Quantity" class="admin-form__field-error"></span>
+            </div>
         </div>
 
-        <div class="admin-form-wrap">
-            <form asp-action="Edit" method="post" class="admin-form">
-                <div asp-validation-summary="ModelOnly" class="admin-form__errors"></div>
-                <input type="hidden" asp-for="Id" />
-
-                <div class="admin-form__row admin-form__row--two">
-                    <div class="admin-form__group">
-                        <label asp-for="Name" class="admin-form__label">Назва товару</label>
-                        <input asp-for="Name" class="admin-form__input" />
-                        <span asp-validation-for="Name" class="admin-form__field-error"></span>
-                    </div>
-                    <div class="admin-form__group">
-                        <label asp-for="Price" class="admin-form__label">Ціна (₴)</label>
-                        <input asp-for="Price" class="admin-form__input" type="number" step="0.01" min="0" />
-                        <span asp-validation-for="Price" class="admin-form__field-error"></span>
-                    </div>
-                </div>
-
-                <div class="admin-form__row admin-form__row--two">
-                    <div class="admin-form__group">
-                        <label asp-for="CategoryId" class="admin-form__label">Категорія</label>
-                        <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="admin-form__input admin-form__select">
-                            <option value="">-- Оберіть категорію --</option>
-                        </select>
-                        <span asp-validation-for="CategoryId" class="admin-form__field-error"></span>
-                    </div>
-                    <div class="admin-form__group">
-                        <label asp-for="Quantity" class="admin-form__label">Кількість (шт.)</label>
-                        <input asp-for="Quantity" class="admin-form__input" type="number" min="0" />
-                        <span asp-validation-for="Quantity" class="admin-form__field-error"></span>
-                    </div>
-                </div>
-
-                <div class="admin-form__group">
-                    <label asp-for="ImageUrl" class="admin-form__label">Посилання на зображення</label>
-                    <input asp-for="ImageUrl" class="admin-form__input" />
-                </div>
-
-                <div class="admin-form__group">
-                    <label asp-for="Description" class="admin-form__label">Опис</label>
-                    <textarea asp-for="Description" class="admin-form__input admin-form__textarea" rows="4"></textarea>
-                </div>
-
-                <div class="admin-form__actions">
-                    <button type="submit" class="amazon-button amazon-button--primary">✓ Зберегти зміни</button>
-                    <a asp-action="Index" class="admin-btn admin-btn--back">Скасувати</a>
-                </div>
-            </form>
+        <div class="admin-form__group">
+            <label asp-for="ImageUrl" class="admin-form__label">Посилання на зображення</label>
+            <input asp-for="ImageUrl" class="admin-form__input" />
         </div>
-    </div>
+
+        <div class="admin-form__group">
+            <label asp-for="Description" class="admin-form__label">Опис</label>
+            <textarea asp-for="Description" class="admin-form__input admin-form__textarea" rows="4"></textarea>
+        </div>
+
+        <div class="admin-form__actions">
+            <button type="submit" class="amazon-button amazon-button--primary">✓ Зберегти зміни</button>
+            <a asp-action="Index" class="admin-btn admin-btn--back">Скасувати</a>
+        </div>
+    </form>
 </div>

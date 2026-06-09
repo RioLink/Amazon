@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "Нова категорія";
+    ViewData["ActiveNav"] = "categories";
+}
+
+<div class="admin-form-page">
+    <div class="admin-form-card">
+        <div class="admin-form-card__head">
+            <div class="admin-form-card__icon admin-form-card__icon--blue">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-11.25a.75.75 0 0 0-1.5 0v2.5h-2.5a.75.75 0 0 0 0 1.5h2.5v2.5a.75.75 0 0 0 1.5 0v-2.5h2.5a.75.75 0 0 0 0-1.5h-2.5v-2.5Z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="admin-form-card__title">Нова категорія</h1>
+                <p class="admin-form-card__sub">Введіть назву для нової категорії товарів</p>
+            </div>
+        </div>
+
+        <form asp-action="CreateCategory" method="post" class="admin-form">
+            @Html.AntiForgeryToken()
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div class="admin-alert admin-alert--danger">@error.ErrorMessage</div>
+                }
+            }
+
+            <div class="admin-form__group">
+                <label class="admin-form__label" for="name">Назва категорії</label>
+                <input class="admin-form__input" id="name" name="name" type="text"
+                       placeholder="Напр. Електроніка, Одяг, Книги..."
+                       required autofocus />
+                <span class="admin-form__hint">Від 2 до 64 символів. Унікальна назва.</span>
+            </div>
+
+            <div class="admin-form__actions">
+                <button type="submit" class="admin-btn admin-btn--primary">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/>
+                    </svg>
+                    Створити категорію
+                </button>
+                <a asp-action="Categories" class="admin-btn admin-btn--ghost">Скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,5 +1,12 @@
+@using Domain.Entities
 @{
     ViewData["Title"] = "Профіль";
+    var username   = User.Identity?.Name ?? "Гість";
+    var email      = ViewData["UserEmail"]?.ToString() ?? "";
+    var avatarPath = ViewData["AvatarPath"]?.ToString() ?? "";
+    var addresses  = ViewData["Addresses"] as List<Address> ?? new List<Address>();
+    var initial    = username.Length > 0 ? username[0].ToString().ToUpper() : "?";
+    var hasAvatar  = !string.IsNullOrEmpty(avatarPath);
 }
 
 <div class="profile-page-layout">
@@ -8,102 +15,523 @@
     <aside class="profile-sidebar">
 
         <div class="profile-avatar-card">
-            <div class="profile-avatar" aria-hidden="true">👤</div>
-            <h2>Мій акаунт</h2>
-            <p>Гість &nbsp;·&nbsp; Авторизація незабаром</p>
+            <!-- Avatar upload zone -->
+            <div class="profile-avatar-wrap" id="avatarWrap" title="Натисніть для зміни фото">
+                @if (hasAvatar)
+                {
+                    <img class="profile-avatar profile-avatar--img" id="avatarImg"
+                         src="@avatarPath" alt="Аватар @username" />
+                }
+                else
+                {
+                    <div class="profile-avatar profile-avatar--letter" id="avatarLetter">@initial</div>
+                }
+                <div class="profile-avatar-overlay" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.25 13.25a.75.75 0 0 0 1.5 0V4.636l2.955 3.129a.75.75 0 0 0 1.09-1.03l-4.25-4.5a.75.75 0 0 0-1.09 0l-4.25 4.5a.75.75 0 1 0 1.09 1.03L9.25 4.636v8.614Z"/><path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z"/></svg>
+                    <span>Змінити фото</span>
+                </div>
+                <form asp-action="UploadAvatar" method="post" enctype="multipart/form-data" id="avatarForm">
+                    @Html.AntiForgeryToken()
+                    <input type="file" id="avatarInput" name="avatar"
+                           accept="image/jpeg,image/png,image/webp,image/gif"
+                           style="display:none" />
+                </form>
+            </div>
+            <h2 class="profile-avatar-card__name">@username</h2>
+            @if (!string.IsNullOrEmpty(email))
+            {
+                <p class="profile-avatar-card__email">@email</p>
+            }
+            <p class="profile-avatar-card__hint" id="avatarHint"></p>
         </div>
 
         <nav aria-label="Меню профілю">
             <ul class="profile-nav">
-                <li>
-                    <a class="is-active"
-                       asp-controller="Profile" asp-action="Index">
-                        <span class="nav-icon" aria-hidden="true">📦</span>
-                        Мої замовлення
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="Product" asp-action="Index">
-                        <span class="nav-icon" aria-hidden="true">🛍️</span>
-                        Каталог товарів
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="Cart" asp-action="Index">
-                        <span class="nav-icon" aria-hidden="true">🛒</span>
-                        Кошик
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="Home" asp-action="Index">
-                        <span class="nav-icon" aria-hidden="true">🏠</span>
-                        Головна
-                    </a>
-                </li>
-
+                <li><a class="is-active" asp-controller="Profile" asp-action="Index">
+                    <span class="nav-icon">📦</span> Мої замовлення
+                </a></li>
+                <li><a asp-controller="Product" asp-action="Index">
+                    <span class="nav-icon">🛍️</span> Каталог товарів
+                </a></li>
+                <li><a asp-controller="Cart" asp-action="Index">
+                    <span class="nav-icon">🛒</span> Кошик
+                </a></li>
+                <li><a asp-controller="Home" asp-action="Index">
+                    <span class="nav-icon">🏠</span> Головна
+                </a></li>
                 <li>
                     <form asp-controller="Auth" asp-action="Logout" method="post">
+                        @Html.AntiForgeryToken()
                         <button type="submit" class="profile-nav-logout">
-                            <span class="nav-icon" aria-hidden="true">🚪</span>
-                            Вийти
+                            <span class="nav-icon">🚪</span> Вийти
                         </button>
                     </form>
                 </li>
             </ul>
         </nav>
-
     </aside>
 
-    @* ── Main content ── *@
+    @* ── Main ── *@
     <main class="profile-main">
 
-        @* Orders history *@
+        <!-- Orders -->
         <section class="profile-section">
             <div class="profile-section__header">
-                <h2>
-                    Мої замовлення
-                    <span class="profile-section__count">(<span id="orders-count">0</span>)</span>
-                </h2>
+                <h2>Мої замовлення <span class="profile-section__count">(<span id="orders-count">0</span>)</span></h2>
             </div>
-
             <div id="orders-container">
-                @* Populated by JS from localStorage *@
                 <div class="orders-empty">
-                    <div class="orders-empty__icon" aria-hidden="true">📦</div>
-                    <p>Завантаження замовлень…</p>
+                    <div class="orders-empty__icon">📦</div>
+                    <p>Ви ще не зробили жодного замовлення.</p>
+                    <a class="profile-catalog-btn" asp-controller="Product" asp-action="Index">Перейти до каталогу</a>
                 </div>
             </div>
         </section>
 
-        @* Account settings placeholder *@
+        <!-- Account settings -->
         <section class="profile-section">
             <div class="profile-section__header">
                 <h2>Налаштування акаунту</h2>
             </div>
-            <p class="profile-section__placeholder">
-                Управління профілем (ім'я, пароль, адреси доставки) буде доступне
-                після підключення системи авторизації.
-            </p>
-            <div class="profile-settings-preview">
-                <div class="profile-setting-row profile-setting-row--disabled">
-                    <span class="profile-setting-row__label">👤 Ім'я та прізвище</span>
-                    <span class="profile-setting-row__hint">Незабаром</span>
+
+            <div class="profile-settings-list">
+
+                <!-- Логін -->
+                <div class="profile-setting-row">
+                    <div class="profile-setting-row__left">
+                        <span class="profile-setting-row__icon">
+                            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-7 9a7 7 0 1 1 14 0H3Z"/></svg>
+                        </span>
+                        <div>
+                            <p class="profile-setting-row__label">Логін</p>
+                            <p class="profile-setting-row__value">@username</p>
+                        </div>
+                    </div>
+                    <span class="profile-setting-row__badge profile-setting-row__badge--locked">
+                        <svg viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z" clip-rule="evenodd"/></svg>
+                        Не змінюється
+                    </span>
                 </div>
-                <div class="profile-setting-row profile-setting-row--disabled">
-                    <span class="profile-setting-row__label">✉️ Email-адреса</span>
-                    <span class="profile-setting-row__hint">Незабаром</span>
+
+                <!-- Email -->
+                <div class="profile-setting-row">
+                    <div class="profile-setting-row__left">
+                        <span class="profile-setting-row__icon">
+                            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a2 2 0 0 0-2 2v1.161l8.441 4.221a1.25 1.25 0 0 0 1.118 0L19 7.162V6a2 2 0 0 0-2-2H3Z"/><path d="m19 8.839-7.77 3.885a2.75 2.75 0 0 1-2.46 0L1 8.839V14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.839Z"/></svg>
+                        </span>
+                        <div>
+                            <p class="profile-setting-row__label">Email</p>
+                            <p class="profile-setting-row__value" id="emailDisplay">@(string.IsNullOrEmpty(email) ? "Не вказано" : email)</p>
+                        </div>
+                    </div>
+                    <button type="button" class="profile-setting-row__action" onclick="toggleEmailForm()">Змінити</button>
                 </div>
-                <div class="profile-setting-row profile-setting-row--disabled">
-                    <span class="profile-setting-row__label">🔒 Пароль</span>
-                    <span class="profile-setting-row__hint">Незабаром</span>
+
+                <!-- Inline email change form -->
+                <div class="profile-pw-form" id="emailForm" style="display:none">
+                    <form id="changeEmailForm" novalidate>
+                        @Html.AntiForgeryToken()
+                        <div class="profile-pw-form__fields" style="grid-template-columns:1fr 1fr">
+                            <div class="profile-pw-form__group">
+                                <label class="profile-pw-form__label">Новий Email</label>
+                                <div class="profile-pw-form__input-wrap">
+                                    <input type="email" id="newEmail" class="profile-pw-form__input"
+                                           placeholder="new@@email.com" autocomplete="email" />
+                                </div>
+                            </div>
+                            <div class="profile-pw-form__group">
+                                <label class="profile-pw-form__label">Поточний пароль (для підтвердження)</label>
+                                <div class="profile-pw-form__input-wrap">
+                                    <input type="password" id="emailPw" class="profile-pw-form__input"
+                                           placeholder="Ваш поточний пароль" autocomplete="current-password" />
+                                    <button type="button" class="profile-pw-form__eye" onclick="togglePwVis('emailPw',this)" tabindex="-1">
+                                        <svg class="eye-show" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd"/></svg>
+                                        <svg class="eye-hide" style="display:none" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.28 2.22a.75.75 0 0 0-1.06 1.06l14.5 14.5a.75.75 0 1 0 1.06-1.06l-1.745-1.745a10.029 10.029 0 0 0 3.3-4.38 1.651 1.651 0 0 0 0-1.185A10.004 10.004 0 0 0 9.999 3a9.956 9.956 0 0 0-4.744 1.194L3.28 2.22ZM7.752 6.69l1.092 1.092a2.5 2.5 0 0 1 3.374 3.373l1.091 1.092a4 4 0 0 0-5.557-5.557Z" clip-rule="evenodd"/><path d="m10.748 13.93 2.523 2.523a10.015 10.015 0 0 1-3.27.547c-4.258 0-7.894-2.66-9.337-6.41a1.651 1.651 0 0 1 0-1.186A10.007 10.007 0 0 1 2.839 6.02L6.07 9.252a4 4 0 0 0 4.678 4.678Z"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="profile-pw-form__actions">
+                            <button type="submit" class="profile-pw-form__save">Зберегти email</button>
+                            <button type="button" class="profile-pw-form__cancel" onclick="toggleEmailForm()">Скасувати</button>
+                        </div>
+                        <div class="profile-pw-form__feedback" id="emailFeedback"></div>
+                    </form>
                 </div>
-                <div class="profile-setting-row profile-setting-row--disabled">
-                    <span class="profile-setting-row__label">📍 Адреси доставки</span>
-                    <span class="profile-setting-row__hint">Незабаром</span>
+
+                <!-- Password -->
+                <div class="profile-setting-row">
+                    <div class="profile-setting-row__left">
+                        <span class="profile-setting-row__icon">
+                            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clip-rule="evenodd"/></svg>
+                        </span>
+                        <div>
+                            <p class="profile-setting-row__label">Пароль</p>
+                            <p class="profile-setting-row__value">••••••••</p>
+                        </div>
+                    </div>
+                    <button type="button" class="profile-setting-row__action" onclick="togglePwForm()">Змінити</button>
                 </div>
-            </div>
+
+                <!-- Inline password form -->
+                <div class="profile-pw-form" id="pwForm" style="display:none">
+                    <form id="changePwForm" novalidate>
+                        @Html.AntiForgeryToken()
+                        <div class="profile-pw-form__fields">
+                            <div class="profile-pw-form__group">
+                                <label class="profile-pw-form__label">Поточний пароль</label>
+                                <div class="profile-pw-form__input-wrap">
+                                    <input type="password" name="CurrentPassword" id="currentPw" class="profile-pw-form__input" placeholder="Поточний пароль" autocomplete="current-password" />
+                                    <button type="button" class="profile-pw-form__eye" onclick="togglePwVis('currentPw',this)" tabindex="-1">
+                                        <svg class="eye-show" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd"/></svg>
+                                        <svg class="eye-hide" style="display:none" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.28 2.22a.75.75 0 0 0-1.06 1.06l14.5 14.5a.75.75 0 1 0 1.06-1.06l-1.745-1.745a10.029 10.029 0 0 0 3.3-4.38 1.651 1.651 0 0 0 0-1.185A10.004 10.004 0 0 0 9.999 3a9.956 9.956 0 0 0-4.744 1.194L3.28 2.22ZM7.752 6.69l1.092 1.092a2.5 2.5 0 0 1 3.374 3.373l1.091 1.092a4 4 0 0 0-5.557-5.557Z" clip-rule="evenodd"/><path d="m10.748 13.93 2.523 2.523a10.015 10.015 0 0 1-3.27.547c-4.258 0-7.894-2.66-9.337-6.41a1.651 1.651 0 0 1 0-1.186A10.007 10.007 0 0 1 2.839 6.02L6.07 9.252a4 4 0 0 0 4.678 4.678Z"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="profile-pw-form__group">
+                                <label class="profile-pw-form__label">Новий пароль</label>
+                                <div class="profile-pw-form__input-wrap">
+                                    <input type="password" name="NewPassword" id="newPw" class="profile-pw-form__input" placeholder="Мін. 8 символів" autocomplete="new-password" />
+                                    <button type="button" class="profile-pw-form__eye" onclick="togglePwVis('newPw',this)" tabindex="-1">
+                                        <svg class="eye-show" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd"/></svg>
+                                        <svg class="eye-hide" style="display:none" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.28 2.22a.75.75 0 0 0-1.06 1.06l14.5 14.5a.75.75 0 1 0 1.06-1.06l-1.745-1.745a10.029 10.029 0 0 0 3.3-4.38 1.651 1.651 0 0 0 0-1.185A10.004 10.004 0 0 0 9.999 3a9.956 9.956 0 0 0-4.744 1.194L3.28 2.22ZM7.752 6.69l1.092 1.092a2.5 2.5 0 0 1 3.374 3.373l1.091 1.092a4 4 0 0 0-5.557-5.557Z" clip-rule="evenodd"/><path d="m10.748 13.93 2.523 2.523a10.015 10.015 0 0 1-3.27.547c-4.258 0-7.894-2.66-9.337-6.41a1.651 1.651 0 0 1 0-1.186A10.007 10.007 0 0 1 2.839 6.02L6.07 9.252a4 4 0 0 0 4.678 4.678Z"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="profile-pw-form__group">
+                                <label class="profile-pw-form__label">Підтвердження</label>
+                                <div class="profile-pw-form__input-wrap">
+                                    <input type="password" name="ConfirmNewPassword" id="confirmPw" class="profile-pw-form__input" placeholder="Повторіть новий пароль" autocomplete="new-password" oninput="checkPwMatch()" />
+                                </div>
+                                <span class="profile-pw-form__hint" id="pwMatchHint"></span>
+                            </div>
+                        </div>
+                        <div class="profile-pw-form__actions">
+                            <button type="submit" class="profile-pw-form__save">Зберегти пароль</button>
+                            <button type="button" class="profile-pw-form__cancel" onclick="togglePwForm()">Скасувати</button>
+                        </div>
+                        <div class="profile-pw-form__feedback" id="pwFeedback"></div>
+                    </form>
+                </div>
+
+                <!-- Delivery addresses -->
+                <div class="profile-setting-row profile-setting-row--section-head">
+                    <div class="profile-setting-row__left">
+                        <span class="profile-setting-row__icon">
+                            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" clip-rule="evenodd"/></svg>
+                        </span>
+                        <div>
+                            <p class="profile-setting-row__label">Адреси доставки</p>
+                            <p class="profile-setting-row__value--muted profile-setting-row__value" id="addressCount">
+                                @(addresses.Count == 0 ? "Не додано жодної адреси" : $"{addresses.Count} адрес(и)")
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" class="profile-setting-row__action" onclick="toggleAddressForm()" id="addAddrBtn">
+                        + Додати адресу
+                    </button>
+                </div>
+
+                <!-- Address cards list -->
+                <div class="profile-addresses" id="addressList">
+                    @foreach (var addr in addresses)
+                    {
+                        <div class="profile-addr-card @(addr.IsDefault ? "profile-addr-card--default" : "")" data-id="@addr.Id">
+                            <div class="profile-addr-card__body">
+                                <div class="profile-addr-card__top">
+                                    <span class="profile-addr-card__name">@addr.FullName</span>
+                                    @if (addr.IsDefault)
+                                    {
+                                        <span class="profile-addr-card__default-badge">✓ Основна</span>
+                                    }
+                                </div>
+                                <p class="profile-addr-card__line">📞 @addr.Phone</p>
+                                <p class="profile-addr-card__line">
+                                    📍 @addr.City, вул. @addr.Street, буд. @addr.Building
+                                    @if (!string.IsNullOrEmpty(addr.Apartment)) { <text>, кв. @addr.Apartment</text> }
+                                    @if (!string.IsNullOrEmpty(addr.PostalCode)) { <text> (@addr.PostalCode)</text> }
+                                </p>
+                            </div>
+                            <div class="profile-addr-card__actions">
+                                @if (!addr.IsDefault)
+                                {
+                                    <button class="profile-addr-card__btn profile-addr-card__btn--default"
+                                            onclick="setDefault(@addr.Id)" title="Зробити основною">
+                                        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+                                    </button>
+                                }
+                                <button class="profile-addr-card__btn profile-addr-card__btn--delete"
+                                        onclick="deleteAddress(@addr.Id)" title="Видалити">
+                                    <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Add address form (hidden by default) -->
+                <div class="profile-addr-form" id="addrForm" style="display:none">
+                    <h4 class="profile-addr-form__title">Нова адреса доставки</h4>
+                    <div class="profile-addr-form__grid">
+                        <div class="profile-addr-form__group profile-addr-form__group--half">
+                            <label class="profile-addr-form__label">Ім'я та прізвище *</label>
+                            <input type="text" id="af-name" class="profile-addr-form__input" placeholder="Іван Петренко" />
+                        </div>
+                        <div class="profile-addr-form__group profile-addr-form__group--half">
+                            <label class="profile-addr-form__label">Телефон *</label>
+                            <input type="tel" id="af-phone" class="profile-addr-form__input" placeholder="+380501234567" />
+                        </div>
+                        <div class="profile-addr-form__group profile-addr-form__group--half">
+                            <label class="profile-addr-form__label">Місто *</label>
+                            <input type="text" id="af-city" class="profile-addr-form__input" placeholder="Київ" />
+                        </div>
+                        <div class="profile-addr-form__group profile-addr-form__group--half">
+                            <label class="profile-addr-form__label">Поштовий індекс</label>
+                            <input type="text" id="af-postal" class="profile-addr-form__input" placeholder="01001" maxlength="10" />
+                        </div>
+                        <div class="profile-addr-form__group profile-addr-form__group--full">
+                            <label class="profile-addr-form__label">Вулиця *</label>
+                            <input type="text" id="af-street" class="profile-addr-form__input" placeholder="вул. Хрещатик" />
+                        </div>
+                        <div class="profile-addr-form__group profile-addr-form__group--quarter">
+                            <label class="profile-addr-form__label">Будинок *</label>
+                            <input type="text" id="af-building" class="profile-addr-form__input" placeholder="10" />
+                        </div>
+                        <div class="profile-addr-form__group profile-addr-form__group--quarter">
+                            <label class="profile-addr-form__label">Квартира</label>
+                            <input type="text" id="af-apt" class="profile-addr-form__input" placeholder="5" />
+                        </div>
+                        <div class="profile-addr-form__group profile-addr-form__group--half profile-addr-form__group--checkbox">
+                            <label class="profile-addr-form__checkbox-label">
+                                <input type="checkbox" id="af-default" />
+                                <span>Зробити основною адресою</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="profile-addr-form__actions">
+                        <button type="button" class="profile-pw-form__save" onclick="submitAddress()">Зберегти адресу</button>
+                        <button type="button" class="profile-pw-form__cancel" onclick="toggleAddressForm()">Скасувати</button>
+                    </div>
+                    <div class="profile-pw-form__feedback" id="addrFeedback"></div>
+                </div>
+
+            </div><!-- /.profile-settings-list -->
         </section>
 
     </main>
-
 </div>
+
+@section Scripts {
+<script>
+const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+
+// ── Avatar ────────────────────────────────────────────────────────────────────
+document.getElementById('avatarWrap').addEventListener('click', () =>
+    document.getElementById('avatarInput').click());
+
+document.getElementById('avatarInput').addEventListener('change', async function() {
+    if (!this.files.length) return;
+    const hint = document.getElementById('avatarHint');
+    hint.textContent = 'Завантаження…';
+    hint.className   = 'profile-avatar-card__hint';
+
+    const fd = new FormData(document.getElementById('avatarForm'));
+    fd.set('avatar', this.files[0]);
+
+    try {
+        const res  = await fetch('@Url.Action("UploadAvatar", "Profile")', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.success) {
+            // Swap avatar display
+            const wrap = document.getElementById('avatarWrap');
+            let img = document.getElementById('avatarImg');
+            if (!img) {
+                const letter = document.getElementById('avatarLetter');
+                if (letter) letter.remove();
+                img = document.createElement('img');
+                img.id        = 'avatarImg';
+                img.alt       = 'Аватар';
+                img.className = 'profile-avatar profile-avatar--img';
+                wrap.insertBefore(img, wrap.querySelector('.profile-avatar-overlay'));
+            }
+            img.src = data.url + '?v=' + Date.now();
+            hint.textContent = '✓ Фото оновлено';
+            hint.className   = 'profile-avatar-card__hint profile-avatar-card__hint--ok';
+        } else {
+            hint.textContent = '✗ ' + data.message;
+            hint.className   = 'profile-avatar-card__hint profile-avatar-card__hint--err';
+        }
+    } catch {
+        hint.textContent = '✗ Помилка завантаження';
+        hint.className   = 'profile-avatar-card__hint profile-avatar-card__hint--err';
+    }
+    setTimeout(() => { hint.textContent = ''; hint.className = 'profile-avatar-card__hint'; }, 3000);
+    this.value = '';
+});
+
+// ── Email ─────────────────────────────────────────────────────────────────────
+function toggleEmailForm() {
+    const f = document.getElementById('emailForm');
+    f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    if (f.style.display === 'block') document.getElementById('newEmail').focus();
+}
+
+document.getElementById('changeEmailForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const fb  = document.getElementById('emailFeedback');
+    const ne  = document.getElementById('newEmail').value.trim();
+    const pw  = document.getElementById('emailPw').value.trim();
+    if (!ne || !pw) { setFb(fb, '✗ Заповніть всі поля', false); return; }
+    if (!/^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(ne)) { setFb(fb, '✗ Невірний формат email', false); return; }
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true; btn.textContent = 'Збереження…';
+    const fd = new FormData();
+    fd.append('__RequestVerificationToken', antiForgeryToken);
+    fd.append('NewEmail', ne); fd.append('CurrentPassword', pw);
+    try {
+        const res  = await fetch('@Url.Action("ChangeEmail", "Profile")', { method:'POST', body: fd });
+        const data = await res.json();
+        if (data.success) {
+            setFb(fb, '✓ Email оновлено', true);
+            document.getElementById('emailDisplay').textContent = data.email;
+            document.getElementById('newEmail').value = '';
+            document.getElementById('emailPw').value  = '';
+            setTimeout(toggleEmailForm, 1500);
+        } else {
+            setFb(fb, '✗ ' + (data.message || 'Помилка'), false);
+        }
+    } catch { setFb(fb, '✗ Помилка сервера', false); }
+    finally { btn.disabled = false; btn.textContent = 'Зберегти email'; }
+});
+
+// ── Password ──────────────────────────────────────────────────────────────────
+function togglePwForm() {
+    const f = document.getElementById('pwForm');
+    f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    if (f.style.display === 'block') document.getElementById('currentPw').focus();
+}
+function togglePwVis(id, btn) {
+    const el = document.getElementById(id);
+    const show = el.type === 'password';
+    el.type = show ? 'text' : 'password';
+    btn.querySelector('.eye-show').style.display = show ? 'none' : '';
+    btn.querySelector('.eye-hide').style.display = show ? '' : 'none';
+}
+function checkPwMatch() {
+    const np = document.getElementById('newPw').value;
+    const cf = document.getElementById('confirmPw').value;
+    const h  = document.getElementById('pwMatchHint');
+    if (!cf) { h.textContent = ''; return; }
+    const ok = np === cf;
+    h.textContent = ok ? '✓ Паролі збігаються' : '✗ Паролі не збігаються';
+    h.className   = 'profile-pw-form__hint ' + (ok ? 'profile-pw-form__hint--ok' : 'profile-pw-form__hint--err');
+}
+
+document.getElementById('changePwForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const fb  = document.getElementById('pwFeedback');
+    const cur = document.getElementById('currentPw').value.trim();
+    const np  = document.getElementById('newPw').value.trim();
+    const cf  = document.getElementById('confirmPw').value.trim();
+    if (!cur || !np || !cf) { setFb(fb, '✗ Заповніть всі поля', false); return; }
+    if (np !== cf)           { setFb(fb, '✗ Паролі не збігаються', false); return; }
+    if (np.length < 8)       { setFb(fb, '✗ Мінімум 8 символів', false); return; }
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true; btn.textContent = 'Збереження…';
+    const fd = new FormData(this);
+    try {
+        const res  = await fetch('@Url.Action("ChangePassword", "Profile")', { method:'POST', body: fd });
+        const data = await res.json();
+        if (data.success) {
+            setFb(fb, '✓ Пароль змінено', true);
+            this.reset();
+            setTimeout(togglePwForm, 1800);
+        } else {
+            setFb(fb, '✗ ' + (data.message || 'Помилка'), false);
+        }
+    } catch { setFb(fb, '✗ Помилка сервера', false); }
+    finally { btn.disabled = false; btn.textContent = 'Зберегти пароль'; }
+});
+
+// ── Addresses ─────────────────────────────────────────────────────────────────
+function toggleAddressForm() {
+    const f = document.getElementById('addrForm');
+    f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    if (f.style.display === 'block') document.getElementById('af-name').focus();
+}
+
+async function submitAddress() {
+    const fb = document.getElementById('addrFeedback');
+    const name = v('af-name'), phone = v('af-phone'), city = v('af-city'),
+          street = v('af-street'), building = v('af-building'),
+          apt = v('af-apt'), postal = v('af-postal');
+    const isDefault = document.getElementById('af-default').checked;
+
+    if (!name || !phone || !city || !street || !building) {
+        setFb(fb, '✗ Заповніть обов\'язкові поля (*)', false); return;
+    }
+
+    const fd = new FormData();
+    fd.append('__RequestVerificationToken', antiForgeryToken);
+    fd.append('FullName',   name);
+    fd.append('Phone',      phone);
+    fd.append('City',       city);
+    fd.append('Street',     street);
+    fd.append('Building',   building);
+    fd.append('Apartment',  apt);
+    fd.append('PostalCode', postal);
+    fd.append('IsDefault',  isDefault.toString());
+
+    const btn = document.querySelector('#addrForm .profile-pw-form__save');
+    btn.disabled = true; btn.textContent = 'Збереження…';
+
+    try {
+        const res  = await fetch('@Url.Action("AddAddress", "Profile")', { method:'POST', body: fd });
+        const data = await res.json();
+        if (data.success) {
+            setFb(fb, '✓ Адресу збережено!', true);
+            // Refresh page to show new card
+            setTimeout(() => location.reload(), 900);
+        } else {
+            setFb(fb, '✗ ' + (data.message || 'Помилка'), false);
+        }
+    } catch { setFb(fb, '✗ Помилка сервера', false); }
+    finally { btn.disabled = false; btn.textContent = 'Зберегти адресу'; }
+}
+
+async function deleteAddress(id) {
+    if (!confirm('Видалити цю адресу?')) return;
+    const fd = new FormData();
+    fd.append('__RequestVerificationToken', antiForgeryToken);
+    fd.append('id', id);
+    const res  = await fetch('@Url.Action("DeleteAddress", "Profile")', { method:'POST', body: fd });
+    const data = await res.json();
+    if (data.success) {
+        document.querySelector(`.profile-addr-card[data-id="${id}"]`)?.remove();
+        updateAddressCount();
+    }
+}
+
+async function setDefault(id) {
+    const fd = new FormData();
+    fd.append('__RequestVerificationToken', antiForgeryToken);
+    fd.append('id', id);
+    const res  = await fetch('@Url.Action("SetDefaultAddress", "Profile")', { method:'POST', body: fd });
+    const data = await res.json();
+    if (data.success) location.reload();
+}
+
+function updateAddressCount() {
+    const cards = document.querySelectorAll('.profile-addr-card').length;
+    document.getElementById('addressCount').textContent =
+        cards === 0 ? 'Не додано жодної адреси' : cards + ' адрес(и)';
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function v(id) { return document.getElementById(id)?.value?.trim() ?? ''; }
+function setFb(el, msg, ok) {
+    el.textContent = msg;
+    el.className   = 'profile-pw-form__feedback ' + (ok ? 'profile-pw-form__feedback--ok' : 'profile-pw-form__feedback--err');
+}
+</script>
+}

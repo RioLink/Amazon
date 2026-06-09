@@ -16,15 +16,20 @@ namespace BLL.Services
             _signInManager = signInManager;
         }
 
-        public async Task<(bool success, string message)> RegisterAsync(string username, string password, string confirmPassword)
+        public async Task<(bool success, string message)> RegisterAsync(string username, string email, string password, string confirmPassword)
         {
             if (password.Contains(" "))
-                return (false, "Password cannot contain spaces.");
+                return (false, "Пароль не може містити пробіли.");
 
             if (password != confirmPassword)
-                return (false, "Passwords do not match.");
+                return (false, "Паролі не збігаються.");
 
-            var user = new User { UserName = username };
+            // Check if email already taken
+            var existingEmail = await _userManager.FindByEmailAsync(email);
+            if (existingEmail != null)
+                return (false, "Ця пошта вже використовується.");
+
+            var user = new User { UserName = username, Email = email };
             var result = await _userManager.CreateAsync(user, password);
 
             if (result.Succeeded)
@@ -38,14 +43,24 @@ namespace BLL.Services
             return (false, message);
         }
 
-        public async Task<(bool success, string message)> LoginAsync(string username, string password)
+        public async Task<(bool success, string message)> LoginAsync(string usernameOrEmail, string password)
         {
+            // Support login by email or username
+            string username = usernameOrEmail;
+            if (usernameOrEmail.Contains('@'))
+            {
+                var userByEmail = await _userManager.FindByEmailAsync(usernameOrEmail);
+                if (userByEmail == null)
+                    return (false, "Невірний логін/пошта або пароль.");
+                username = userByEmail.UserName ?? usernameOrEmail;
+            }
+
             var result = await _signInManager.PasswordSignInAsync(username, password, isPersistent: false, lockoutOnFailure: false);
 
             if (result.Succeeded)
                 return (true, string.Empty);
 
-            return (false, "Incorrect password or username.");
+            return (false, "Невірний логін/пошта або пароль.");
         }
 
         public async Task LogoutAsync()
