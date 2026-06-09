@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+
+  <!-- Header -->
+  <data name="DeliverTo" xml:space="preserve"><value>Доставка до</value></data>
+  <data name="AllUkraine" xml:space="preserve"><value>Вся Україна</value></data>
+  <data name="SearchPlaceholder" xml:space="preserve"><value>Пошук товарів</value></data>
+  <data name="HelloGreeting" xml:space="preserve"><value>Вітаємо,</value></data>
+  <data name="AccountHint" xml:space="preserve"><value>Акаунт та списки</value></data>
+  <data name="SignInRegister" xml:space="preserve"><value>Увійти / Реєстрація</value></data>
+  <data name="SignOut" xml:space="preserve"><value>Вийти</value></data>
+  <data name="Cart" xml:space="preserve"><value>Кошик</value></data>
+  <data name="AdminPanel" xml:space="preserve"><value>⚙ Адмін</value></data>
+  <data name="AdminHint" xml:space="preserve"><value>Панель</value></data>
+
+  <!-- Nav -->
+  <data name="NavCatalog" xml:space="preserve"><value>Каталог</value></data>
+  <data name="NavHome" xml:space="preserve"><value>Головна</value></data>
+  <data name="NavProducts" xml:space="preserve"><value>Товари</value></data>
+  <data name="NavMyOrders" xml:space="preserve"><value>Мої замовлення</value></data>
+
+  <!-- Footer -->
+  <data name="FooterAbout" xml:space="preserve"><value>Про нас</value></data>
+  <data name="FooterContacts" xml:space="preserve"><value>Контакти</value></data>
+  <data name="FooterPrivacy" xml:space="preserve"><value>Політика конфіденційності</value></data>
+  <data name="FooterCopyright" xml:space="preserve"><value>Навчальний проєкт.</value></data>
+
+  <!-- Auth landing -->
+  <data name="AuthWelcome" xml:space="preserve"><value>Ласкаво просимо</value></data>
+  <data name="AuthSubtitle" xml:space="preserve"><value>Увійдіть або створіть новий акаунт</value></data>
+  <data name="AuthSignIn" xml:space="preserve"><value>Увійти</value></data>
+  <data name="AuthSignInHint" xml:space="preserve"><value>Вже маєте акаунт?</value></data>
+  <data name="AuthRegister" xml:space="preserve"><value>Зареєструватися</value></data>
+  <data name="AuthRegisterHint" xml:space="preserve"><value>Ще немає акаунту?</value></data>
+  <data name="AuthBackHome" xml:space="preserve"><value>← На головну</value></data>
+
+  <!-- Delivery oblasts -->
+  <data name="Oblast_All" xml:space="preserve"><value>Вся Україна</value></data>
+  <data name="Oblast_Kyiv" xml:space="preserve"><value>м. Київ</value></data>
+  <data name="Oblast_Vinnytsia" xml:space="preserve"><value>Вінницька обл.</value></data>
+  <data name="Oblast_Volyn" xml:space="preserve"><value>Волинська обл.</value></data>
+  <data name="Oblast_Dnipro" xml:space="preserve"><value>Дніпропетровська обл.</value></data>
+  <data name="Oblast_Donetsk" xml:space="preserve"><value>Донецька обл.</value></data>
+  <data name="Oblast_Zhytomyr" xml:space="preserve"><value>Житомирська обл.</value></data>
+  <data name="Oblast_Zakarpattia" xml:space="preserve"><value>Закарпатська обл.</value></data>
+  <data name="Oblast_Zaporizhzhia" xml:space="preserve"><value>Запорізька обл.</value></data>
+  <data name="Oblast_IvanoFrankivsk" xml:space="preserve"><value>Івано-Франківська обл.</value></data>
+  <data name="Oblast_KyivRegion" xml:space="preserve"><value>Київська обл.</value></data>
+  <data name="Oblast_Kirovohrad" xml:space="preserve"><value>Кіровоградська обл.</value></data>
+  <data name="Oblast_Luhansk" xml:space="preserve"><value>Луганська обл.</value></data>
+  <data name="Oblast_Lviv" xml:space="preserve"><value>Львівська обл.</value></data>
+  <data name="Oblast_Mykolaiv" xml:space="preserve"><value>Миколаївська обл.</value></data>
+  <data name="Oblast_Odesa" xml:space="preserve"><value>Одеська обл.</value></data>
+  <data name="Oblast_Poltava" xml:space="preserve"><value>Полтавська обл.</value></data>
+  <data name="Oblast_Rivne" xml:space="preserve"><value>Рівненська обл.</value></data>
+  <data name="Oblast_Sumy" xml:space="preserve"><value>Сумська обл.</value></data>
+  <data name="Oblast_Ternopil" xml:space="preserve"><value>Тернопільська обл.</value></data>
+  <data name="Oblast_Kharkiv" xml:space="preserve"><value>Харківська обл.</value></data>
+  <data name="Oblast_Kherson" xml:space="preserve"><value>Херсонська обл.</value></data>
+  <data name="Oblast_Khmelnytskyi" xml:space="preserve"><value>Хмельницька обл.</value></data>
+  <data name="Oblast_Cherkasy" xml:space="preserve"><value>Черкаська обл.</value></data>
+  <data name="Oblast_Chernivtsi" xml:space="preserve"><value>Чернівецька обл.</value></data>
+  <data name="Oblast_Chernihiv" xml:space="preserve"><value>Чернігівська обл.</value></data>
+</root>

@@ -1,0 +1,152 @@
+@model IEnumerable<Domain.Entities.Category>
+
+@{
+    ViewData["Title"] = "Категорії";
+    ViewData["ActiveNav"] = "categories";
+    var total = Model.Count();
+}
+
+<!-- Stats -->
+<div class="admin-stats">
+    <div class="admin-stat-card admin-stat-card--blue">
+        <div class="admin-stat-card__icon">🏷️</div>
+        <div class="admin-stat-card__body">
+            <span class="admin-stat-card__value">@total</span>
+            <span class="admin-stat-card__label">Всього категорій</span>
+        </div>
+    </div>
+    <div class="admin-stat-card admin-stat-card--green">
+        <div class="admin-stat-card__icon">📦</div>
+        <div class="admin-stat-card__body">
+            <span class="admin-stat-card__value">@Model.Sum(c => c.Products.Count)</span>
+            <span class="admin-stat-card__label">Товарів у категоріях</span>
+        </div>
+    </div>
+    <div class="admin-stat-card admin-stat-card--orange">
+        <div class="admin-stat-card__icon">📊</div>
+        <div class="admin-stat-card__body">
+            <span class="admin-stat-card__value">@(total > 0 ? Model.Max(c => c.Products.Count) : 0)</span>
+            <span class="admin-stat-card__label">Макс. товарів в категорії</span>
+        </div>
+    </div>
+    <div class="admin-stat-card admin-stat-card--purple">
+        <div class="admin-stat-card__icon">🔲</div>
+        <div class="admin-stat-card__body">
+            <span class="admin-stat-card__value">@Model.Count(c => c.Products.Count == 0)</span>
+            <span class="admin-stat-card__label">Порожніх категорій</span>
+        </div>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="admin-alert admin-alert--success">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="admin-alert admin-alert--danger">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd"/></svg>
+        @TempData["Error"]
+    </div>
+}
+
+<!-- Table section -->
+<div class="admin-section">
+    <div class="admin-section__head">
+        <div class="admin-section__head-left">
+            <h2 class="admin-section__title">Список категорій</h2>
+            <span class="admin-section__count">@total позицій</span>
+        </div>
+        <a asp-action="CreateCategory" class="admin-add-btn">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"/>
+            </svg>
+            Додати категорію
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="admin-empty">
+            <div class="admin-empty__icon">🏷️</div>
+            <p class="admin-empty__title">Категорій ще немає</p>
+            <p class="admin-empty__sub">Додайте першу категорію для організації товарів</p>
+            <a asp-action="CreateCategory" class="admin-add-btn">+ Додати категорію</a>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th class="admin-table__th--id">ID</th>
+                        <th>Назва</th>
+                        <th>Товарів</th>
+                        <th>Заповненість</th>
+                        <th class="admin-table__th--actions">Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var maxProducts = Model.Max(c => c.Products.Count);
+                    }
+                    @foreach (var cat in Model.OrderBy(c => c.Name))
+                    {
+                        var pct = maxProducts > 0 ? (int)((double)cat.Products.Count / maxProducts * 100) : 0;
+                        <tr class="admin-table__row">
+                            <td class="admin-table__id">#@cat.Id</td>
+                            <td>
+                                <div class="admin-cat-name">
+                                    <span class="admin-cat-dot"></span>
+                                    <span class="admin-table__name">@cat.Name</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="admin-badge @(cat.Products.Count == 0 ? "admin-badge--danger" : "admin-badge--success")">
+                                    @cat.Products.Count шт.
+                                </span>
+                            </td>
+                            <td>
+                                <div class="admin-progress">
+                                    <div class="admin-progress__bar" style="width:@pct%"></div>
+                                    <span class="admin-progress__label">@pct%</span>
+                                </div>
+                            </td>
+                            <td class="admin-table__actions">
+                                <a asp-action="EditCategory" asp-route-id="@cat.Id"
+                                   class="admin-icon-btn admin-icon-btn--edit" title="Редагувати">
+                                    <svg viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z"/>
+                                        <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z"/>
+                                    </svg>
+                                </a>
+                                @if (cat.Products.Count == 0)
+                                {
+                                    <a asp-action="DeleteCategory" asp-route-id="@cat.Id"
+                                       class="admin-icon-btn admin-icon-btn--delete" title="Видалити"
+                                       onclick="return confirm('Видалити категорію «@cat.Name»?')">
+                                        <svg viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="admin-icon-btn admin-icon-btn--disabled" title="Видалення неможливе: є товари">
+                                        <svg viewBox="0 0 20 20" fill="currentColor" style="opacity:.35">
+                                            <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4Z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

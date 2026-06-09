@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+
+  <!-- Header -->
+  <data name="DeliverTo" xml:space="preserve"><value>Deliver to</value></data>
+  <data name="AllUkraine" xml:space="preserve"><value>All Ukraine</value></data>
+  <data name="SearchPlaceholder" xml:space="preserve"><value>Search products</value></data>
+  <data name="HelloGreeting" xml:space="preserve"><value>Hello,</value></data>
+  <data name="AccountHint" xml:space="preserve"><value>Account &amp; Lists</value></data>
+  <data name="SignInRegister" xml:space="preserve"><value>Sign in / Register</value></data>
+  <data name="SignOut" xml:space="preserve"><value>Sign out</value></data>
+  <data name="Cart" xml:space="preserve"><value>Cart</value></data>
+  <data name="AdminPanel" xml:space="preserve"><value>⚙ Admin</value></data>
+  <data name="AdminHint" xml:space="preserve"><value>Panel</value></data>
+
+  <!-- Nav -->
+  <data name="NavCatalog" xml:space="preserve"><value>Catalog</value></data>
+  <data name="NavHome" xml:space="preserve"><value>Home</value></data>
+  <data name="NavProducts" xml:space="preserve"><value>Products</value></data>
+  <data name="NavMyOrders" xml:space="preserve"><value>My Orders</value></data>
+
+  <!-- Footer -->
+  <data name="FooterAbout" xml:space="preserve"><value>About us</value></data>
+  <data name="FooterContacts" xml:space="preserve"><value>Contacts</value></data>
+  <data name="FooterPrivacy" xml:space="preserve"><value>Privacy Policy</value></data>
+  <data name="FooterCopyright" xml:space="preserve"><value>Educational project.</value></data>
+
+  <!-- Auth landing -->
+  <data name="AuthWelcome" xml:space="preserve"><value>Welcome back</value></data>
+  <data name="AuthSubtitle" xml:space="preserve"><value>Sign in or create a new account</value></data>
+  <data name="AuthSignIn" xml:space="preserve"><value>Sign in</value></data>
+  <data name="AuthSignInHint" xml:space="preserve"><value>Already have an account?</value></data>
+  <data name="AuthRegister" xml:space="preserve"><value>Create account</value></data>
+  <data name="AuthRegisterHint" xml:space="preserve"><value>New to Amazon ITStep?</value></data>
+  <data name="AuthBackHome" xml:space="preserve"><value>← Back to home</value></data>
+
+  <!-- Delivery oblasts (English names) -->
+  <data name="Oblast_All" xml:space="preserve"><value>All Ukraine</value></data>
+  <data name="Oblast_Kyiv" xml:space="preserve"><value>Kyiv city</value></data>
+  <data name="Oblast_Vinnytsia" xml:space="preserve"><value>Vinnytsia region</value></data>
+  <data name="Oblast_Volyn" xml:space="preserve"><value>Volyn region</value></data>
+  <data name="Oblast_Dnipro" xml:space="preserve"><value>Dnipropetrovsk region</value></data>
+  <data name="Oblast_Donetsk" xml:space="preserve"><value>Donetsk region</value></data>
+  <data name="Oblast_Zhytomyr" xml:space="preserve"><value>Zhytomyr region</value></data>
+  <data name="Oblast_Zakarpattia" xml:space="preserve"><value>Zakarpattia region</value></data>
+  <data name="Oblast_Zaporizhzhia" xml:space="preserve"><value>Zaporizhzhia region</value></data>
+  <data name="Oblast_IvanoFrankivsk" xml:space="preserve"><value>Ivano-Frankivsk region</value></data>
+  <data name="Oblast_KyivRegion" xml:space="preserve"><value>Kyiv region</value></data>
+  <data name="Oblast_Kirovohrad" xml:space="preserve"><value>Kirovohrad region</value></data>
+  <data name="Oblast_Luhansk" xml:space="preserve"><value>Luhansk region</value></data>
+  <data name="Oblast_Lviv" xml:space="preserve"><value>Lviv region</value></data>
+  <data name="Oblast_Mykolaiv" xml:space="preserve"><value>Mykolaiv region</value></data>
+  <data name="Oblast_Odesa" xml:space="preserve"><value>Odesa region</value></data>
+  <data name="Oblast_Poltava" xml:space="preserve"><value>Poltava region</value></data>
+  <data name="Oblast_Rivne" xml:space="preserve"><value>Rivne region</value></data>
+  <data name="Oblast_Sumy" xml:space="preserve"><value>Sumy region</value></data>
+  <data name="Oblast_Ternopil" xml:space="preserve"><value>Ternopil region</value></data>
+  <data name="Oblast_Kharkiv" xml:space="preserve"><value>Kharkiv region</value></data>
+  <data name="Oblast_Kherson" xml:space="preserve"><value>Kherson region</value></data>
+  <data name="Oblast_Khmelnytskyi" xml:space="preserve"><value>Khmelnytskyi region</value></data>
+  <data name="Oblast_Cherkasy" xml:space="preserve"><value>Cherkasy region</value></data>
+  <data name="Oblast_Chernivtsi" xml:space="preserve"><value>Chernivtsi region</value></data>
+  <data name="Oblast_Chernihiv" xml:space="preserve"><value>Chernihiv region</value></data>
+</root>

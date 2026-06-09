@@ -3,19 +3,68 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Amazon Clone - навчальний інтернет-магазин на ASP.NET Core MVC" />
-    <title>@ViewData["Title"]</title>
-
+    <title>@ViewData["Title"] — Amazon ITStep</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="min-vw-100 min-vh-100">
-    <main class="min-vh-100 d-flex flex-column justify-content-center align-items-center" role="main">
-        @RenderBody()
-    </main>
+<body class="auth-body">
+    <div class="auth-split">
+
+        <!-- LEFT: brand panel -->
+        <div class="auth-split__brand" aria-hidden="true">
+            <a class="auth-split__back" asp-controller="Home" asp-action="Index">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clip-rule="evenodd"/>
+                </svg>
+                На головну
+            </a>
+            <div class="auth-split__brand-inner">
+                <a class="auth-split__logo" asp-controller="Home" asp-action="Index">
+                    <span class="auth-split__logo-name">amazon</span>
+                    <span class="auth-split__logo-sub">itstep</span>
+                </a>
+                <p class="auth-split__tagline">
+                    Мільйони товарів.<br />Одна платформа.<br />Все для тебе.
+                </p>
+                <ul class="auth-split__features">
+                    <li>
+                        <span class="auth-split__feature-icon">🚀</span>
+                        <span>Швидка доставка по всій Україні</span>
+                    </li>
+                    <li>
+                        <span class="auth-split__feature-icon">🔒</span>
+                        <span>Безпечні платежі та захист даних</span>
+                    </li>
+                    <li>
+                        <span class="auth-split__feature-icon">💎</span>
+                        <span>Тисячі перевірених продавців</span>
+                    </li>
+                    <li>
+                        <span class="auth-split__feature-icon">↩️</span>
+                        <span>Повернення протягом 30 днів</span>
+                    </li>
+                </ul>
+
+                <!-- Decorative circles -->
+                <div class="auth-split__deco auth-split__deco--1"></div>
+                <div class="auth-split__deco auth-split__deco--2"></div>
+                <div class="auth-split__deco auth-split__deco--3"></div>
+            </div>
+        </div>
+
+        <!-- RIGHT: form panel -->
+        <div class="auth-split__form">
+            <main class="auth-split__form-inner" role="main">
+                @RenderBody()
+            </main>
+            <footer class="auth-split__form-footer">
+                &copy; @DateTime.Now.Year Amazon ITStep. Навчальний проєкт.
+            </footer>
+        </div>
+
+    </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
