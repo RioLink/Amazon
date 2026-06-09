@@ -1,4 +1,5 @@
 ﻿using BLL.Interfaces;
+using DAL.Repositories;
 using DAL.Repositories.Interfaces;
 using Domain.Entities;
 
@@ -6,10 +7,10 @@ namespace BLL.Services
 {
     public class ProductService : IProductService
     {
-        private readonly IGenericRepository<Product> _productRepo;
+        private readonly IProductRepository _productRepo;
         private readonly IGenericRepository<Category> _categoryRepo;
 
-        public ProductService(IGenericRepository<Product> productRepo, IGenericRepository<Category> categoryRepo)
+        public ProductService(IProductRepository productRepo, IGenericRepository<Category> categoryRepo)
         {
             _productRepo = productRepo;
             _categoryRepo = categoryRepo;
@@ -17,12 +18,12 @@ namespace BLL.Services
 
         public async Task<IEnumerable<Product>> GetAllProductsAsync()
         {
-            return await _productRepo.GetAllAsync();
+            return await _productRepo.GetAllWithCategoriesAsync();
         }
 
         public async Task<Product?> GetProductByIdAsync(int id)
         {
-            return await _productRepo.GetByIdAsync(id);
+            return await _productRepo.GetByIdWithCategoryAsync(id);
         }
 
         public async Task<(bool Success, string Message)> AddProductAsync(string name, decimal price, int categoryId, string description, string imageUrl, int quantity)
