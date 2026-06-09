@@ -1,4 +1,5 @@
-﻿using BLL.DTOs;
+﻿using Domain.Entities;
+using Domain.Enums;
 using BLL.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -18,9 +19,9 @@ namespace BLL.Services
             // Логика удаления из корзины
         }
 
-        public async Task<CartDto> GetCartByUserIdAsync(string userId)
+        public async Task<CartItem> GetCartByUserIdAsync(string userId)
         {
-            return new CartDto();
+            return new CartItem();
         }
     }
 }

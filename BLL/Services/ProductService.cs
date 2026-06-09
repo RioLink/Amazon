@@ -1,22 +1,45 @@
-﻿
-using BLL.DTOs;
-using BLL.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using BLL.Interfaces;
+using Domain.Entities;
+using DAL.Repositories.Interfaces; 
 
 namespace AmazonMVC.BLL.Services
 {
     public class ProductService : IProductService
     {
-        public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
+
+        private readonly IGenericRepository<Product> _repo;
+
+        public ProductService(IGenericRepository<Product> repo)
         {
-            // Тут будем подтягивать  товары из базк но пока офф
-            return new List<ProductDto>();
+            _repo = repo;
         }
 
-        public async Task<ProductDto> GetProductByIdAsync(int id)
+        public async Task<IEnumerable<Product>> GetAllProductsAsync()
         {
-            return null;
+            return await _repo.GetAllAsync();
+        }
+
+        public async Task<Product?> GetProductByIdAsync(int id)
+        {
+            return await _repo.GetByIdAsync(id);
+        }
+
+        public async Task AddProductAsync(Product product)
+        {
+            await _repo.AddAsync(product);
+        }
+
+        public async Task UpdateProductAsync(Product product)
+        {
+            await _repo.UpdateAsync(product);
+        }
+
+        public async Task DeleteProductAsync(int id)
+        {
+
+            await _repo.DeleteAsync(id);
         }
     }
 }

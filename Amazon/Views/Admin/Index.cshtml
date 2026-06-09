@@ -1,0 +1,19 @@
+﻿@model IEnumerable<Domain.Entities.Product>
+<h1>Товари</h1>
+<a asp-action="Create" class="btn btn-primary">Додати товар</a>
+<table class="table">
+    <thead><tr><th>Назва</th><th>Ціна</th><th>Дії</th></tr></thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Price.ToString("C")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Редагувати</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Видалити</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
