@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repositories
 {
-    internal class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         protected readonly AppDbContext _context;
         protected readonly DbSet<T> _dbSet;
