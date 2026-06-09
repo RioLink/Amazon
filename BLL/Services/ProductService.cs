@@ -4,7 +4,7 @@ using BLL.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace AmazonMVC.BLL.Services
+namespace BLL.Services
 {
     public class ProductService : IProductService
     {
@@ -16,7 +16,8 @@ namespace AmazonMVC.BLL.Services
 
         public async Task<ProductDto> GetProductByIdAsync(int id)
         {
-            return null;
+            // Тут буде запит до бази — поки повертаємо порожній об'єкт
+            return new ProductDto();
         }
     }
 }

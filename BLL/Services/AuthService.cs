@@ -6,7 +6,7 @@ using System.Text;
 
 namespace BLL.Services
 {
-    internal class AuthService : IAuthService
+    public class AuthService : IAuthService
     {
         public async Task<bool> RegisterAsync(RegisterDto model)
         {
