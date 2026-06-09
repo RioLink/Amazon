@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using BLL.Interfaces;
 using Domain.Entities;
-using DAL.Repositories.Interfaces; // Убедись, что этот неймспейс доступен
+using DAL.Repositories.Interfaces; 
 
 namespace BLL.Services
 {
@@ -17,7 +17,7 @@ namespace BLL.Services
 
         public async Task<IEnumerable<Product>> GetAllProductsAsync()
         {
-            // Убираем всё, что было между <<<<<<< и >>>>>>>, оставляем только это:
+            
             return await _repo.GetAllAsync();
         }
 
