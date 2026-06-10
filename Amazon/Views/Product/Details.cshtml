@@ -85,22 +85,22 @@
         <div class="product-details__divider"></div>
 
         <!-- Qty + Add to cart -->
-        <div class="product-details__actions">
+        <form class="product-details__actions" asp-controller="Cart" asp-action="Add" method="post" id="detailsForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="ProductId" value="@Model.Id" />
+            <input type="hidden" name="Quantity" id="qtyInput" value="1" />
             <div class="qty-stepper">
                 <button class="qty-stepper__btn" type="button" id="qtyMinus" aria-label="Зменшити">−</button>
                 <span class="qty-stepper__value" id="qtyValue">1</span>
                 <button class="qty-stepper__btn" type="button" id="qtyPlus" aria-label="Збільшити">+</button>
             </div>
-            <button class="amazon-button amazon-button--primary product-details__add-btn"
-                    type="button"
-                    id="detailsAddBtn"
-                    data-product="@System.Text.Json.JsonSerializer.Serialize(new { id = Model.Id, name = Model.Name, price = Model.Price, imageUrl = Model.ImageUrl, category = Model.Category })">
+            <button class="amazon-button amazon-button--primary product-details__add-btn" type="submit">
                 <svg viewBox="0 0 24 24" aria-hidden="true" style="width:20px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
                     <path d="M2.5 3.5h2l2.1 10.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 1.9-1.4L21 7H6m3 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm10 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/>
                 </svg>
                 Додати в кошик
             </button>
-        </div>
+        </form>
 
         <!-- Trust -->
         <div class="product-details__trust">
@@ -115,20 +115,13 @@
 <script>
 (function () {
     let qty = 1;
-    const minus = document.getElementById('qtyMinus');
-    const plus  = document.getElementById('qtyPlus');
-    const val   = document.getElementById('qtyValue');
-    const btn   = document.getElementById('detailsAddBtn');
+    const minus    = document.getElementById('qtyMinus');
+    const plus     = document.getElementById('qtyPlus');
+    const val      = document.getElementById('qtyValue');
+    const qtyInput = document.getElementById('qtyInput');
 
-    minus.addEventListener('click', () => { if (qty > 1) val.textContent = --qty; });
-    plus.addEventListener('click',  () => { val.textContent = ++qty; });
-
-    btn.addEventListener('click', () => {
-        const product = JSON.parse(btn.dataset.product);
-        if (typeof addToCart === 'function') {
-            for (let i = 0; i < qty; i++) addToCart(product);
-        }
-    });
+    minus.addEventListener('click', () => { if (qty > 1) { val.textContent = --qty; qtyInput.value = qty; } });
+    plus.addEventListener('click',  () => { val.textContent = ++qty; qtyInput.value = qty; });
 })();
 </script>
 }
