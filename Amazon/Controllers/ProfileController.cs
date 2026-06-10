@@ -27,10 +27,15 @@ public class ProfileController : Controller
             .Include(u => u.Addresses)
             .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
 
+        var ordersCount = user != null
+            ? await _db.Orders.CountAsync(o => o.UserId == user.Id)
+            : 0;
+
         ViewData["UserEmail"]    = user?.Email ?? "";
         ViewData["AvatarPath"]   = user?.AvatarPath ?? "";
         ViewData["Addresses"]    = user?.Addresses.OrderByDescending(a => a.IsDefault).ThenBy(a => a.CreatedAt).ToList()
                                    ?? new List<Address>();
+        ViewData["OrdersCount"]  = ordersCount;
         return View();
     }
 

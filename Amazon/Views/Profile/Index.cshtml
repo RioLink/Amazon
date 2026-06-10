@@ -47,8 +47,11 @@
 
         <nav aria-label="Меню профілю">
             <ul class="profile-nav">
-                <li><a class="is-active" asp-controller="Profile" asp-action="Index">
+                <li><a asp-controller="Orders" asp-action="Index">
                     <span class="nav-icon">📦</span> Мої замовлення
+                </a></li>
+                <li><a class="is-active" asp-controller="Profile" asp-action="Index">
+                    <span class="nav-icon">👤</span> Профіль
                 </a></li>
                 <li><a asp-controller="Product" asp-action="Index">
                     <span class="nav-icon">🛍️</span> Каталог товарів
@@ -74,18 +77,32 @@
     @* ── Main ── *@
     <main class="profile-main">
 
-        <!-- Orders -->
-        <section class="profile-section">
-            <div class="profile-section__header">
-                <h2>Мої замовлення <span class="profile-section__count">(<span id="orders-count">0</span>)</span></h2>
-            </div>
-            <div id="orders-container">
-                <div class="orders-empty">
-                    <div class="orders-empty__icon">📦</div>
-                    <p>Ви ще не зробили жодного замовлення.</p>
-                    <a class="profile-catalog-btn" asp-controller="Product" asp-action="Index">Перейти до каталогу</a>
+        <!-- Orders shortcut -->
+        @{
+            var ordersCount = (ViewData["OrdersCount"] as int?) ?? 0;
+        }
+        <section class="profile-section profile-section--orders-link">
+            <a class="profile-orders-shortcut" asp-controller="Orders" asp-action="Index">
+                <div class="profile-orders-shortcut__left">
+                    <span class="profile-orders-shortcut__icon">📦</span>
+                    <div>
+                        <div class="profile-orders-shortcut__title">Мої замовлення</div>
+                        <div class="profile-orders-shortcut__sub">
+                            @if (ordersCount == 0)
+                            {
+                                <text>Ще немає замовлень</text>
+                            }
+                            else
+                            {
+                                <text>@ordersCount @(ordersCount == 1 ? "замовлення" : ordersCount < 5 ? "замовлення" : "замовлень")</text>
+                            }
+                        </div>
+                    </div>
                 </div>
-            </div>
+                <svg class="profile-orders-shortcut__arrow" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/>
+                </svg>
+            </a>
         </section>
 
         <!-- Account settings -->

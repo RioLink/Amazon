@@ -1,19 +1,97 @@
-@model IReadOnlyList<ProductCardViewModel>
-
+@using Domain.Entities
+@model List<ProductCardViewModel>
 
 @{
     ViewData["Title"] = "Каталог";
     var search = ViewData["Search"] as string;
+    var categories = ViewData["Categories"] as List<Category> ?? new();
+    var categoryId = ViewData["CategoryId"] as int?;
+    var categoryName = ViewData["CategoryName"] as string;
+
+    bool isSearchMode = !string.IsNullOrWhiteSpace(search);
+    bool isCategoryMode = categoryId.HasValue;
+    bool isRootMode = !isSearchMode && !isCategoryMode;
 }
 
 <header class="page-heading">
     <span class="section-heading__eyebrow">Каталог</span>
-    <h1>@(string.IsNullOrWhiteSpace(search) ? "Усі товари" : $"Результати для «{search}»")</h1>
-    <p>Зараз каталог працює на тестових даних. Пізніше тут будуть товари з BLL і бази даних.</p>
+    @if (isSearchMode)
+    {
+        <h1>Результати для «@search»</h1>
+    }
+    else if (isCategoryMode)
+    {
+        <h1>@categoryName</h1>
+        <nav class="catalog-breadcrumb" aria-label="breadcrumb">
+            <a asp-action="Index">Каталог</a>
+            <span>›</span>
+            <span>@categoryName</span>
+        </nav>
+    }
+    else
+    {
+        <h1>Категорії товарів</h1>
+    }
 </header>
 
-@if (Model.Count > 0)
+@* Search bar *@
+<form class="catalog-search-form" asp-action="Index" method="get">
+    @if (categoryId.HasValue)
+    {
+        <input type="hidden" name="categoryId" value="@categoryId" />
+    }
+    <div class="catalog-search-wrap">
+        <input class="catalog-search-input" type="search" name="search" value="@search"
+               placeholder="Пошук товарів..." autocomplete="off" />
+        <button class="catalog-search-btn" type="submit">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <circle cx="9" cy="9" r="6"/><path d="M15 15l3 3" stroke-linecap="round"/>
+            </svg>
+        </button>
+    </div>
+</form>
+
+@if (isRootMode)
 {
+    @* Category grid *@
+    <div class="category-grid">
+        @foreach (var cat in categories)
+        {
+            var count = cat.Products?.Count ?? 0;
+            <a class="category-card" asp-action="Index" asp-route-categoryId="@cat.Id">
+                <div class="category-card__icon">
+                    @{
+                        var icon = cat.Name switch {
+                            "Електроніка" => "💻",
+                            "Телефони" => "📱",
+                            "Аудіо" => "🎧",
+                            "Фото та відео" => "📷",
+                            "Розумний дім" => "🏠",
+                            "Ігри та консолі" => "🎮",
+                            "Аксесуари" => "🔌",
+                            "Побутова техніка" => "🏷️",
+                            _ => "📦"
+                        };
+                    }
+                    @icon
+                </div>
+                <div class="category-card__info">
+                    <span class="category-card__name">@cat.Name</span>
+                    <span class="category-card__count">@count товар@(count == 1 ? "" : count is >= 2 and <= 4 ? "и" : "ів")</span>
+                </div>
+                <svg class="category-card__arrow" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                    <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"/>
+                </svg>
+            </a>
+        }
+    </div>
+}
+else if (Model != null && Model.Count > 0)
+{
+    @if (isCategoryMode)
+    {
+        <a class="catalog-back-link" asp-action="Index">← Всі категорії</a>
+    }
     <div class="product-grid">
         @foreach (var product in Model)
         {
@@ -23,9 +101,13 @@
 }
 else
 {
+    @if (isCategoryMode)
+    {
+        <a class="catalog-back-link" asp-action="Index">← Всі категорії</a>
+    }
     <div class="empty-state">
         <h2>Нічого не знайдено</h2>
         <p>Спробуйте змінити пошуковий запит або переглянути весь каталог.</p>
-        <a class="amazon-button amazon-button--primary" asp-action="Index">Показати всі товари</a>
+        <a class="amazon-button amazon-button--primary" asp-action="Index">Всі категорії</a>
     </div>
 }

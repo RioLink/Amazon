@@ -1,0 +1,185 @@
+@using Domain.Enums
+@model List<Domain.Entities.Order>
+
+@{
+    ViewData["Title"] = "Мої замовлення";
+
+    var totalSpent = Model.Where(o => o.Status != OrderStatus.Cancelled).Sum(o => o.TotalAmount);
+    var deliveredCount = Model.Count(o => o.Status == OrderStatus.Delivered);
+    var inProgressCount = Model.Count(o => o.Status is OrderStatus.Pending or OrderStatus.Processing or OrderStatus.Shipped);
+
+    string StatusLabel(OrderStatus s) => s switch {
+        OrderStatus.Pending    => "Очікує",
+        OrderStatus.Processing => "Обробляється",
+        OrderStatus.Shipped    => "Відправлено",
+        OrderStatus.Delivered  => "Доставлено",
+        OrderStatus.Cancelled  => "Скасовано",
+        _                      => s.ToString()
+    };
+    string StatusCss(OrderStatus s) => s switch {
+        OrderStatus.Delivered  => "orders-badge--delivered",
+        OrderStatus.Cancelled  => "orders-badge--cancelled",
+        OrderStatus.Shipped    => "orders-badge--shipped",
+        OrderStatus.Processing => "orders-badge--processing",
+        _                      => "orders-badge--pending"
+    };
+    string StatusIcon(OrderStatus s) => s switch {
+        OrderStatus.Delivered  => "✅",
+        OrderStatus.Cancelled  => "❌",
+        OrderStatus.Shipped    => "🚚",
+        OrderStatus.Processing => "⚙️",
+        _                      => "🕐"
+    };
+}
+
+<div class="orders-page">
+
+    <!-- Hero header -->
+    <div class="orders-hero">
+        <div class="orders-hero__inner">
+            <div class="orders-hero__left">
+                <h1 class="orders-hero__title">
+                    <span class="orders-hero__icon">📦</span>
+                    Мої замовлення
+                </h1>
+                <p class="orders-hero__sub">
+                    @if (Model.Count == 0)
+                    {
+                        <text>У вас ще немає замовлень</text>
+                    }
+                    else
+                    {
+                        <text>Усього замовлень: <strong>@Model.Count</strong></text>
+                    }
+                </p>
+            </div>
+            <a class="orders-hero__btn" asp-controller="Product" asp-action="Index">
+                🛍️ Перейти до каталогу
+            </a>
+        </div>
+    </div>
+
+    <div class="orders-page__body">
+
+        @if (Model.Count == 0)
+        {
+            <!-- Empty state -->
+            <div class="orders-empty-state">
+                <div class="orders-empty-state__img">🛒</div>
+                <h2>Ви ще нічого не замовляли</h2>
+                <p>Перегляньте каталог та зробіть своє перше замовлення!</p>
+                <a class="orders-empty-state__btn" asp-controller="Product" asp-action="Index">
+                    Перейти до каталогу
+                </a>
+            </div>
+        }
+        else
+        {
+            <!-- Stats row -->
+            <div class="orders-stats">
+                <div class="orders-stat">
+                    <span class="orders-stat__value">@Model.Count</span>
+                    <span class="orders-stat__label">Замовлень</span>
+                </div>
+                <div class="orders-stat">
+                    <span class="orders-stat__value">@totalSpent.ToString("N0") ₴</span>
+                    <span class="orders-stat__label">Витрачено</span>
+                </div>
+                <div class="orders-stat">
+                    <span class="orders-stat__value">@deliveredCount</span>
+                    <span class="orders-stat__label">Доставлено</span>
+                </div>
+                <div class="orders-stat">
+                    <span class="orders-stat__value">@inProgressCount</span>
+                    <span class="orders-stat__label">В обробці</span>
+                </div>
+            </div>
+
+            <!-- Orders list -->
+            <div class="orders-list-page">
+                @foreach (var order in Model)
+                {
+                    var itemCount = order.Items.Sum(i => i.Quantity);
+                    <div class="order-card-page">
+
+                        <!-- Card header -->
+                        <div class="order-card-page__header">
+                            <div class="order-card-page__meta">
+                                <span class="order-card-page__num">Замовлення #@order.Id</span>
+                                <span class="order-card-page__date">@order.Date.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("uk-UA"))</span>
+                                <span class="order-card-page__items-count">@itemCount @(itemCount == 1 ? "товар" : itemCount < 5 ? "товари" : "товарів")</span>
+                            </div>
+                            <span class="orders-badge @StatusCss(order.Status)">
+                                @StatusIcon(order.Status) @StatusLabel(order.Status)
+                            </span>
+                        </div>
+
+                        <!-- Progress bar (timeline) -->
+                        @if (order.Status != OrderStatus.Cancelled)
+                        {
+                            var step = order.Status switch {
+                                OrderStatus.Pending    => 1,
+                                OrderStatus.Processing => 2,
+                                OrderStatus.Shipped    => 3,
+                                OrderStatus.Delivered  => 4,
+                                _                      => 0
+                            };
+                            <div class="order-timeline">
+                                @foreach (var (label, icon, i) in new[] {
+                                    ("Прийнято",    "✅", 1),
+                                    ("Обробка",     "⚙️", 2),
+                                    ("Відправлено", "🚚", 3),
+                                    ("Доставлено",  "🏠", 4)
+                                })
+                                {
+                                    <div class="order-timeline__step @(i <= step ? "order-timeline__step--done" : "") @(i == step ? "order-timeline__step--current" : "")">
+                                        <div class="order-timeline__dot">@(i <= step ? icon : "")</div>
+                                        <span class="order-timeline__label">@label</span>
+                                    </div>
+                                    @if (i < 4)
+                                    {
+                                        <div class="order-timeline__line @(i < step ? "order-timeline__line--done" : "")"></div>
+                                    }
+                                }
+                            </div>
+                        }
+
+                        <!-- Products -->
+                        <div class="order-card-page__products">
+                            @foreach (var item in order.Items)
+                            {
+                                <div class="order-card-page__product">
+                                    @if (!string.IsNullOrEmpty(item.Product?.ImageUrl))
+                                    {
+                                        <img class="order-card-page__product-img"
+                                             src="@item.Product.ImageUrl"
+                                             alt="@item.Product?.Name" />
+                                    }
+                                    else
+                                    {
+                                        <div class="order-card-page__product-img order-card-page__product-img--placeholder">📦</div>
+                                    }
+                                    <div class="order-card-page__product-info">
+                                        <span class="order-card-page__product-name">@(item.Product?.Name ?? "Товар")</span>
+                                        <span class="order-card-page__product-qty">@item.Quantity × @item.Price.ToString("N0") ₴</span>
+                                    </div>
+                                    <span class="order-card-page__product-subtotal">
+                                        @((item.Quantity * item.Price).ToString("N0")) ₴
+                                    </span>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Card footer -->
+                        <div class="order-card-page__footer">
+                            <span class="order-card-page__total-label">Сума замовлення:</span>
+                            <span class="order-card-page__total-amount">@order.TotalAmount.ToString("N0") ₴</span>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        }
+
+    </div>
+</div>

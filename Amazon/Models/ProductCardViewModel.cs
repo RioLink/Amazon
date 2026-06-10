@@ -8,6 +8,8 @@ public class ProductCardViewModel
 
     public required string Category { get; init; }
 
+    public int CategoryId { get; init; }
+
     public required string ImageUrl { get; init; }
 
     public decimal Price { get; init; }

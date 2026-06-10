@@ -18,13 +18,13 @@ namespace Amazon.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var products = (await _productService.GetMostPopularProductsAsync()).Select(p => new ProductCardViewModel { 
-                Id = p.Id,  
-                Name = p.Name, 
-                Category = p.Category.Name, 
-                Price = p.Price, 
-                Description = p.Description, 
-                ImageUrl = p.ImageUrl 
+            var products = (await _productService.GetMostPopularProductsAsync()).Select(p => new ProductCardViewModel {
+                Id = p.Id,
+                Name = p.Name,
+                Category = p.Category.Name,
+                Price = p.Price,
+                Description = p.Description,
+                ImageUrl = p.ImageUrl
             }).ToList();
 
             return View(products);
@@ -35,6 +35,7 @@ namespace Amazon.Controllers
         public IActionResult Terms() => View();
         public IActionResult Disclaimer() => View();
         public IActionResult AboutUs() => View();
+        public IActionResult Careers() => View();
 
         [HttpGet]
         public IActionResult SetLanguage(string culture, string? returnUrl)

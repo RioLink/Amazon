@@ -12,14 +12,17 @@ namespace Amazon.Controllers
         private readonly IAuthService      _authService;
         private readonly UserManager<User> _userManager;
         private readonly IEmailService     _emailService;
+        private readonly ICartService      _cartService;
 
         public AuthController(IAuthService authService,
                               UserManager<User> userManager,
-                              IEmailService emailService)
+                              IEmailService emailService,
+                              ICartService cartService)
         {
             _authService  = authService;
             _userManager  = userManager;
             _emailService = emailService;
+            _cartService  = cartService;
         }
 
         [HttpGet]
@@ -52,7 +55,27 @@ namespace Amazon.Controllers
 
             var (success, message) = await _authService.LoginAsync(model.Username, model.Password);
 
-            if (success) return RedirectToAction("Index", "Home");
+            if (success)
+            {
+                // Merge guest session cart → DB cart
+                var guestCart = GuestCartService.GetCart(HttpContext.Session);
+                if (guestCart.Count > 0)
+                {
+                    var user = await _userManager.FindByNameAsync(model.Username);
+                    if (user != null)
+                    {
+                        foreach (var item in guestCart)
+                            await _cartService.AddToCartAsync(user.Id, item.ProductId, item.Quantity);
+                    }
+                    GuestCartService.Clear(HttpContext.Session);
+                }
+
+                var returnUrl = Request.Query["ReturnUrl"].ToString();
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                    return Redirect(returnUrl);
+
+                return RedirectToAction("Index", "Home");
+            }
 
             ModelState.AddModelError("", message);
             return View(model);

@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <div class="category-grid">
+    <div class="category-grid category-grid--home">
         <a class="category-card category-card--electronics"
            asp-controller="Product" asp-action="Index" asp-route-search="Техніка">
             <span class="category-card__icon" aria-hidden="true">⌁</span>
@@ -88,6 +88,14 @@
             <span>
                 <strong>Спорт</strong>
                 <small>Товари для активного способу життя</small>
+            </span>
+        </a>
+        <a class="category-card category-card--games"
+           asp-controller="Product" asp-action="Index" asp-route-search="Ігри">
+            <span class="category-card__icon" aria-hidden="true">🎮</span>
+            <span>
+                <strong>Ігри</strong>
+                <small>Консолі, ігри та аксесуари</small>
             </span>
         </a>
     </div>

@@ -1,35 +1,58 @@
 @model ProductCardViewModel
+
 <article class="product-card">
-    <a class="product-card__image-link" asp-controller="Product" asp-action="Details" asp-route-id="@Model.Id">
+    <a class="product-card__image-link"
+       asp-controller="Product" asp-action="Details" asp-route-id="@Model.Id"
+       aria-label="Переглянути @Model.Name" tabindex="-1">
         @if (Model.OldPrice.HasValue)
         {
-            <span class="product-card__badge">Знижка</span>
+            var discount = (int)Math.Round((1 - Model.Price / Model.OldPrice.Value) * 100);
+            <span class="product-card__badge">−@discount%</span>
         }
         <img class="product-card__image" src="@Model.ImageUrl" alt="@Model.Name" loading="lazy" />
+        <div class="product-card__overlay">
+            <span class="product-card__overlay-text">Швидкий перегляд</span>
+        </div>
     </a>
+
     <div class="product-card__content">
         <span class="product-card__category">@Model.Category</span>
+
         <h3 class="product-card__title">
             <a asp-controller="Product" asp-action="Details" asp-route-id="@Model.Id">@Model.Name</a>
         </h3>
-        <div class="product-card__rating">
-            <span>★★★★★</span>
-            <small>@Model.Rating (@Model.ReviewCount)</small>
+
+        <div class="product-card__stars" aria-label="Оцінка @Model.Rating з 5">
+            @{
+                var ratingD = Model.Rating ?? 0.0;
+                var full = (int)Math.Floor(ratingD);
+                var half = (ratingD - full) >= 0.5;
+            }
+            @for (int i = 1; i <= 5; i++)
+            {
+                if (i <= full) { <span class="star star--full">★</span> }
+                else if (i == full + 1 && half) { <span class="star star--half">★</span> }
+                else { <span class="star star--empty">★</span> }
+            }
+            <span class="product-card__review-count">(@Model.ReviewCount)</span>
         </div>
+
         <div class="product-card__footer">
-            <div class="product-card__price">
-                <strong>@Model.Price.ToString("N0") ₴</strong>
+            <div class="product-card__price-block">
+                <span class="product-card__price-current">@Model.Price.ToString("N0") ₴</span>
                 @if (Model.OldPrice.HasValue)
                 {
-                    <del>@Model.OldPrice.Value.ToString("N0") ₴</del>
+                    <span class="product-card__price-old">@Model.OldPrice.Value.ToString("N0") ₴</span>
                 }
             </div>
-            <form asp-controller="Cart" asp-action="Add" method="post">
+            <form class="product-card__cart-form" asp-controller="Cart" asp-action="Add" method="post">
+                @Html.AntiForgeryToken()
                 <input type="hidden" name="ProductId" value="@Model.Id" />
                 <input type="hidden" name="Quantity" value="1" />
-                <button type="submit" class="product-card__cart-button" aria-label="Додати @Model.Name у кошик">
-                    <svg aria-hidden="true" viewBox="0 0 24 24">
-                        <path d="M2.5 3.5h2l2.1 10.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 1.9-1.4L21 7H6m3 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm10 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" />
+                <button class="product-card__cart-btn" type="submit"
+                        aria-label="Додати @Model.Name у кошик">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2.5 3.5h2l2.1 10.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 1.9-1.4L21 7H6m3 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm10 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/>
                     </svg>
                 </button>
             </form>

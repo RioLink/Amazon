@@ -1,64 +1,34 @@
 @{
     ViewData["Title"] = "Замовлення підтверджено";
+    var orderAddress = ViewData["OrderAddress"]?.ToString() ?? "—";
 }
 
-<div class="confirm-page" id="confirm-content">
+<div class="confirm-page">
 
-    @* ── Hero: success message ── *@
     <div class="confirm-hero">
         <div class="confirm-checkmark" aria-hidden="true">✓</div>
         <h1>Замовлення прийнято!</h1>
         <p>Дякуємо за покупку. Ми вже обробляємо ваше замовлення.</p>
-        <span class="confirm-order-id" id="confirm-order-id">—</span>
     </div>
 
-    @* ── Details: address & payment ── *@
     <div class="confirm-details">
         <div class="confirm-card">
             <h3>Адреса доставки</h3>
-            <p id="confirm-address">—</p>
+            <p>@orderAddress</p>
         </div>
         <div class="confirm-card">
             <h3>Дата замовлення</h3>
-            <p id="confirm-date">—</p>
-            <h3 style="margin-top:16px;">Оплата</h3>
-            <p id="confirm-payment">—</p>
+            <p>@DateTime.Now.ToString("dd.MM.yyyy")</p>
             <h3 style="margin-top:16px;">Статус</h3>
-            <p>
-                <span class="order-status order-status--received">Прийнято</span>
-            </p>
+            <p><span class="order-status order-status--pending">Очікує обробки</span></p>
         </div>
     </div>
 
-    @* ── Items in this order ── *@
-    <div class="confirm-items">
-        <h3>Товари у замовленні</h3>
-        <ul class="confirm-items__list" id="confirm-items-list"></ul>
-
-        <div class="confirm-items__totals">
-            <div class="confirm-items__totals-row">
-                <span>Товари</span>
-                <span id="confirm-subtotal">—</span>
-            </div>
-            <div class="confirm-items__totals-row">
-                <span>Доставка</span>
-                <span id="confirm-shipping">—</span>
-            </div>
-            <div class="confirm-items__totals-row confirm-items__totals-row--total">
-                <span>Загальна сума</span>
-                <span id="confirm-total">—</span>
-            </div>
-        </div>
-    </div>
-
-    @* ── Actions ── *@
     <div class="confirm-actions">
-        <a class="amazon-button amazon-button--primary"
-           asp-controller="Profile" asp-action="Index">
+        <a class="amazon-button amazon-button--primary" asp-controller="Profile" asp-action="Index">
             Мої замовлення
         </a>
-        <a class="amazon-button amazon-button--secondary"
-           asp-controller="Product" asp-action="Index">
+        <a class="amazon-button amazon-button--secondary" asp-controller="Product" asp-action="Index">
             Продовжити покупки
         </a>
     </div>
