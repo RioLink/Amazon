@@ -1,15 +1,8 @@
 @using Microsoft.Extensions.Localization
-@using System.Globalization
 @inject IStringLocalizer<Amazon.SharedResource> L
 
-@{
-    var currentCulture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
-    var isEn = currentCulture == "en";
-    var returnUrl = Context.Request.Path + Context.Request.QueryString;
-}
-
 <!DOCTYPE html>
-<html lang="@currentCulture">
+<html lang="uk">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,12 +11,68 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <!-- Google Translate -->
+    <style>
+        /* Hide the native widget — we use a custom button */
+        #google_translate_element { display: none !important; }
+        body > .skiptranslate { display: none !important; }
+        body { top: 0 !important; }
+
+        /* Custom language button */
+        .gt-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: rgba(255,255,255,.10);
+            border: 1px solid rgba(255,255,255,.28);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background .15s, border-color .15s;
+            z-index: 200;
+        }
+        .gt-btn:hover { background: rgba(255,255,255,.22); border-color: #fff; }
+        .gt-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+        .gt-btn__caret { width: 12px !important; opacity: .7; }
+
+        .gt-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            background: #1a232e;
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 8px;
+            box-shadow: 0 10px 32px rgba(0,0,0,.45);
+            min-width: 170px;
+            z-index: 9999;
+            overflow: hidden;
+        }
+        .gt-dropdown__item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            font-size: 13px;
+            color: #e8ecef;
+            cursor: pointer;
+            transition: background .1s;
+        }
+        .gt-dropdown__item:hover { background: rgba(255,255,255,.10); }
+        .gt-dropdown__item.active { color: #f0c040; font-weight: 700; }
+        .gt-wrap { position: relative; flex-shrink: 0; }
+    </style>
 </head>
 <body>
     <header class="site-header">
         <nav class="main-navigation" aria-label="Головна навігація">
 
-            <!-- ── ROW 1: Logo / Delivery / Search / Lang / Account / Cart ── -->
+            <!-- ── ROW 1: Logo / Delivery / Search / Translate / Account / Cart ── -->
             <div class="main-navigation__content">
 
                 <!-- Logo -->
@@ -44,8 +93,8 @@
                                   d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
                         </svg>
                         <span class="delivery-picker__text">
-                            <span class="delivery-picker__label">@L["DeliverTo"]</span>
-                            <span class="delivery-picker__value" id="deliveryLabel">@L["AllUkraine"]</span>
+                            <span class="delivery-picker__label">Доставка до</span>
+                            <span class="delivery-picker__value" id="deliveryLabel">Вся Україна</span>
                         </span>
                         <svg class="delivery-picker__caret" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd"/>
@@ -54,55 +103,52 @@
 
                     <!-- Dropdown: Ukraine oblasts -->
                     <div class="delivery-dropdown" id="deliveryDropdown" hidden>
-                        <div class="delivery-dropdown__head">
-                            @(isEn ? "Choose your region" : "Оберіть вашу область")
-                        </div>
+                        <div class="delivery-dropdown__head">Оберіть вашу область</div>
                         <ul class="delivery-dropdown__list" role="listbox">
                             <li class="delivery-dropdown__item delivery-dropdown__item--all"
-                                role="option" data-oblast="@L["Oblast_All"]"
-                                onclick="selectOblast(this)">
+                                role="option" data-oblast="Вся Україна" onclick="selectOblast(this)">
                                 <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M1 2.75A.75.75 0 0 1 1.75 2h16.5a.75.75 0 0 1 0 1.5H18v8.75A2.75 2.75 0 0 1 15.25 15h-1.072l.798 3.06a.75.75 0 0 1-1.452.38L13.41 18H6.59l-.114.44a.75.75 0 0 1-1.452-.38L5.823 15H4.75A2.75 2.75 0 0 1 2 12.25V3.5h-.25A.75.75 0 0 1 1 2.75Z" clip-rule="evenodd"/></svg>
-                                @L["Oblast_All"]
+                                Вся Україна
                             </li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Kyiv"]" onclick="selectOblast(this)">@L["Oblast_Kyiv"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Vinnytsia"]" onclick="selectOblast(this)">@L["Oblast_Vinnytsia"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Volyn"]" onclick="selectOblast(this)">@L["Oblast_Volyn"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Dnipro"]" onclick="selectOblast(this)">@L["Oblast_Dnipro"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Donetsk"]" onclick="selectOblast(this)">@L["Oblast_Donetsk"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Zhytomyr"]" onclick="selectOblast(this)">@L["Oblast_Zhytomyr"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Zakarpattia"]" onclick="selectOblast(this)">@L["Oblast_Zakarpattia"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Zaporizhzhia"]" onclick="selectOblast(this)">@L["Oblast_Zaporizhzhia"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_IvanoFrankivsk"]" onclick="selectOblast(this)">@L["Oblast_IvanoFrankivsk"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_KyivRegion"]" onclick="selectOblast(this)">@L["Oblast_KyivRegion"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Kirovohrad"]" onclick="selectOblast(this)">@L["Oblast_Kirovohrad"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Luhansk"]" onclick="selectOblast(this)">@L["Oblast_Luhansk"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Lviv"]" onclick="selectOblast(this)">@L["Oblast_Lviv"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Mykolaiv"]" onclick="selectOblast(this)">@L["Oblast_Mykolaiv"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Odesa"]" onclick="selectOblast(this)">@L["Oblast_Odesa"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Poltava"]" onclick="selectOblast(this)">@L["Oblast_Poltava"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Rivne"]" onclick="selectOblast(this)">@L["Oblast_Rivne"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Sumy"]" onclick="selectOblast(this)">@L["Oblast_Sumy"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Ternopil"]" onclick="selectOblast(this)">@L["Oblast_Ternopil"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Kharkiv"]" onclick="selectOblast(this)">@L["Oblast_Kharkiv"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Kherson"]" onclick="selectOblast(this)">@L["Oblast_Kherson"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Khmelnytskyi"]" onclick="selectOblast(this)">@L["Oblast_Khmelnytskyi"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Cherkasy"]" onclick="selectOblast(this)">@L["Oblast_Cherkasy"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Chernivtsi"]" onclick="selectOblast(this)">@L["Oblast_Chernivtsi"]</li>
-                            <li class="delivery-dropdown__item" role="option" data-oblast="@L["Oblast_Chernihiv"]" onclick="selectOblast(this)">@L["Oblast_Chernihiv"]</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="м. Київ" onclick="selectOblast(this)">м. Київ</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Вінницька обл." onclick="selectOblast(this)">Вінницька обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Волинська обл." onclick="selectOblast(this)">Волинська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Дніпропетровська обл." onclick="selectOblast(this)">Дніпропетровська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Донецька обл." onclick="selectOblast(this)">Донецька обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Житомирська обл." onclick="selectOblast(this)">Житомирська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Закарпатська обл." onclick="selectOblast(this)">Закарпатська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Запорізька обл." onclick="selectOblast(this)">Запорізька обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Івано-Франківська обл." onclick="selectOblast(this)">Івано-Франківська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Київська обл." onclick="selectOblast(this)">Київська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Кіровоградська обл." onclick="selectOblast(this)">Кіровоградська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Луганська обл." onclick="selectOblast(this)">Луганська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Львівська обл." onclick="selectOblast(this)">Львівська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Миколаївська обл." onclick="selectOblast(this)">Миколаївська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Одеська обл." onclick="selectOblast(this)">Одеська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Полтавська обл." onclick="selectOblast(this)">Полтавська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Рівненська обл." onclick="selectOblast(this)">Рівненська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Сумська обл." onclick="selectOblast(this)">Сумська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Тернопільська обл." onclick="selectOblast(this)">Тернопільська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Харківська обл." onclick="selectOblast(this)">Харківська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Херсонська обл." onclick="selectOblast(this)">Херсонська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Хмельницька обл." onclick="selectOblast(this)">Хмельницька обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Черкаська обл." onclick="selectOblast(this)">Черкаська обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Чернівецька обл." onclick="selectOblast(this)">Чернівецька обл.</li>
+                            <li class="delivery-dropdown__item" role="option" data-oblast="Чернігівська обл." onclick="selectOblast(this)">Чернігівська обл.</li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Search -->
                 <form class="search-form" asp-controller="Product" asp-action="Index" method="get" role="search">
-                    <label class="visually-hidden" for="header-search">@L["SearchPlaceholder"]</label>
+                    <label class="visually-hidden" for="header-search">Пошук товарів</label>
                     <input id="header-search"
                            class="search-form__input"
                            type="search"
                            name="search"
-                           placeholder="@L["SearchPlaceholder"]"
+                           placeholder="Пошук товарів"
                            autocomplete="off" />
-                    <button class="search-form__button" type="submit" aria-label="@(isEn ? "Search" : "Знайти")">
+                    <button class="search-form__button" type="submit" aria-label="Знайти">
                         <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
                             <path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" />
                         </svg>
@@ -112,62 +158,61 @@
                 <!-- Right actions -->
                 <div class="main-navigation__actions">
 
-                    <!-- Language switcher -->
-                    <div class="lang-switcher" id="langSwitcher">
-                        <button class="lang-switcher__btn" type="button"
-                                onclick="toggleLang()" aria-expanded="false" aria-controls="langDropdown">
-                            <span class="lang-switcher__flag">@(isEn ? "🇬🇧" : "🇺🇦")</span>
-                            <span class="lang-switcher__code">@(isEn ? "EN" : "UK")</span>
-                            <svg class="lang-switcher__caret" viewBox="0 0 20 20" fill="currentColor">
+                    <!-- Google Translate (custom button) -->
+                    <div class="gt-wrap" id="gtWrap">
+                        <button class="gt-btn" id="gtBtn" onclick="toggleGtMenu()" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                            </svg>
+                            <span id="gtLabel">УКР</span>
+                            <svg class="gt-btn__caret" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd"/>
                             </svg>
                         </button>
-                        <div class="lang-dropdown" id="langDropdown" hidden>
-                            <a class="lang-dropdown__item @(!isEn ? "lang-dropdown__item--active" : "")"
-                               asp-controller="Home" asp-action="SetLanguage"
-                               asp-route-culture="uk" asp-route-returnUrl="@returnUrl">
-                                🇺🇦 Українська
-                            </a>
-                            <a class="lang-dropdown__item @(isEn ? "lang-dropdown__item--active" : "")"
-                               asp-controller="Home" asp-action="SetLanguage"
-                               asp-route-culture="en" asp-route-returnUrl="@returnUrl">
-                                🇬🇧 English
-                            </a>
+                        <div class="gt-dropdown" id="gtDropdown" hidden>
+                            <div class="gt-dropdown__item active" data-lang="" data-label="УКР" onclick="selectLang(this)">🇺🇦 Українська</div>
+                            <div class="gt-dropdown__item" data-lang="en" data-label="ENG" onclick="selectLang(this)">🇬🇧 English</div>
+                            <div class="gt-dropdown__item" data-lang="de" data-label="DEU" onclick="selectLang(this)">🇩🇪 Deutsch</div>
+                            <div class="gt-dropdown__item" data-lang="fr" data-label="FRA" onclick="selectLang(this)">🇫🇷 Français</div>
+                            <div class="gt-dropdown__item" data-lang="pl" data-label="POL" onclick="selectLang(this)">🇵🇱 Polski</div>
+                            <div class="gt-dropdown__item" data-lang="es" data-label="ESP" onclick="selectLang(this)">🇪🇸 Español</div>
+                            <div class="gt-dropdown__item" data-lang="it" data-label="ITA" onclick="selectLang(this)">🇮🇹 Italiano</div>
+                            <div class="gt-dropdown__item" data-lang="zh-CN" data-label="中文" onclick="selectLang(this)">🇨🇳 中文</div>
+                            <div class="gt-dropdown__item" data-lang="ja" data-label="日本語" onclick="selectLang(this)">🇯🇵 日本語</div>
                         </div>
                     </div>
+                    <!-- Hidden native widget -->
+                    <div id="google_translate_element"></div>
 
                     <!-- Admin link -->
                     @if (User.IsInRole("Admin"))
                     {
                         <a class="header-link header-link--admin" asp-controller="Admin" asp-action="Index">
-                            <span class="header-link__hint">@L["AdminHint"]</span>
-                            <span class="header-link__title">@L["AdminPanel"]</span>
+                            <span class="header-link__hint">Панель</span>
+                            <span class="header-link__title">⚙ Адмін</span>
                         </a>
                     }
 
                     <!-- Account -->
                     @if (User.Identity != null && User.Identity.IsAuthenticated)
                     {
-                        <!-- Profile link -->
                         <a class="header-link" asp-controller="Profile" asp-action="Index">
-                            <span class="header-link__hint">@L["HelloGreeting"]</span>
+                            <span class="header-link__hint">Вітаємо,</span>
                             <span class="header-link__title">@User.Identity.Name</span>
                         </a>
-                        <!-- Logout -->
                         <form asp-controller="Auth" asp-action="Logout" method="post" class="header-logout-form">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="header-link header-link--logout" title="@L["SignOut"]">
-                                <span class="header-link__hint">@L["AccountHint"]</span>
-                                <span class="header-link__title">@L["SignOut"]</span>
+                            <button type="submit" class="header-link header-link--logout" title="Вийти">
+                                <span class="header-link__hint">Акаунт та списки</span>
+                                <span class="header-link__title">Вийти</span>
                             </button>
                         </form>
                     }
                     else
                     {
-                        <!-- Single combined auth button -->
                         <a class="header-link header-link--account" asp-controller="Auth" asp-action="Index">
-                            <span class="header-link__hint">@L["AccountHint"]</span>
-                            <span class="header-link__title">@L["SignInRegister"]</span>
+                            <span class="header-link__hint">Акаунт та списки</span>
+                            <span class="header-link__title">Увійти / Реєстрація</span>
                         </a>
                     }
 
@@ -177,9 +222,9 @@
                             <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
                                 <path d="M2.5 3.5h2l2.1 10.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 1.9-1.4L21 7H6m3 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm10 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" />
                             </svg>
-                            <span class="cart-count" aria-label="@(isEn ? "Items in cart" : "Товарів у кошику")">0</span>
+                            <span class="cart-count" aria-label="Товарів у кошику">0</span>
                         </div>
-                        <span class="header-link__title">@L["Cart"]</span>
+                        <span class="header-link__title">Кошик</span>
                     </a>
                 </div>
             </div>
@@ -188,9 +233,9 @@
             <div class="category-navigation">
                 <div class="category-navigation__content">
                     @await Component.InvokeAsync("CatalogMenu")
-                    <a asp-controller="Home" asp-action="Index">@L["NavHome"]</a>
-                    <a asp-controller="Product" asp-action="Index">@L["NavProducts"]</a>
-                    <a asp-controller="Orders" asp-action="Index">@L["NavMyOrders"]</a>
+                    <a asp-controller="Home" asp-action="Index">Головна</a>
+                    <a asp-controller="Product" asp-action="Index">Товари</a>
+                    <a asp-controller="Orders" asp-action="Index">Мої замовлення</a>
                 </div>
             </div>
 
@@ -203,7 +248,6 @@
 
     <footer class="site-footer">
 
-        <!-- Top wave decoration -->
         <div class="site-footer__wave" aria-hidden="true">
             <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
                 <path d="M0,30 C240,60 480,0 720,30 C960,60 1200,0 1440,30 L1440,60 L0,60 Z" fill="#131921"/>
@@ -212,7 +256,6 @@
 
         <div class="site-footer__inner">
 
-            <!-- ── Row 1: Brand + Columns ── -->
             <div class="site-footer__top">
 
                 <!-- Brand column -->
@@ -221,103 +264,82 @@
                         <span class="site-footer__logo-name">amazon</span>
                         <span class="site-footer__logo-sub">ITSTEP</span>
                     </a>
-                    <p class="site-footer__tagline">
-                        @(isEn
-                            ? "Millions of products. One platform. Everything for you."
-                            : "Мільйони товарів. Одна платформа. Все для тебе.")
-                    </p>
-                    <!-- Social icons -->
+                    <p class="site-footer__tagline">Мільйони товарів. Одна платформа. Все для тебе.</p>
                     <div class="site-footer__socials">
                         <a class="site-footer__social" href="https://www.instagram.com" target="_blank" rel="noopener" aria-label="Instagram">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069ZM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0Zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881Z"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069ZM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0Zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881Z"/></svg>
                         </a>
                         <a class="site-footer__social" href="https://www.facebook.com" target="_blank" rel="noopener" aria-label="Facebook">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073Z"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073Z"/></svg>
                         </a>
                         <a class="site-footer__social" href="https://telegram.org" target="_blank" rel="noopener" aria-label="Telegram">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0Zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635Z"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0Zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635Z"/></svg>
                         </a>
                         <a class="site-footer__social" href="https://www.youtube.com" target="_blank" rel="noopener" aria-label="YouTube">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z"/></svg>
                         </a>
                     </div>
                 </div>
 
                 <!-- Shopping column -->
                 <div class="site-footer__col">
-                    <h4 class="site-footer__col-title">
-                        @(isEn ? "Shopping" : "Покупки")
-                    </h4>
+                    <h4 class="site-footer__col-title">Покупки</h4>
                     <ul class="site-footer__col-list">
-                        <li><a asp-controller="Product" asp-action="Index">@(isEn ? "All Products" : "Всі товари")</a></li>
-                        <li><a asp-controller="Cart" asp-action="Index">@(isEn ? "Cart" : "Кошик")</a></li>
-                        <li><a asp-controller="Checkout" asp-action="Index">@(isEn ? "Checkout" : "Оформлення")</a></li>
-                        <li><a asp-controller="Profile" asp-action="Index">@(isEn ? "My Orders" : "Мої замовлення")</a></li>
+                        <li><a asp-controller="Product" asp-action="Index">Всі товари</a></li>
+                        <li><a asp-controller="Cart" asp-action="Index">Кошик</a></li>
+                        <li><a asp-controller="Checkout" asp-action="Index">Оформлення</a></li>
+                        <li><a asp-controller="Orders" asp-action="Index">Мої замовлення</a></li>
                     </ul>
                 </div>
 
                 <!-- Company column -->
                 <div class="site-footer__col">
-                    <h4 class="site-footer__col-title">
-                        @(isEn ? "Company" : "Компанія")
-                    </h4>
+                    <h4 class="site-footer__col-title">Компанія</h4>
                     <ul class="site-footer__col-list">
-                        <li><a asp-controller="Home" asp-action="AboutUs">@(isEn ? "About Us" : "Про нас")</a></li>
-                        <li><a href="mailto:support@amazon-itstep.com">@(isEn ? "Contact Us" : "Контакти")</a></li>
+                        <li><a asp-controller="Home" asp-action="AboutUs">Про нас</a></li>
+                        <li><a href="mailto:support@amazon-itstep.com">Контакти</a></li>
                         <li><a href="#" onclick="return false;">#ITStep</a></li>
-                        <li><a asp-controller="Home" asp-action="Careers">@(isEn ? "Careers" : "Кар'єра")</a></li>
+                        <li><a asp-controller="Home" asp-action="Careers">Кар'єра</a></li>
                     </ul>
                 </div>
 
                 <!-- Legal column -->
                 <div class="site-footer__col">
-                    <h4 class="site-footer__col-title">
-                        @(isEn ? "Legal" : "Правова інформація")
-                    </h4>
+                    <h4 class="site-footer__col-title">Правова інформація</h4>
                     <ul class="site-footer__col-list">
-                        <li><a asp-controller="Home" asp-action="PrivacyPolicy">@(isEn ? "Privacy Policy" : "Політика конфіденційності")</a></li>
-                        <li><a asp-controller="Home" asp-action="Terms">@(isEn ? "Terms & Conditions" : "Умови використання")</a></li>
-                        <li><a asp-controller="Home" asp-action="Disclaimer">@(isEn ? "Disclaimer" : "Відмова від відповідальності")</a></li>
+                        <li><a asp-controller="Home" asp-action="PrivacyPolicy">Політика конфіденційності</a></li>
+                        <li><a asp-controller="Home" asp-action="Terms">Умови використання</a></li>
+                        <li><a asp-controller="Home" asp-action="Disclaimer">Відмова від відповідальності</a></li>
                     </ul>
                 </div>
 
             </div>
 
-            <!-- ── Row 2: Newsletter ── -->
+            <!-- Newsletter -->
             <div class="site-footer__newsletter">
                 <div class="site-footer__newsletter-text">
-                    <strong>@(isEn ? "Subscribe to our newsletter" : "Підпишіться на розсилку")</strong>
-                    <span>@(isEn ? "Deals, new arrivals, no spam." : "Акції, новинки, без спаму.")</span>
+                    <strong>Підпишіться на розсилку</strong>
+                    <span>Акції, новинки, без спаму.</span>
                 </div>
                 <div class="site-footer__newsletter-wrap">
                     <form class="site-footer__newsletter-form" id="newsletterForm" onsubmit="subscribeNewsletter(event)">
                         <input type="email" id="newsletterEmail"
-                               placeholder="@(isEn ? "your@email.com" : "ваша@пошта.com")"
+                               placeholder="ваша@@пошта.com"
                                class="site-footer__newsletter-input" required />
-                        <button type="submit" class="site-footer__newsletter-btn">
-                            @(isEn ? "Subscribe" : "Підписатись")
-                        </button>
+                        <button type="submit" class="site-footer__newsletter-btn">Підписатись</button>
                     </form>
                     <div id="newsletterMsg" class="site-footer__newsletter-msg" style="display:none"></div>
                 </div>
             </div>
 
-            <!-- ── Row 3: Bottom bar ── -->
+            <!-- Bottom bar -->
             <div class="site-footer__bottom">
                 <div class="site-footer__bottom-left">
                     <span class="site-footer__copyright">
-                        &copy; @DateTime.Now.Year <strong>Amazon ITStep</strong>. @(isEn ? "All rights reserved." : "Всі права захищені.")
+                        &copy; @DateTime.Now.Year <strong>Amazon ITStep</strong>. Всі права захищені.
                     </span>
                     <span class="site-footer__dot" aria-hidden="true">·</span>
-                    <span class="site-footer__edu">@(isEn ? "Educational project" : "Навчальний проєкт") · ITStep</span>
+                    <span class="site-footer__edu">Навчальний проєкт · ITStep</span>
                 </div>
                 <div class="site-footer__bottom-right">
                     <span class="site-footer__pay-icon" title="Visa">💳</span>
@@ -334,10 +356,85 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
+    <!-- Google Translate API -->
+    <script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'uk',
+            includedLanguages: 'en,de,fr,pl,es,it,zh-CN,ja',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
+        }, 'google_translate_element');
+    }
+
+    // Map lang code → display label
+    const GT_LABELS = {
+        '':      'УКР',
+        'en':    'ENG',
+        'de':    'DEU',
+        'fr':    'FRA',
+        'pl':    'POL',
+        'es':    'ESP',
+        'it':    'ITA',
+        'zh-CN': '中文',
+        'ja':    '日本語'
+    };
+
+    // Read current lang from googtrans cookie  (/uk/en → 'en')
+    function getGtLang() {
+        const m = document.cookie.match(/(?:^|;)\s*googtrans=\/[^/]+\/([^;]+)/);
+        return m ? m[1] : '';
+    }
+
+    // Sync button label + active item with current translation state
+    function syncGtUI() {
+        const lang  = getGtLang();
+        const label = GT_LABELS[lang] || lang.toUpperCase();
+        document.getElementById('gtLabel').textContent = label;
+        document.querySelectorAll('.gt-dropdown__item').forEach(el => {
+            el.classList.toggle('active', el.dataset.lang === lang);
+        });
+    }
+
+    function toggleGtMenu() {
+        const dd = document.getElementById('gtDropdown');
+        dd.hidden = !dd.hidden;
+    }
+
+    function selectLang(el) {
+        const lang = el.dataset.lang;
+        document.getElementById('gtDropdown').hidden = true;
+
+        if (lang === '') {
+            // Remove cookie → restore Ukrainian
+            document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/';
+            document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/; domain=.' + location.hostname;
+        } else {
+            document.cookie = 'googtrans=/uk/' + lang + '; path=/';
+            document.cookie = 'googtrans=/uk/' + lang + '; path=/; domain=.' + location.hostname;
+        }
+        location.reload();
+    }
+
+    // On page load — sync UI with current cookie
+    document.addEventListener('DOMContentLoaded', syncGtUI);
+
+    // Close dropdown on outside click
+    document.addEventListener('click', function(e) {
+        const wrap = document.getElementById('gtWrap');
+        if (wrap && !wrap.contains(e.target)) {
+            const dd = document.getElementById('gtDropdown');
+            if (dd) dd.hidden = true;
+        }
+    });
+    </script>
+    <script type="text/javascript"
+            src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+    </script>
+
     <script>
     // ── Delivery picker ──────────────────────────────────────────────────────
     (function () {
-        // Restore saved oblast from localStorage
         const saved = localStorage.getItem('amazon-itstep-oblast');
         if (saved) {
             const el = document.getElementById('deliveryLabel');
@@ -351,8 +448,7 @@
         const open = !dd.hidden;
         dd.hidden = open;
         btn.setAttribute('aria-expanded', String(!open));
-        // close lang dropdown if open
-        closeLang();
+        closeCatalog();
     }
 
     function selectOblast(el) {
@@ -361,23 +457,6 @@
         localStorage.setItem('amazon-itstep-oblast', val);
         document.getElementById('deliveryDropdown').hidden = true;
         document.querySelector('.delivery-picker__btn').setAttribute('aria-expanded', 'false');
-    }
-
-    // ── Language switcher ────────────────────────────────────────────────────
-    function toggleLang() {
-        const dd  = document.getElementById('langDropdown');
-        const btn = document.querySelector('.lang-switcher__btn');
-        const open = !dd.hidden;
-        dd.hidden = open;
-        btn.setAttribute('aria-expanded', String(!open));
-        // close delivery dropdown if open
-        const ddd = document.getElementById('deliveryDropdown');
-        if (ddd) { ddd.hidden = true; document.querySelector('.delivery-picker__btn')?.setAttribute('aria-expanded','false'); }
-    }
-
-    function closeLang() {
-        const dd = document.getElementById('langDropdown');
-        if (dd) { dd.hidden = true; document.querySelector('.lang-switcher__btn')?.setAttribute('aria-expanded','false'); }
     }
 
     // ── Catalog dropdown ─────────────────────────────────────────────────────
@@ -404,27 +483,19 @@
             const dd = document.getElementById('deliveryDropdown');
             if (dd) { dd.hidden = true; document.querySelector('.delivery-picker__btn')?.setAttribute('aria-expanded','false'); }
         }
-        const ls = document.getElementById('langSwitcher');
-        if (ls && !ls.contains(e.target)) {
-            closeLang();
-        }
         const cm = document.getElementById('catalogMenu');
         if (cm && !cm.contains(e.target)) {
             closeCatalog();
         }
     });
-    </script>
 
-    <script>
-        // ── Newsletter ───────────────────────────────────────────────────────────
+    // ── Newsletter ────────────────────────────────────────────────────────────
     function subscribeNewsletter(e) {
         e.preventDefault();
         const email = document.getElementById('newsletterEmail').value.trim();
         const msg   = document.getElementById('newsletterMsg');
         const form  = document.getElementById('newsletterForm');
-
         if (!email) return;
-
         form.style.display = 'none';
         msg.style.display  = 'block';
         msg.innerHTML = `
@@ -442,14 +513,15 @@
                 </div>
             </div>`;
     }
+    </script>
 
+    <script>
     async function updateCartCount() {
         const res = await fetch('/Cart/GetCount');
         const data = await res.json();
         document.querySelector('.cart-count').textContent = data.count;
-        }
-
-        updateCartCount();
+    }
+    updateCartCount();
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

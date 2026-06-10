@@ -1,11 +1,9 @@
 @using Microsoft.Extensions.Localization
-@using System.Globalization
 @inject IStringLocalizer<Amazon.SharedResource> L
 
 @{
     Layout = "_Layout";
-    var isEn = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en";
-    ViewData["Title"] = isEn ? "Sign in or Register" : "Вхід або Реєстрація";
+    ViewData["Title"] = "Вхід або Реєстрація";
 }
 
 <div class="auth-landing">
@@ -65,7 +63,7 @@
 
             <!-- Divider -->
             <div class="auth-landing__divider">
-                <span>@(isEn ? "or" : "або")</span>
+                <span>або</span>
             </div>
 
             <!-- Register card -->
@@ -94,17 +92,17 @@
         <div class="auth-landing__stats">
             <div class="auth-landing__stat">
                 <span class="auth-landing__stat-num">50K+</span>
-                <span class="auth-landing__stat-label">@(isEn ? "Products" : "Товарів")</span>
+                <span class="auth-landing__stat-label">Товарів</span>
             </div>
             <div class="auth-landing__stat-sep"></div>
             <div class="auth-landing__stat">
                 <span class="auth-landing__stat-num">120K+</span>
-                <span class="auth-landing__stat-label">@(isEn ? "Happy customers" : "Задоволених покупців")</span>
+                <span class="auth-landing__stat-label">Задоволених покупців</span>
             </div>
             <div class="auth-landing__stat-sep"></div>
             <div class="auth-landing__stat">
                 <span class="auth-landing__stat-num">24/7</span>
-                <span class="auth-landing__stat-label">@(isEn ? "Support" : "Підтримка")</span>
+                <span class="auth-landing__stat-label">Підтримка</span>
             </div>
         </div>
 
@@ -112,19 +110,19 @@
         <div class="auth-landing__features">
             <div class="auth-landing__feature">
                 <div class="auth-landing__feature-icon">🚀</div>
-                <span>@(isEn ? "Fast delivery across Ukraine" : "Швидка доставка по Україні")</span>
+                <span>Швидка доставка по Україні</span>
             </div>
             <div class="auth-landing__feature">
                 <div class="auth-landing__feature-icon">🔒</div>
-                <span>@(isEn ? "Secure payments" : "Безпечні платежі")</span>
+                <span>Безпечні платежі</span>
             </div>
             <div class="auth-landing__feature">
                 <div class="auth-landing__feature-icon">↩️</div>
-                <span>@(isEn ? "30-day returns" : "Повернення за 30 днів")</span>
+                <span>Повернення за 30 днів</span>
             </div>
             <div class="auth-landing__feature">
                 <div class="auth-landing__feature-icon">💎</div>
-                <span>@(isEn ? "Verified sellers" : "Перевірені продавці")</span>
+                <span>Перевірені продавці</span>
             </div>
         </div>
 
