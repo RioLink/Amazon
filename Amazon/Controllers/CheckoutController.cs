@@ -1,4 +1,5 @@
 using Amazon.Models;
+using Amazon.Services;
 using BLL.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Amazon.Controllers;
 
-[Authorize]
 public class CheckoutController : Controller
 {
     private readonly ICartService _cartService;
@@ -23,16 +23,24 @@ public class CheckoutController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var userId = _userManager.GetUserId(User)!;
-        var cartItems = await _cartService.GetCartByUserIdAsync(userId);
+        var userId = _userManager.GetUserId(User);
+        List<CartItemViewModel> viewModel;
 
-        var viewModel = cartItems.Select(c => new CartItemViewModel
+        if (userId != null)
         {
-            ProductId = c.ProductId,
-            ProductName = c.Product?.Name ?? "Товар",
-            Quantity = c.Quantity,
-            Price = c.Product?.Price ?? 0
-        }).ToList();
+            var cartItems = await _cartService.GetCartByUserIdAsync(userId);
+            viewModel = cartItems.Select(c => new CartItemViewModel
+            {
+                ProductId   = c.ProductId,
+                ProductName = c.Product?.Name ?? "Товар",
+                Quantity    = c.Quantity,
+                Price       = c.Product?.Price ?? 0
+            }).ToList();
+        }
+        else
+        {
+            viewModel = GuestCartService.GetCart(HttpContext.Session);
+        }
 
         if (viewModel.Count == 0)
             return RedirectToAction("Index", "Cart");
@@ -41,6 +49,7 @@ public class CheckoutController : Controller
     }
 
     [HttpPost]
+    [Authorize]  // Оформлення замовлення — тільки для авторизованих
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> PlaceOrder(string fullName, string email, string phone,
         string city, string postal, string address, string payment)
@@ -54,8 +63,8 @@ public class CheckoutController : Controller
         var orderItems = cartItems.Select(c => new OrderItem
         {
             ProductId = c.ProductId,
-            Quantity = c.Quantity,
-            Price = c.Product?.Price ?? 0
+            Quantity  = c.Quantity,
+            Price     = c.Product?.Price ?? 0
         }).ToList();
 
         var subtotal = orderItems.Sum(i => i.Price * i.Quantity);

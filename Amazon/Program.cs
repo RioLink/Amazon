@@ -31,6 +31,15 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromDays(7);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = ".AmazonITStep.Session";
+});
+
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequiredLength = 8;
@@ -84,6 +93,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions()
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapStaticAssets();
