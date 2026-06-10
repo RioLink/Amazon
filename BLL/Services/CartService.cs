@@ -9,10 +9,10 @@ namespace BLL.Services
 {
     public class CartService : ICartService
     {
-        private readonly IGenericRepository<CartItem> _cartRepo;
+        private readonly ICartRepository _cartRepo;
         private readonly IGenericRepository<Product> _productRepo;
 
-        public CartService(IGenericRepository<CartItem> cartRepo, IGenericRepository<Product> productRepo)
+        public CartService(ICartRepository cartRepo, IGenericRepository<Product> productRepo)
         {
             _cartRepo = cartRepo;
             _productRepo = productRepo;
@@ -33,8 +33,8 @@ namespace BLL.Services
 
         public async Task<(bool Success, string Message)> AddToCartAsync(string userId, int productId, int quantity)
         {
-            if (quantity <= 0)
-                return (false, "Кількість має бути більше 0");
+            //if (quantity <= 0)
+            //    return (false, "Кількість має бути більше 0");
 
             var product = await _productRepo.GetByIdAsync(productId);
             if (product == null)
@@ -87,6 +87,11 @@ namespace BLL.Services
             {
                 await _cartRepo.DeleteAsync(item.Id);
             }
+        }
+
+        public async Task<int> GetCartSizeByUserIdAsync(string userId) 
+        {
+            return await _cartRepo.CountByUserIdAsync(userId);
         }
     }
 }

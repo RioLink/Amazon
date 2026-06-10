@@ -29,11 +29,11 @@
                 <del>@Model.OldPrice.Value.ToString("N0") ₴</del>
             }
         </div>
-        <button class="amazon-button amazon-button--primary"
-                type="button"
-                data-add-to-cart="@Model.Id"
-                data-product="@System.Text.Json.JsonSerializer.Serialize(new { id = Model.Id, name = Model.Name, price = Model.Price, imageUrl = Model.ImageUrl, category = Model.Category })">
-            🛒 Додати в кошик
-        </button>
+
+        <form asp-action="Add" asp-controller="Cart" method="post">
+            <input type="hidden" name="ProductId" value="@Model.Id" />
+            <input type="hidden" name="Quantity" value="1" />
+            <button class="amazon-button amazon-button--primary" type="submit">🛒 Додати в кошик</button>
+        </form>
     </div>
 </div>
