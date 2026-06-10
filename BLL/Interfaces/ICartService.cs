@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Domain.Entities;
 using System.Collections.Generic;
-using System.Text;
-using Domain.Entities;
-using Domain.Enums;
+using System.Threading.Tasks;
+
 namespace BLL.Interfaces
 {
     public interface ICartService
     {
-        Task AddToCartAsync(string userId, int productId, int quantity);
-        Task RemoveFromCartAsync(string userId, int productId);
-        Task<CartItem> GetCartByUserIdAsync(string userId);
+        Task<IEnumerable<CartItem>> GetCartByUserIdAsync(string userId); 
+        Task<(bool Success, string Message)> AddToCartAsync(string userId, int productId, int quantity);
+        Task<(bool Success, string Message)> RemoveFromCartAsync(string userId, int productId);
+        //Очистка
+        Task ClearCartAsync(string userId);
     }
 }

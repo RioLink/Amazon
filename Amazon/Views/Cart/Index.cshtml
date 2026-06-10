@@ -1,48 +1,65 @@
+@model IEnumerable<Amazon.Models.CartItemViewModel>
+
 @{
     ViewData["Title"] = "Кошик";
+    var hasItems = Model != null && Model.Any();
+    var subtotal = hasItems ? Model.Sum(x => x.TotalPrice) : 0;
 }
 
-@* Empty state — shown by JS when cart is empty *@
-<div id="cart-empty-state" class="empty-state" hidden>
+@* Empty state — показываем только если Model пустая *@
+<div id="cart-empty-state" class="empty-state" style="@(hasItems ? "display:none;" : "")">
     <span class="empty-state__icon" aria-hidden="true">🛒</span>
     <h1>Ваш кошик порожній</h1>
     <p>Додайте товари з каталогу, і вони з'являться тут.</p>
-    <a class="amazon-button amazon-button--primary"
-       asp-controller="Product" asp-action="Index">
+    <a class="amazon-button amazon-button--primary" asp-controller="Product" asp-action="Index">
         Перейти до каталогу
     </a>
 </div>
 
-@* Filled state — shown by JS when cart has items *@
-<div id="cart-filled-state" class="cart-page-layout" hidden>
+@* Filled state — показываем только если есть товары *@
+<div id="cart-filled-state" class="cart-page-layout" style="@(!hasItems ? "display:none;" : "")">
 
-    @* ── Left column: items list ── *@
     <section class="cart-panel" aria-label="Товари в кошику">
         <div class="cart-panel__header">
             <h1>Кошик</h1>
-            <button id="clear-cart-btn" class="cart-panel__clear" type="button">
-                Очистити кошик
-            </button>
+            <form asp-action="Clear" method="post">
+                <button type="submit" class="cart-panel__clear">Очистити кошик</button>
+            </form>
         </div>
-        <ul class="cart-items-list"
-            id="cart-items-list"
-            aria-live="polite"
-            aria-label="Список товарів у кошику">
+        
+        <ul class="cart-items-list" aria-live="polite">
+            @if (hasItems)
+            {
+                @foreach (var item in Model)
+                {
+                    <li class="cart-item" style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
+                        <div>
+                            <strong>@item.ProductName</strong><br />
+                            <small>Ціна: @item.Price.ToString("F2") ₴</small>
+                        </div>
+                        <div>
+                            <span>Кількість: @item.Quantity</span><br />
+                            <strong>@item.TotalPrice.ToString("F2") ₴</strong>
+                            <form asp-action="Remove" method="post" asp-route-productId="@item.ProductId">
+                                <button type="submit" style="color:red; background:none; border:none; cursor:pointer; font-size: 0.8em;">Видалити</button>
+                            </form>
+                        </div>
+                    </li>
+                }
+            }
         </ul>
     </section>
 
-    @* ── Right column: order summary ── *@
     <aside class="cart-summary" aria-label="Підсумок замовлення">
         <h2>Підсумок</h2>
-
         <div class="cart-summary__rows">
             <div class="cart-summary__row">
                 <span>Товари</span>
-                <span id="cart-subtotal">0 ₴</span>
+                <span>@subtotal.ToString("F2") ₴</span>
             </div>
-            <div class="cart-summary__row" id="cart-shipping-row">
+            <div class="cart-summary__row">
                 <span>Доставка</span>
-                <span id="cart-shipping">0 ₴</span>
+                <span>0 ₴</span>
             </div>
         </div>
 
@@ -50,23 +67,11 @@
 
         <div class="cart-summary__total">
             <span>Разом</span>
-            <span id="cart-total">0 ₴</span>
+            <span>@subtotal.ToString("F2") ₴</span>
         </div>
 
-        <a class="amazon-button amazon-button--primary cart-summary__checkout-btn"
-           asp-controller="Checkout" asp-action="Index">
+        <a class="amazon-button amazon-button--primary cart-summary__checkout-btn" asp-controller="Checkout" asp-action="Index">
             Оформити замовлення →
         </a>
-
-        <p class="cart-summary__note">
-            🔒 Безпечна оплата &nbsp;·&nbsp; Повернення протягом 30 днів
-        </p>
-
-        <div class="cart-summary__continue">
-            <a asp-controller="Product" asp-action="Index">
-                ← Продовжити покупки
-            </a>
-        </div>
     </aside>
-
 </div>
