@@ -5567,4 +5567,4 @@ input:focus-visible {
   .category-grid--home { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-.category-card--games { background: linear-gradient(135deg, #fde8f0, #f9c6d8); }
+.category-card--games { background: #fff; }
