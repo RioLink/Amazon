@@ -60,17 +60,7 @@ public class CheckoutController : Controller
         if (!cartItems.Any())
             return RedirectToAction("Index", "Cart");
 
-        var orderItems = cartItems.Select(c => new OrderItem
-        {
-            ProductId = c.ProductId,
-            Quantity  = c.Quantity,
-            Price     = c.Product?.Price ?? 0
-        }).ToList();
-
-        var subtotal = orderItems.Sum(i => i.Price * i.Quantity);
-        var total = subtotal < 500 ? subtotal + 99 : subtotal;
-
-        await _orderService.CreateOrderAsync(userId, orderItems, total);
+        await _orderService.CreateOrderAsync(userId, cartItems);
         await _cartService.ClearCartAsync(userId);
 
         TempData["OrderSuccess"] = "true";

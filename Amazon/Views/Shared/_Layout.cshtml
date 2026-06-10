@@ -297,13 +297,17 @@
                     <strong>@(isEn ? "Subscribe to our newsletter" : "Підпишіться на розсилку")</strong>
                     <span>@(isEn ? "Deals, new arrivals, no spam." : "Акції, новинки, без спаму.")</span>
                 </div>
-                <form class="site-footer__newsletter-form" onsubmit="return false">
-                    <input type="email" placeholder="@(isEn ? "your@email.com" : "ваша@пошта.com")"
-                           class="site-footer__newsletter-input" />
-                    <button type="submit" class="site-footer__newsletter-btn">
-                        @(isEn ? "Subscribe" : "Підписатись")
-                    </button>
-                </form>
+                <div class="site-footer__newsletter-wrap">
+                    <form class="site-footer__newsletter-form" id="newsletterForm" onsubmit="subscribeNewsletter(event)">
+                        <input type="email" id="newsletterEmail"
+                               placeholder="@(isEn ? "your@email.com" : "ваша@пошта.com")"
+                               class="site-footer__newsletter-input" required />
+                        <button type="submit" class="site-footer__newsletter-btn">
+                            @(isEn ? "Subscribe" : "Підписатись")
+                        </button>
+                    </form>
+                    <div id="newsletterMsg" class="site-footer__newsletter-msg" style="display:none"></div>
+                </div>
             </div>
 
             <!-- ── Row 3: Bottom bar ── -->
@@ -412,7 +416,34 @@
     </script>
 
     <script>
-        async function updateCartCount() {
+        // ── Newsletter ───────────────────────────────────────────────────────────
+    function subscribeNewsletter(e) {
+        e.preventDefault();
+        const email = document.getElementById('newsletterEmail').value.trim();
+        const msg   = document.getElementById('newsletterMsg');
+        const form  = document.getElementById('newsletterForm');
+
+        if (!email) return;
+
+        form.style.display = 'none';
+        msg.style.display  = 'block';
+        msg.innerHTML = `
+            <div class="newsletter-success">
+                <span class="newsletter-success__icon">🎉</span>
+                <div>
+                    <strong>Дякуємо за підписку!</strong>
+                    <p>На адресу <em>${email}</em> надходитимуть:</p>
+                    <ul>
+                        <li>🔥 Гарячі акції та знижки до 70%</li>
+                        <li>🆕 Новинки каталогу першими</li>
+                        <li>🎁 Ексклюзивні пропозиції для підписників</li>
+                        <li>🚚 Інформація про безкоштовну доставку</li>
+                    </ul>
+                </div>
+            </div>`;
+    }
+
+    async function updateCartCount() {
         const res = await fetch('/Cart/GetCount');
         const data = await res.json();
         document.querySelector('.cart-count').textContent = data.count;

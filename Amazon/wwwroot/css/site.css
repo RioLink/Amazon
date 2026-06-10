@@ -6102,3 +6102,32 @@ input:focus-visible {
   opacity: .6;
   flex-shrink: 0;
 }
+
+/* ── Newsletter success message ─────────────────────────────────────────── */
+.site-footer__newsletter-wrap { flex: 1; }
+.site-footer__newsletter-msg { margin-top: 4px; }
+.newsletter-success {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 12px;
+  padding: 16px 20px;
+  animation: nlFadeIn .3s ease;
+}
+@keyframes nlFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.newsletter-success__icon { font-size: 2rem; flex-shrink: 0; }
+.newsletter-success strong { color: #fff; font-size: 15px; display: block; margin-bottom: 6px; }
+.newsletter-success p  { color: #94a3b8; font-size: 13px; margin: 0 0 8px; }
+.newsletter-success ul {
+  list-style: none;
+  padding: 0; margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.newsletter-success ul li { color: #cbd5e1; font-size: 13px; }
