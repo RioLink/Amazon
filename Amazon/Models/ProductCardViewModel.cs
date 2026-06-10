@@ -14,9 +14,9 @@ public class ProductCardViewModel
 
     public decimal? OldPrice { get; init; }
 
-    public double Rating { get; init; }
+    public double? Rating { get; init; }
 
-    public int ReviewCount { get; init; }
+    public int? ReviewCount { get; init; }
 
     public required string Description { get; init; }
 }

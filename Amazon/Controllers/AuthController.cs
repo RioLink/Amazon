@@ -22,11 +22,9 @@ namespace Amazon.Controllers
             _emailService = emailService;
         }
 
-        // ── Index ─────────────────────────────────────────────────────────────
         [HttpGet]
         public ActionResult Index() => View();
 
-        // ── Register ──────────────────────────────────────────────────────────
         [HttpGet]
         public ActionResult Register() => View();
 
@@ -44,7 +42,6 @@ namespace Amazon.Controllers
             return View(user);
         }
 
-        // ── Login ─────────────────────────────────────────────────────────────
         [HttpGet]
         public ActionResult Login() => View();
 
@@ -61,7 +58,6 @@ namespace Amazon.Controllers
             return View(model);
         }
 
-        // ── Logout ────────────────────────────────────────────────────────────
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
@@ -70,7 +66,6 @@ namespace Amazon.Controllers
             return RedirectToAction("Index", "Auth");
         }
 
-        // ── Forgot Password ───────────────────────────────────────────────────
         [HttpGet]
         public IActionResult ForgotPassword() => View();
 
@@ -86,7 +81,6 @@ namespace Amazon.Controllers
 
             var user = await _userManager.FindByEmailAsync(email.Trim());
 
-            // Always show success to avoid email enumeration
             if (user != null)
             {
                 var token      = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -111,7 +105,6 @@ namespace Amazon.Controllers
                 await _emailService.SendAsync(user.Email!, "Відновлення паролю — Amazon ITStep", body);
             }
 
-            // Store email for the success page
             TempData["ForgotEmail"] = email.Trim();
             return RedirectToAction("ForgotPasswordConfirmation");
         }
@@ -119,7 +112,6 @@ namespace Amazon.Controllers
         [HttpGet]
         public IActionResult ForgotPasswordConfirmation() => View();
 
-        // ── Reset Password ────────────────────────────────────────────────────
         [HttpGet]
         public IActionResult ResetPassword(string? token, string? email)
         {

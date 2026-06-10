@@ -30,10 +30,6 @@ namespace Amazon.Controllers
             _userManager     = userManager;
         }
 
-        // ══════════════════════════════════════════════════════
-        // PRODUCTS
-        // ══════════════════════════════════════════════════════
-
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -137,10 +133,6 @@ namespace Amazon.Controllers
             return View(model);
         }
 
-        // ══════════════════════════════════════════════════════
-        // ORDERS
-        // ══════════════════════════════════════════════════════
-
         [HttpGet]
         public async Task<IActionResult> Orders()
         {
@@ -161,10 +153,6 @@ namespace Amazon.Controllers
             await _orderService.ChangeOrderStatusAsync(id, status);
             return RedirectToAction(nameof(Orders));
         }
-
-        // ══════════════════════════════════════════════════════
-        // CATEGORIES
-        // ══════════════════════════════════════════════════════
 
         [HttpGet]
         public async Task<IActionResult> Categories()
@@ -221,10 +209,6 @@ namespace Amazon.Controllers
             return RedirectToAction(nameof(Categories));
         }
 
-        // ══════════════════════════════════════════════════════
-        // USERS
-        // ══════════════════════════════════════════════════════
-
         [HttpGet]
         public async Task<IActionResult> Users()
         {
@@ -259,13 +243,11 @@ namespace Amazon.Controllers
 
             if (user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.UtcNow)
             {
-                // Unlock
                 await _userManager.SetLockoutEndDateAsync(user, null);
                 TempData["Success"] = $"Користувача {user.UserName} розблоковано.";
             }
             else
             {
-                // Lock for 100 years
                 await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100));
                 await _userManager.SetLockoutEnabledAsync(user, true);
                 TempData["Success"] = $"Користувача {user.UserName} заблоковано.";

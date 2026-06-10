@@ -1,4 +1,6 @@
 using Amazon.Models;
+using BLL.Services;
+using BLL.Interfaces;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -7,9 +9,25 @@ namespace Amazon.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly IProductService _productService;
+
+        public HomeController(IProductService productService) 
         {
-            return View(DemoCatalog.Products);
+            _productService = productService;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var products = (await _productService.GetMostPopularProductsAsync()).Select(p => new ProductCardViewModel { 
+                Id = p.Id,  
+                Name = p.Name, 
+                Category = p.Category.Name, 
+                Price = p.Price, 
+                Description = p.Description, 
+                ImageUrl = p.ImageUrl 
+            }).ToList();
+
+            return View(products);
         }
 
         public IActionResult Privacy() => View();
@@ -18,10 +36,6 @@ namespace Amazon.Controllers
         public IActionResult Disclaimer() => View();
         public IActionResult AboutUs() => View();
 
-        /// <summary>
-        /// Switches the UI language by writing the culture cookie and redirecting back.
-        /// GET /Home/SetLanguage?culture=en&amp;returnUrl=/
-        /// </summary>
         [HttpGet]
         public IActionResult SetLanguage(string culture, string? returnUrl)
         {

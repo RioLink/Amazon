@@ -21,7 +21,6 @@ public class ProfileController : Controller
         _env         = env;
     }
 
-    // ── Index ────────────────────────────────────────────────────────────────
     public async Task<IActionResult> Index()
     {
         var user = await _userManager.Users
@@ -35,7 +34,6 @@ public class ProfileController : Controller
         return View();
     }
 
-    // ── Upload Avatar ─────────────────────────────────────────────────────────
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UploadAvatar(IFormFile avatar)
@@ -54,7 +52,6 @@ public class ProfileController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null) return Json(new { success = false, message = "Користувача не знайдено." });
 
-        // Delete old avatar file
         if (!string.IsNullOrEmpty(user.AvatarPath))
         {
             var oldPath = Path.Combine(_env.WebRootPath, user.AvatarPath.TrimStart('/'));
@@ -62,7 +59,6 @@ public class ProfileController : Controller
                 System.IO.File.Delete(oldPath);
         }
 
-        // Save new file
         var fileName  = $"{user.Id}{ext}";
         var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "avatars");
         Directory.CreateDirectory(uploadsDir);
@@ -77,7 +73,6 @@ public class ProfileController : Controller
         return Json(new { success = true, url = user.AvatarPath });
     }
 
-    // ── Change Email ──────────────────────────────────────────────────────────
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangeEmail(string NewEmail, string CurrentPassword)
@@ -91,11 +86,9 @@ public class ProfileController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null) return Json(new { success = false, message = "Користувача не знайдено." });
 
-        // Verify current password
         var pwOk = await _userManager.CheckPasswordAsync(user, CurrentPassword);
         if (!pwOk) return Json(new { success = false, message = "Невірний поточний пароль." });
 
-        // Check if email already taken
         var existing = await _userManager.FindByEmailAsync(NewEmail.Trim());
         if (existing != null && existing.Id != user.Id)
             return Json(new { success = false, message = "Ця пошта вже використовується." });
@@ -111,7 +104,6 @@ public class ProfileController : Controller
         return Json(new { success = false, message = error });
     }
 
-    // ── Change Password ───────────────────────────────────────────────────────
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangePassword(string CurrentPassword, string NewPassword, string ConfirmNewPassword)
@@ -136,7 +128,6 @@ public class ProfileController : Controller
         return Json(new { success = false, message = error });
     }
 
-    // ── Add Address ───────────────────────────────────────────────────────────
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddAddress(string FullName, string Phone, string City,
@@ -150,12 +141,10 @@ public class ProfileController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null) return Json(new { success = false, message = "Користувача не знайдено." });
 
-        // Max 5 addresses
         var count = await _db.Addresses.CountAsync(a => a.UserId == user.Id);
         if (count >= 5)
             return Json(new { success = false, message = "Максимум 5 адрес." });
 
-        // If new address is default — reset others
         if (IsDefault)
             await _db.Addresses.Where(a => a.UserId == user.Id && a.IsDefault)
                 .ExecuteUpdateAsync(s => s.SetProperty(a => a.IsDefault, false));
@@ -170,7 +159,7 @@ public class ProfileController : Controller
             Building   = Building.Trim(),
             Apartment  = Apartment?.Trim(),
             PostalCode = PostalCode?.Trim(),
-            IsDefault  = IsDefault || count == 0, // first address is always default
+            IsDefault  = IsDefault || count == 0, 
             CreatedAt  = DateTime.UtcNow
         };
 
@@ -180,7 +169,6 @@ public class ProfileController : Controller
         return Json(new { success = true, id = address.Id, isDefault = address.IsDefault });
     }
 
-    // ── Delete Address ────────────────────────────────────────────────────────
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteAddress(int id)
@@ -195,7 +183,6 @@ public class ProfileController : Controller
         _db.Addresses.Remove(address);
         await _db.SaveChangesAsync();
 
-        // If deleted address was default — set first remaining as default
         if (wasDefault)
         {
             var first = await _db.Addresses.Where(a => a.UserId == user.Id).OrderBy(a => a.CreatedAt).FirstOrDefaultAsync();
@@ -205,7 +192,6 @@ public class ProfileController : Controller
         return Json(new { success = true });
     }
 
-    // ── Set Default Address ───────────────────────────────────────────────────
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SetDefaultAddress(int id)
