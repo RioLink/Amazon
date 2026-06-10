@@ -18,14 +18,14 @@ public static class GuestCartService
     public static void SaveCart(ISession session, List<CartItemViewModel> cart)
         => session.SetString(SessionKey, JsonSerializer.Serialize(cart));
 
-    public static void Add(ISession session, int productId, string productName, decimal price, int quantity = 1)
+    public static void Add(ISession session, int productId, string productName, decimal price, int quantity = 1, string? imageUrl = null)
     {
         var cart = GetCart(session);
         var existing = cart.FirstOrDefault(i => i.ProductId == productId);
         if (existing != null)
             existing.Quantity += quantity;
         else
-            cart.Add(new CartItemViewModel { ProductId = productId, ProductName = productName, Price = price, Quantity = quantity });
+            cart.Add(new CartItemViewModel { ProductId = productId, ProductName = productName, Price = price, Quantity = quantity, ImageUrl = imageUrl });
         SaveCart(session, cart);
     }
 

@@ -16,7 +16,7 @@
     <span>›</span>
     <a asp-controller="Product" asp-action="Index">Товари</a>
     <span>›</span>
-    <span>@Model.Category</span>
+    <a asp-controller="Product" asp-action="Index" asp-route-categoryId="@Model.CategoryId">@Model.Category</a>
     <span>›</span>
     <span class="details-breadcrumb__current">@Model.Name</span>
 </nav>

@@ -76,6 +76,7 @@ using (var scope = app.Services.CreateScope())
     await CategoriesSeeder.SeedAsync(context);
     await ProductSeeder.SeedAsync(context);
     await OrderSeeder.SeedAsync(context, userManager);
+    await ProductSeeder.SeedToysAsync(context);
 }
 
 if (!app.Environment.IsDevelopment())

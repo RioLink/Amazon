@@ -187,15 +187,10 @@
             <!-- ── ROW 2: Secondary nav ── -->
             <div class="category-navigation">
                 <div class="category-navigation__content">
-                    <a class="category-navigation__catalog" asp-controller="Product" asp-action="Index">
-                        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                            <path d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                        @L["NavCatalog"]
-                    </a>
+                    @await Component.InvokeAsync("CatalogMenu")
                     <a asp-controller="Home" asp-action="Index">@L["NavHome"]</a>
                     <a asp-controller="Product" asp-action="Index">@L["NavProducts"]</a>
-                    <a asp-controller="Profile" asp-action="Index">@L["NavMyOrders"]</a>
+                    <a asp-controller="Orders" asp-action="Index">@L["NavMyOrders"]</a>
                 </div>
             </div>
 
@@ -381,6 +376,23 @@
         if (dd) { dd.hidden = true; document.querySelector('.lang-switcher__btn')?.setAttribute('aria-expanded','false'); }
     }
 
+    // ── Catalog dropdown ─────────────────────────────────────────────────────
+    function toggleCatalog() {
+        const dd  = document.getElementById('catalogDropdown');
+        const btn = document.querySelector('.catalog-menu__btn');
+        if (!dd) return;
+        const open = !dd.hidden;
+        dd.hidden = open;
+        btn.setAttribute('aria-expanded', String(!open));
+    }
+
+    function closeCatalog() {
+        const dd  = document.getElementById('catalogDropdown');
+        const btn = document.querySelector('.catalog-menu__btn');
+        if (dd)  dd.hidden = true;
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
     // Close dropdowns when clicking outside
     document.addEventListener('click', function(e) {
         const dp = document.getElementById('deliveryPicker');
@@ -391,6 +403,10 @@
         const ls = document.getElementById('langSwitcher');
         if (ls && !ls.contains(e.target)) {
             closeLang();
+        }
+        const cm = document.getElementById('catalogMenu');
+        if (cm && !cm.contains(e.target)) {
+            closeCatalog();
         }
     });
     </script>

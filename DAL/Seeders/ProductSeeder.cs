@@ -284,5 +284,51 @@ namespace DAL.Seeders
             await context.Products.AddRangeAsync(products);
             await context.SaveChangesAsync();
         }
+
+        public static async Task SeedToysAsync(AppDbContext context)
+        {
+            var cats = await context.Categories.ToListAsync();
+            var toysCat = cats.FirstOrDefault(c => c.Name == "Іграшки");
+            if (toysCat == null) return;
+
+            if (await context.Products.AnyAsync(p => p.CategoryId == toysCat.Id)) return;
+
+            var toys = new List<Product>
+            {
+                new() {
+                    Name = "LEGO Technic Bugatti Chiron 42083",
+                    Price = 8999, Description = "3599 деталей, масштаб 1:8, функціональна коробка передач, рухомий двигун W16.",
+                    ImageUrl = "https://picsum.photos/seed/lego-bugatti/400/400",
+                    CategoryId = toysCat.Id, Quantity = 12
+                },
+                new() {
+                    Name = "Конструктор LEGO Star Wars Тисячолітній Сокіл",
+                    Price = 15999, Description = "7541 деталей, культовий корабель із серії Зоряних Воєн, колекційна модель.",
+                    ImageUrl = "https://picsum.photos/seed/lego-falcon/400/400",
+                    CategoryId = toysCat.Id, Quantity = 6
+                },
+                new() {
+                    Name = "Радіокерована машинка Traxxas Slash 4×4",
+                    Price = 6499, Description = "Масштаб 1:10, 4WD, швидкість до 60 км/год, водонепроникний корпус.",
+                    ImageUrl = "https://picsum.photos/seed/traxxas-slash/400/400",
+                    CategoryId = toysCat.Id, Quantity = 8
+                },
+                new() {
+                    Name = "Інтерактивна лялька Baby Born 43 см",
+                    Price = 2299, Description = "П'є і мочиться, закриває очі, плаче зі справжніми слізьми, 9 функцій.",
+                    ImageUrl = "https://picsum.photos/seed/baby-born/400/400",
+                    CategoryId = toysCat.Id, Quantity = 25
+                },
+                new() {
+                    Name = "Настільна гра Monopoly Classic",
+                    Price = 999, Description = "Класична версія, 2–8 гравців, вік від 8 років, українська мова.",
+                    ImageUrl = "https://picsum.photos/seed/monopoly-classic/400/400",
+                    CategoryId = toysCat.Id, Quantity = 40
+                },
+            };
+
+            await context.Products.AddRangeAsync(toys);
+            await context.SaveChangesAsync();
+        }
     }
 }

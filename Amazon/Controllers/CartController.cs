@@ -33,7 +33,8 @@ public class CartController : Controller
                 ProductId   = c.ProductId,
                 ProductName = c.Product?.Name ?? "Товар",
                 Quantity    = c.Quantity,
-                Price       = c.Product?.Price ?? 0
+                Price       = c.Product?.Price ?? 0,
+                ImageUrl    = c.Product?.ImageUrl
             }).ToList();
         }
         else
@@ -59,7 +60,7 @@ public class CartController : Controller
         {
             var product = await _productService.GetProductByIdAsync(model.ProductId);
             if (product != null)
-                GuestCartService.Add(HttpContext.Session, product.Id, product.Name, product.Price, model.Quantity);
+                GuestCartService.Add(HttpContext.Session, product.Id, product.Name, product.Price, model.Quantity, product.ImageUrl);
         }
 
         var referer = Request.Headers.Referer.ToString();
