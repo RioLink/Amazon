@@ -11,10 +11,16 @@
     <div class="product-details__content">
         <span class="product-card__category">@Model.Category</span>
         <h1>@Model.Name</h1>
-        <div class="product-card__rating" aria-label="Оцінка @Model.Rating з 5">
-            <span aria-hidden="true">★★★★★</span>
-            <small>@Model.Rating · @Model.ReviewCount відгуків</small>
-        </div>
+        @if (Model.Rating.HasValue)
+        {
+            <div class="product-card__rating" aria-label="Оцінка @Model.Rating з 5">
+                <span aria-hidden="true">★★★★★</span>
+                @if (Model.ReviewCount.HasValue) 
+                {
+                    <small>@Model.Rating · @Model.ReviewCount відгуків</small>
+                }
+            </div>
+        }
         <p class="product-details__description">@Model.Description</p>
         <div class="product-details__price">
             <strong>@Model.Price.ToString("N0") ₴</strong>

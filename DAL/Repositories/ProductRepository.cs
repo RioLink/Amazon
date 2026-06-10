@@ -23,5 +23,25 @@ namespace DAL.Repositories
             var product = await _context.Products.Where(p => p.Id == id).Include(p => p.Category).FirstOrDefaultAsync();
             return product;
         }
+
+        public async
+        Task<IEnumerable<Product>> GetMostPopularProductsAsync()
+        {
+            var products = await _context.Orders
+                .Include( o => o.Items)
+                .ThenInclude(oi => oi.Product)
+                .SelectMany(o => o.Items)
+                .GroupBy(oi => oi.ProductId)
+                .Select(g => new
+                {
+                    ProductId = g.Key,
+                    TotalQuantity = g.Sum(oi => oi.Quantity)
+                })
+                .OrderByDescending(g => g.TotalQuantity)
+                .Take(5)
+                .Join(_context.Products, g => g.ProductId, p => p.Id, (g, p) => p)
+                .Include(p => p.Category).ToListAsync();
+            return products;
+        }
     }
 }

@@ -9,5 +9,6 @@ namespace DAL.Repositories.Interfaces
     {
         Task<List<Product>> GetAllWithCategoriesAsync();
         Task<Product?> GetByIdWithCategoryAsync(int id);
+        Task<IEnumerable<Product>> GetMostPopularProductsAsync();
     }
 }

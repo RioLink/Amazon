@@ -19,10 +19,16 @@
             </a>
         </h3>
 
-        <div class="product-card__rating" aria-label="Оцінка @Model.Rating з 5">
-            <span aria-hidden="true">★★★★★</span>
-            <small>@Model.Rating (@Model.ReviewCount)</small>
-        </div>
+        @if (Model.ReviewCount.HasValue) 
+        {
+            <div class="product-card__rating" aria-label="Оцінка @Model.Rating з 5">
+                <span aria-hidden="true">★★★★★</span>
+                @if (Model.ReviewCount.HasValue)
+                {
+                    <small>@Model.Rating (@Model.ReviewCount)</small>
+                }
+            </div>
+        }
 
         <div class="product-card__footer">
             <div class="product-card__price">

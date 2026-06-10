@@ -9,11 +9,13 @@ namespace BLL.Services
     {
         private readonly IProductRepository _productRepo;
         private readonly IGenericRepository<Category> _categoryRepo;
+        private readonly IGenericRepository<Order> _orderRepo;
 
-        public ProductService(IProductRepository productRepo, IGenericRepository<Category> categoryRepo)
+        public ProductService(IProductRepository productRepo, IGenericRepository<Category> categoryRepo, IGenericRepository<Order> orderRepo)
         {
             _productRepo = productRepo;
             _categoryRepo = categoryRepo;
+            _orderRepo = orderRepo;
         }
 
         public async Task<IEnumerable<Product>> GetAllProductsAsync()
@@ -64,6 +66,11 @@ namespace BLL.Services
 
             await _productRepo.AddAsync(newProduct);
             return (true, string.Empty);
+        }
+
+        public async Task<IEnumerable<Product>> GetMostPopularProductsAsync()
+        {
+            return await _productRepo.GetMostPopularProductsAsync();
         }
 
         public async Task<(bool Success, string Message)> UpdateProductAsync(int id, string name, decimal price, int categoryId, string description, string imageUrl, int quantity)
