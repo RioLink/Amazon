@@ -18,13 +18,13 @@ namespace Amazon.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var products = (await _productService.GetMostPopularProductsAsync()).Select(p => new ProductCardViewModel { 
-                Id = p.Id,  
-                Name = p.Name, 
-                Category = p.Category.Name, 
-                Price = p.Price, 
-                Description = p.Description, 
-                ImageUrl = p.ImageUrl 
+            var products = (await _productService.GetMostPopularProductsAsync()).Take(4).Select(p => new ProductCardViewModel {
+                Id = p.Id,
+                Name = p.Name,
+                Category = p.Category.Name,
+                Price = p.Price,
+                Description = p.Description,
+                ImageUrl = p.ImageUrl
             }).ToList();
 
             return View(products);

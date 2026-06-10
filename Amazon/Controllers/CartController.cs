@@ -41,7 +41,7 @@ public class CartController : Controller
         try
         {
             var userId = _userManager.GetUserId(User);
-            if (userId == null) return RedirectToAction("Login", "Account");
+            if (userId == null) return RedirectToAction("Login", "Auth");
 
             var result = await _cartService.AddToCartAsync(userId, model.ProductId, model.Quantity);
 
@@ -73,6 +73,7 @@ public class CartController : Controller
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetCount()
     {
         var userId = _userManager.GetUserId(User);

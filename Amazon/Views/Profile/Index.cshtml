@@ -75,17 +75,70 @@
     <main class="profile-main">
 
         <!-- Orders -->
+        @{
+            var orders = ViewData["Orders"] as List<Domain.Entities.Order> ?? new();
+        }
         <section class="profile-section">
             <div class="profile-section__header">
-                <h2>Мої замовлення <span class="profile-section__count">(<span id="orders-count">0</span>)</span></h2>
+                <h2>Мої замовлення <span class="profile-section__count">(@orders.Count)</span></h2>
             </div>
-            <div id="orders-container">
+            @if (orders.Count == 0)
+            {
                 <div class="orders-empty">
                     <div class="orders-empty__icon">📦</div>
                     <p>Ви ще не зробили жодного замовлення.</p>
                     <a class="profile-catalog-btn" asp-controller="Product" asp-action="Index">Перейти до каталогу</a>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="orders-list">
+                    @foreach (var order in orders)
+                    {
+                        var statusLabel = order.Status switch {
+                            Domain.Enums.OrderStatus.Pending    => "Очікує",
+                            Domain.Enums.OrderStatus.Processing => "Обробляється",
+                            Domain.Enums.OrderStatus.Shipped    => "Відправлено",
+                            Domain.Enums.OrderStatus.Delivered  => "Доставлено",
+                            Domain.Enums.OrderStatus.Cancelled  => "Скасовано",
+                            _ => order.Status.ToString()
+                        };
+                        var statusCss = order.Status switch {
+                            Domain.Enums.OrderStatus.Delivered  => "order-status--delivered",
+                            Domain.Enums.OrderStatus.Cancelled  => "order-status--cancelled",
+                            Domain.Enums.OrderStatus.Shipped    => "order-status--shipped",
+                            _ => "order-status--pending"
+                        };
+                        <div class="order-card">
+                            <div class="order-card__header">
+                                <div>
+                                    <span class="order-card__id">Замовлення #@order.Id</span>
+                                    <span class="order-card__date">@order.Date.ToString("dd.MM.yyyy")</span>
+                                </div>
+                                <span class="order-status @statusCss">@statusLabel</span>
+                            </div>
+                            <div class="order-card__items">
+                                @foreach (var item in order.Items)
+                                {
+                                    <div class="order-card__item">
+                                        @if (!string.IsNullOrEmpty(item.Product?.ImageUrl))
+                                        {
+                                            <img class="order-card__item-img" src="@item.Product.ImageUrl" alt="@item.Product.Name" />
+                                        }
+                                        <div class="order-card__item-info">
+                                            <span class="order-card__item-name">@(item.Product?.Name ?? "Товар")</span>
+                                            <span class="order-card__item-qty">@item.Quantity × @item.Price.ToString("N0") ₴</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="order-card__footer">
+                                <span class="order-card__total">Всього: <strong>@order.TotalAmount.ToString("N0") ₴</strong></span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
         </section>
 
         <!-- Account settings -->

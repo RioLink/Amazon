@@ -1,5 +1,10 @@
+@model List<Amazon.Models.CartItemViewModel>
+
 @{
     ViewData["Title"] = "Оформлення замовлення";
+    var subtotal = Model.Sum(i => i.Price * i.Quantity);
+    var shipping = subtotal >= 500 ? 0m : 99m;
+    var total = subtotal + shipping;
 }
 
 <div class="page-heading">
@@ -11,7 +16,8 @@
 <div class="checkout-layout">
 
     @* ── Left column: form ── *@
-    <form id="checkout-form" class="checkout-form-panel" novalidate>
+    <form asp-action="PlaceOrder" method="post" class="checkout-form-panel" novalidate>
+        @Html.AntiForgeryToken()
 
         @* Step 1 – Delivery *@
         <section class="checkout-section">
@@ -22,65 +28,40 @@
 
             <div class="form-group">
                 <label for="fullName">Повне ім'я *</label>
-                <input type="text"
-                       id="fullName" name="fullName"
-                       placeholder="Іваненко Іван Іванович"
-                       autocomplete="name"
-                       aria-required="true" />
-                <span class="form-group__error" id="err-fullName" role="alert"></span>
+                <input type="text" id="fullName" name="fullName"
+                       placeholder="Іваненко Іван Іванович" autocomplete="name" required />
             </div>
 
             <div class="form-row form-row--2">
                 <div class="form-group">
                     <label for="email">Email *</label>
-                    <input type="email"
-                           id="email" name="email"
-                           placeholder="example@email.com"
-                           autocomplete="email"
-                           aria-required="true" />
-                    <span class="form-group__error" id="err-email" role="alert"></span>
+                    <input type="email" id="email" name="email"
+                           placeholder="example@email.com" autocomplete="email" required />
                 </div>
                 <div class="form-group">
                     <label for="phone">Телефон *</label>
-                    <input type="tel"
-                           id="phone" name="phone"
-                           placeholder="+380 99 999 99 99"
-                           autocomplete="tel"
-                           aria-required="true" />
-                    <span class="form-group__error" id="err-phone" role="alert"></span>
+                    <input type="tel" id="phone" name="phone"
+                           placeholder="+380 99 999 99 99" autocomplete="tel" required />
                 </div>
             </div>
 
             <div class="form-row form-row--2">
                 <div class="form-group">
                     <label for="city">Місто *</label>
-                    <input type="text"
-                           id="city" name="city"
-                           placeholder="Київ"
-                           autocomplete="address-level2"
-                           aria-required="true" />
-                    <span class="form-group__error" id="err-city" role="alert"></span>
+                    <input type="text" id="city" name="city"
+                           placeholder="Київ" autocomplete="address-level2" required />
                 </div>
                 <div class="form-group">
-                    <label for="postal">Поштовий індекс *</label>
-                    <input type="text"
-                           id="postal" name="postal"
-                           placeholder="01001"
-                           autocomplete="postal-code"
-                           maxlength="10"
-                           aria-required="true" />
-                    <span class="form-group__error" id="err-postal" role="alert"></span>
+                    <label for="postal">Поштовий індекс</label>
+                    <input type="text" id="postal" name="postal"
+                           placeholder="01001" autocomplete="postal-code" maxlength="10" />
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="address">Вулиця, будинок, квартира *</label>
-                <input type="text"
-                       id="address" name="address"
-                       placeholder="вул. Хрещатик, 1, кв. 5"
-                       autocomplete="street-address"
-                       aria-required="true" />
-                <span class="form-group__error" id="err-address" role="alert"></span>
+                <input type="text" id="address" name="address"
+                       placeholder="вул. Хрещатик, 1, кв. 5" autocomplete="street-address" required />
             </div>
         </section>
 
@@ -116,43 +97,44 @@
             </div>
         </section>
 
-        @* Submit *@
-        <button class="amazon-button amazon-button--primary checkout-submit-btn"
-                type="submit">
+        <button class="amazon-button amazon-button--primary checkout-submit-btn" type="submit">
             Підтвердити замовлення →
         </button>
-
     </form>
 
     @* ── Right column: order summary ── *@
     <aside class="checkout-summary" aria-label="Ваше замовлення">
         <h2>Ваше замовлення</h2>
 
-        <ul class="checkout-summary__items"
-            id="checkout-summary-items"
-            aria-live="polite"></ul>
+        <ul class="checkout-summary__items">
+            @foreach (var item in Model)
+            {
+                <li class="checkout-summary__item">
+                    <span class="checkout-summary__item-name">@item.ProductName <span class="checkout-summary__item-qty">×@item.Quantity</span></span>
+                    <span class="checkout-summary__item-price">@((item.Price * item.Quantity).ToString("N0")) ₴</span>
+                </li>
+            }
+        </ul>
 
         <hr class="checkout-summary__divider" />
 
         <div class="checkout-summary__rows">
             <div class="checkout-summary__row">
                 <span>Товари</span>
-                <span id="checkout-subtotal">—</span>
+                <span>@subtotal.ToString("N0") ₴</span>
             </div>
-            <div class="checkout-summary__row" id="checkout-shipping-row">
+            <div class="checkout-summary__row">
                 <span>Доставка</span>
-                <span id="checkout-shipping">—</span>
+                <span>@(shipping == 0 ? "Безкоштовно" : $"{shipping:N0} ₴")</span>
             </div>
         </div>
 
         <div class="checkout-summary__total">
             <span>Разом</span>
-            <span id="checkout-total">—</span>
+            <span>@total.ToString("N0") ₴</span>
         </div>
 
-        <p class="checkout-summary__secure">
-            🔒 Захищена транзакція
-        </p>
+        <p class="checkout-summary__secure">🔒 Захищена транзакція</p>
     </aside>
 
 </div>
