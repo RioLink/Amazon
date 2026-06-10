@@ -32,15 +32,31 @@
             {
                 @foreach (var item in Model)
                 {
-                    <li class="cart-item" style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
+                    <li class="cart-item">
                         <div>
                             <strong>@item.ProductName</strong><br />
                             <small>Ціна: @item.Price.ToString("F2") ₴</small>
                         </div>
                         <div>
-                            <span>Кількість: @item.Quantity</span><br />
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <form asp-action="Add" method="post">
+                                    <input type="hidden" name="ProductId" value="@item.ProductId" />
+                                    <input type="hidden" name="Quantity" value="-1" />
+                                    <button type="submit">−</button>
+                                </form>
+
+                                <span>@item.Quantity</span>
+
+                                <form asp-action="Add" method="post">
+
+                                    <input type="hidden" name="ProductId" value="@item.ProductId" />
+                                    <input type="hidden" name="Quantity" value="1" />
+                                    <button type="submit">+</button>
+                                </form>
+                            </div>
                             <strong>@item.TotalPrice.ToString("F2") ₴</strong>
-                            <form asp-action="Remove" method="post" asp-route-productId="@item.ProductId">
+                            <form asp-action="Remove" method="post">
+                                <input type="hidden" name="ProductId" value="@item.ProductId" />
                                 <button type="submit" style="color:red; background:none; border:none; cursor:pointer; font-size: 0.8em;">Видалити</button>
                             </form>
                         </div>

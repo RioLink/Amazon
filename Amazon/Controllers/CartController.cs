@@ -55,6 +55,11 @@ public class CartController : Controller
             System.Diagnostics.Debug.WriteLine($"ОШИБКА: {ex.Message}");
             System.Diagnostics.Debug.WriteLine($"СТЭК: {ex.StackTrace}");
         }
+        
+        var referer = Request.Headers.Referer.ToString();
+        
+        if (!string.IsNullOrEmpty(referer))
+            return Redirect(referer);
 
         return RedirectToAction(nameof(Index));
     }
@@ -65,6 +70,16 @@ public class CartController : Controller
         var userId = _userManager.GetUserId(User);
         await _cartService.RemoveFromCartAsync(userId, productId);
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetCount()
+    {
+        var userId = _userManager.GetUserId(User);
+        if (userId == null) return Json(new { count = 0 });
+
+        int count = await _cartService.GetCartSizeByUserIdAsync(userId);
+        return Json(new { count });
     }
 
     [HttpPost]

@@ -407,6 +407,16 @@
     });
     </script>
 
+    <script>
+        async function updateCartCount() {
+        const res = await fetch('/Cart/GetCount');
+        const data = await res.json();
+        document.querySelector('.cart-count').textContent = data.count;
+        }
+
+        updateCartCount();
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
