@@ -5555,3 +5555,16 @@ input:focus-visible {
 }
 .order-card__total { font-size: 15px; color: #1e293b; }
 .order-card__total strong { color: var(--amazon-orange); }
+
+/* ── Home: 5-column category grid ───────────────────────────── */
+.category-grid--home {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+@media (max-width: 1100px) {
+  .category-grid--home { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .category-grid--home { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.category-card--games { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); }
