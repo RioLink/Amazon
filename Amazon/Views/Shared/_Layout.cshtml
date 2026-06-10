@@ -173,10 +173,12 @@
 
                     <!-- Cart -->
                     <a class="header-link header-link--cart" asp-controller="Cart" asp-action="Index">
-                        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                            <path d="M2.5 3.5h2l2.1 10.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 1.9-1.4L21 7H6m3 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm10 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" />
-                        </svg>
-                        <span class="cart-count" aria-label="@(isEn ? "Items in cart" : "Товарів у кошику")">0</span>
+                        <div class="cart-icon-wrap">
+                            <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                                <path d="M2.5 3.5h2l2.1 10.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 1.9-1.4L21 7H6m3 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm10 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" />
+                            </svg>
+                            <span class="cart-count" aria-label="@(isEn ? "Items in cart" : "Товарів у кошику")">0</span>
+                        </div>
                         <span class="header-link__title">@L["Cart"]</span>
                     </a>
                 </div>

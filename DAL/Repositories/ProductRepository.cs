@@ -24,24 +24,32 @@ namespace DAL.Repositories
             return product;
         }
 
-        public async
-        Task<IEnumerable<Product>> GetMostPopularProductsAsync()
+        public async Task<IEnumerable<Product>> GetMostPopularProductsAsync()
         {
-            var products = await _context.Orders
-                .Include( o => o.Items)
-                .ThenInclude(oi => oi.Product)
+            // If orders exist — top products by order volume
+            var popularIds = await _context.Orders
                 .SelectMany(o => o.Items)
                 .GroupBy(oi => oi.ProductId)
-                .Select(g => new
-                {
-                    ProductId = g.Key,
-                    TotalQuantity = g.Sum(oi => oi.Quantity)
-                })
-                .OrderByDescending(g => g.TotalQuantity)
-                .Take(5)
-                .Join(_context.Products, g => g.ProductId, p => p.Id, (g, p) => p)
-                .Include(p => p.Category).ToListAsync();
-            return products;
+                .Select(g => new { ProductId = g.Key, Total = g.Sum(oi => oi.Quantity) })
+                .OrderByDescending(g => g.Total)
+                .Take(12)
+                .Select(g => g.ProductId)
+                .ToListAsync();
+
+            if (popularIds.Count > 0)
+            {
+                return await _context.Products
+                    .Where(p => popularIds.Contains(p.Id))
+                    .Include(p => p.Category)
+                    .ToListAsync();
+            }
+
+            // Fallback: newest products from DB
+            return await _context.Products
+                .Include(p => p.Category)
+                .OrderByDescending(p => p.Id)
+                .Take(12)
+                .ToListAsync();
         }
     }
 }

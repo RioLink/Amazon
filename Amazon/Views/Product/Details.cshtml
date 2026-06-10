@@ -2,38 +2,133 @@
 
 @{
     ViewData["Title"] = Model.Name;
+    var hasDiscount = Model.OldPrice.HasValue;
+    var discount    = hasDiscount ? (int)Math.Round((1 - (double)Model.Price / (double)Model.OldPrice!.Value) * 100) : 0;
+    var saving      = hasDiscount ? Model.OldPrice!.Value - Model.Price : 0;
+    var ratingVal   = Model.Rating ?? 0.0;
+    var full        = (int)Math.Floor(ratingVal);
+    var half        = (ratingVal - full) >= 0.5;
 }
 
+<!-- Breadcrumb -->
+<nav class="details-breadcrumb" aria-label="Навігація">
+    <a asp-controller="Home" asp-action="Index">Головна</a>
+    <span>›</span>
+    <a asp-controller="Product" asp-action="Index">Товари</a>
+    <span>›</span>
+    <span>@Model.Category</span>
+    <span>›</span>
+    <span class="details-breadcrumb__current">@Model.Name</span>
+</nav>
+
 <div class="product-details">
-    <div class="product-details__image">
-        <img src="@Model.ImageUrl" alt="@Model.Name" />
+
+    <!-- ── Image ── -->
+    <div class="product-details__gallery">
+        <div class="product-details__image-wrap">
+            @if (hasDiscount)
+            {
+                <span class="product-details__discount-badge">−@discount%</span>
+            }
+            <img class="product-details__img" src="@Model.ImageUrl" alt="@Model.Name" />
+        </div>
     </div>
-    <div class="product-details__content">
-        <span class="product-card__category">@Model.Category</span>
-        <h1>@Model.Name</h1>
+
+    <!-- ── Info ── -->
+    <div class="product-details__info">
+
+        <span class="product-details__category-chip">@Model.Category</span>
+        <h1 class="product-details__title">@Model.Name</h1>
+
         @if (Model.Rating.HasValue)
         {
-            <div class="product-card__rating" aria-label="Оцінка @Model.Rating з 5">
-                <span aria-hidden="true">★★★★★</span>
-                @if (Model.ReviewCount.HasValue) 
+            <div class="product-details__stars">
+                @for (int i = 1; i <= 5; i++)
                 {
-                    <small>@Model.Rating · @Model.ReviewCount відгуків</small>
+                    if (i <= full) { <span class="star star--full">★</span> }
+                    else if (i == full + 1 && half) { <span class="star star--half">★</span> }
+                    else { <span class="star star--empty">★</span> }
+                }
+                <span class="product-details__rating-val">@Model.Rating?.ToString("F1")</span>
+                @if (Model.ReviewCount.HasValue)
+                {
+                    <span class="product-details__review-link">(@Model.ReviewCount відгуків)</span>
                 }
             </div>
         }
-        <p class="product-details__description">@Model.Description</p>
-        <div class="product-details__price">
-            <strong>@Model.Price.ToString("N0") ₴</strong>
-            @if (Model.OldPrice.HasValue)
+
+        <div class="product-details__divider"></div>
+
+        <!-- Price -->
+        <div class="product-details__price-block">
+            <span class="product-details__price-current">@Model.Price.ToString("N0") ₴</span>
+            @if (hasDiscount)
             {
-                <del>@Model.OldPrice.Value.ToString("N0") ₴</del>
+                <div class="product-details__price-meta">
+                    <span class="product-details__price-old">@Model.OldPrice!.Value.ToString("N0") ₴</span>
+                    <span class="product-details__price-saving">Економія: @saving.ToString("N0") ₴</span>
+                </div>
             }
         </div>
 
-        <form asp-action="Add" asp-controller="Cart" method="post">
-            <input type="hidden" name="ProductId" value="@Model.Id" />
-            <input type="hidden" name="Quantity" value="1" />
-            <button class="amazon-button amazon-button--primary" type="submit">🛒 Додати в кошик</button>
-        </form>
+        <!-- Stock / delivery -->
+        <div class="product-details__badges">
+            <span class="product-details__stock">✔ В наявності</span>
+            <span class="product-details__delivery">🚚 Доставка 2–5 днів</span>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Description))
+        {
+            <p class="product-details__description">@Model.Description</p>
+        }
+
+        <div class="product-details__divider"></div>
+
+        <!-- Qty + Add to cart -->
+        <div class="product-details__actions">
+            <div class="qty-stepper">
+                <button class="qty-stepper__btn" type="button" id="qtyMinus" aria-label="Зменшити">−</button>
+                <span class="qty-stepper__value" id="qtyValue">1</span>
+                <button class="qty-stepper__btn" type="button" id="qtyPlus" aria-label="Збільшити">+</button>
+            </div>
+            <button class="amazon-button amazon-button--primary product-details__add-btn"
+                    type="button"
+                    id="detailsAddBtn"
+                    data-product="@System.Text.Json.JsonSerializer.Serialize(new { id = Model.Id, name = Model.Name, price = Model.Price, imageUrl = Model.ImageUrl, category = Model.Category })">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width:20px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+                    <path d="M2.5 3.5h2l2.1 10.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 1.9-1.4L21 7H6m3 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm10 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/>
+                </svg>
+                Додати в кошик
+            </button>
+        </div>
+
+        <!-- Trust -->
+        <div class="product-details__trust">
+            <div class="product-details__trust-item">🔒 Безпечна оплата</div>
+            <div class="product-details__trust-item">↩ Повернення 30 днів</div>
+            <div class="product-details__trust-item">☎ Підтримка 24/7</div>
+        </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+(function () {
+    let qty = 1;
+    const minus = document.getElementById('qtyMinus');
+    const plus  = document.getElementById('qtyPlus');
+    const val   = document.getElementById('qtyValue');
+    const btn   = document.getElementById('detailsAddBtn');
+
+    minus.addEventListener('click', () => { if (qty > 1) val.textContent = --qty; });
+    plus.addEventListener('click',  () => { val.textContent = ++qty; });
+
+    btn.addEventListener('click', () => {
+        const product = JSON.parse(btn.dataset.product);
+        if (typeof addToCart === 'function') {
+            for (let i = 0; i < qty; i++) addToCart(product);
+        }
+    });
+})();
+</script>
+}

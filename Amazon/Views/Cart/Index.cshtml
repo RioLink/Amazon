@@ -2,92 +2,135 @@
 
 @{
     ViewData["Title"] = "Кошик";
-    var hasItems = Model != null && Model.Any();
-    var subtotal = hasItems ? Model.Sum(x => x.TotalPrice) : 0;
+    var items       = Model?.ToList() ?? new List<Amazon.Models.CartItemViewModel>();
+    var hasItems    = items.Any();
+    var subtotal    = items.Sum(x => x.TotalPrice);
+    var totalQty    = items.Sum(x => x.Quantity);
+    var shipping    = subtotal >= 500 ? 0m : 99m;
+    var total       = subtotal + shipping;
+    const decimal FREE_THRESHOLD = 500m;
+    var progressPct = hasItems ? (int)Math.Min(100, (subtotal / FREE_THRESHOLD) * 100) : 0;
 }
 
-@* Empty state — показываем только если Model пустая *@
-<div id="cart-empty-state" class="empty-state" style="@(hasItems ? "display:none;" : "")">
-    <span class="empty-state__icon" aria-hidden="true">🛒</span>
-    <h1>Ваш кошик порожній</h1>
-    <p>Додайте товари з каталогу, і вони з'являться тут.</p>
-    <a class="amazon-button amazon-button--primary" asp-controller="Product" asp-action="Index">
-        Перейти до каталогу
-    </a>
-</div>
+@if (!hasItems)
+{
+    <div class="empty-state">
+        <span class="empty-state__icon">🛒</span>
+        <h1>Ваш кошик порожній</h1>
+        <p>Додайте товари з каталогу, і вони з'являться тут.</p>
+        <a class="amazon-button amazon-button--primary" asp-controller="Product" asp-action="Index">
+            Перейти до каталогу
+        </a>
+    </div>
+}
+else
+{
+    <div class="cart-page-layout">
 
-@* Filled state — показываем только если есть товары *@
-<div id="cart-filled-state" class="cart-page-layout" style="@(!hasItems ? "display:none;" : "")">
+        @* ── Left: items ── *@
+        <section class="cart-panel" aria-label="Товари в кошику">
+            <div class="cart-panel__header">
+                <div>
+                    <h1 class="cart-panel__title">Кошик</h1>
+                    <span class="cart-panel__count">@totalQty @(totalQty == 1 ? "товар" : totalQty < 5 ? "товари" : "товарів")</span>
+                </div>
+                <form asp-action="Clear" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="cart-panel__clear">Очистити кошик</button>
+                </form>
+            </div>
 
-    <section class="cart-panel" aria-label="Товари в кошику">
-        <div class="cart-panel__header">
-            <h1>Кошик</h1>
-            <form asp-action="Clear" method="post">
-                <button type="submit" class="cart-panel__clear">Очистити кошик</button>
-            </form>
-        </div>
-        
-        <ul class="cart-items-list" aria-live="polite">
-            @if (hasItems)
-            {
-                @foreach (var item in Model)
+            <ul class="cart-items-list" aria-live="polite">
+                @foreach (var item in items)
                 {
                     <li class="cart-item">
-                        <div>
-                            <strong>@item.ProductName</strong><br />
-                            <small>Ціна: @item.Price.ToString("F2") ₴</small>
+                        <div class="cart-item__img-wrap">
+                            <div class="cart-item__image-placeholder">🛍</div>
                         </div>
-                        <div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <form asp-action="Add" method="post">
+                        <div class="cart-item__details">
+                            <span class="cart-item__name">@item.ProductName</span>
+                            <span class="cart-item__unit-price">@item.Price.ToString("N0") ₴ / шт.</span>
+                            <!-- Qty stepper -->
+                            <div class="cart-item__stepper">
+                                <form asp-action="Add" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
                                     <input type="hidden" name="ProductId" value="@item.ProductId" />
                                     <input type="hidden" name="Quantity" value="-1" />
-                                    <button type="submit">−</button>
+                                    <button type="submit" class="qty-stepper__btn" aria-label="Зменшити">−</button>
                                 </form>
-
-                                <span>@item.Quantity</span>
-
-                                <form asp-action="Add" method="post">
-
+                                <span class="qty-stepper__value">@item.Quantity</span>
+                                <form asp-action="Add" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
                                     <input type="hidden" name="ProductId" value="@item.ProductId" />
                                     <input type="hidden" name="Quantity" value="1" />
-                                    <button type="submit">+</button>
+                                    <button type="submit" class="qty-stepper__btn" aria-label="Збільшити">+</button>
                                 </form>
                             </div>
-                            <strong>@item.TotalPrice.ToString("F2") ₴</strong>
+                        </div>
+                        <div class="cart-item__actions">
+                            <span class="cart-item__price">@item.TotalPrice.ToString("N0") ₴</span>
                             <form asp-action="Remove" method="post">
+                                @Html.AntiForgeryToken()
                                 <input type="hidden" name="ProductId" value="@item.ProductId" />
-                                <button type="submit" style="color:red; background:none; border:none; cursor:pointer; font-size: 0.8em;">Видалити</button>
+                                <button type="submit" class="cart-item__remove">Видалити</button>
                             </form>
                         </div>
                     </li>
                 }
-            }
-        </ul>
-    </section>
+            </ul>
+        </section>
 
-    <aside class="cart-summary" aria-label="Підсумок замовлення">
-        <h2>Підсумок</h2>
-        <div class="cart-summary__rows">
-            <div class="cart-summary__row">
-                <span>Товари</span>
-                <span>@subtotal.ToString("F2") ₴</span>
+        @* ── Right: summary ── *@
+        <aside class="cart-summary" aria-label="Підсумок замовлення">
+
+            <!-- Free shipping progress -->
+            <div class="cart-shipping-progress @(shipping == 0 ? "cart-shipping-progress--achieved" : "")">
+                @if (shipping == 0)
+                {
+                    <p class="cart-shipping-progress__text">🎉 <strong>Безкоштовна доставка!</strong></p>
+                }
+                else
+                {
+                    <p class="cart-shipping-progress__text">До безкоштовної: <strong>@((FREE_THRESHOLD - subtotal).ToString("N0")) ₴</strong></p>
+                }
+                <div class="cart-shipping-progress__bar">
+                    <div class="cart-shipping-progress__fill" style="width:@progressPct%"></div>
+                </div>
             </div>
-            <div class="cart-summary__row">
-                <span>Доставка</span>
-                <span>0 ₴</span>
+
+            <h2 class="cart-summary__heading">Підсумок</h2>
+
+            <div class="cart-summary__rows">
+                <div class="cart-summary__row">
+                    <span>Товари (@totalQty)</span>
+                    <span>@subtotal.ToString("N0") ₴</span>
+                </div>
+                <div class="cart-summary__row @(shipping == 0 ? "cart-summary__row--shipping-free" : "")">
+                    <span>Доставка</span>
+                    <span>@(shipping == 0 ? "Безкоштовно" : shipping.ToString("N0") + " ₴")</span>
+                </div>
             </div>
-        </div>
 
-        <hr class="cart-summary__divider" />
+            <hr class="cart-summary__divider" />
 
-        <div class="cart-summary__total">
-            <span>Разом</span>
-            <span>@subtotal.ToString("F2") ₴</span>
-        </div>
+            <div class="cart-summary__total">
+                <span>Разом</span>
+                <span>@total.ToString("N0") ₴</span>
+            </div>
 
-        <a class="amazon-button amazon-button--primary cart-summary__checkout-btn" asp-controller="Checkout" asp-action="Index">
-            Оформити замовлення →
-        </a>
-    </aside>
-</div>
+            <a class="amazon-button amazon-button--primary cart-summary__checkout-btn"
+               asp-controller="Checkout" asp-action="Index">
+                Оформити замовлення →
+            </a>
+
+            <div class="cart-summary__trust">
+                <span>🔒 Безпечна оплата</span>
+                <span>↩ Повернення 30 днів</span>
+            </div>
+
+            <div class="cart-summary__continue">
+                <a asp-controller="Product" asp-action="Index">← Продовжити покупки</a>
+            </div>
+        </aside>
+    </div>
+}

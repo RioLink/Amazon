@@ -19,7 +19,7 @@ builder.Services.AddControllersWithViews()
     .AddDataAnnotationsLocalization();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -59,6 +59,7 @@ using (var scope = app.Services.CreateScope())
 
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await CategoriesSeeder.SeedAsync(context);
+    await ProductSeeder.SeedAsync(context);
     await OrderSeeder.SeedAsync(context, userManager);
 }
 
