@@ -5568,3 +5568,125 @@ input:focus-visible {
 }
 
 .category-card--games { background: #fff; }
+
+/* ── Careers page ────────────────────────────────────────────── */
+.careers-hero {
+  text-align: center;
+  padding: 56px 24px 40px;
+  max-width: 700px;
+  margin: 0 auto 48px;
+}
+.careers-hero h1 { font-size: clamp(1.6rem, 3vw, 2.4rem); margin: 8px 0 16px; }
+.careers-hero p  { color: #64748b; font-size: 1.05rem; line-height: 1.6; }
+
+.careers-section { margin-bottom: 60px; }
+.careers-section__title   { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+.careers-section__subtitle { color: #64748b; font-size: 14px; margin-bottom: 28px; }
+
+.vacancies-list { display: flex; flex-direction: column; gap: 20px; }
+
+.vacancy-card {
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px 28px;
+  transition: box-shadow .2s, border-color .2s;
+}
+.vacancy-card:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,.08);
+  border-color: var(--amazon-orange);
+}
+.vacancy-card__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.vacancy-card__icon {
+  font-size: 2rem;
+  width: 52px; height: 52px;
+  display: grid; place-items: center;
+  background: #f8fafc;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.vacancy-card__title { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin: 0 0 3px; }
+.vacancy-card__meta  { font-size: 13px; color: #64748b; }
+.vacancy-card__badge {
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.vacancy-card__badge--hot  { background: #fef3c7; color: #92400e; }
+.vacancy-card__badge--new  { background: #dcfce7; color: #166534; }
+
+.vacancy-card__desc { color: #475569; font-size: 14px; line-height: 1.65; margin-bottom: 14px; }
+
+.vacancy-card__requirements {
+  list-style: none;
+  padding: 0; margin: 0 0 18px;
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.vacancy-card__requirements li {
+  background: #f1f5f9;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #334155;
+}
+
+.vacancy-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+.vacancy-card__salary { font-size: 1rem; font-weight: 700; color: #1e293b; }
+.vacancy-card__apply {
+  background: var(--amazon-orange);
+  color: #fff;
+  padding: 9px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .2s;
+}
+.vacancy-card__apply:hover { background: #e07b00; color: #fff; }
+
+/* Perks */
+.careers-perks { margin-bottom: 56px; }
+.careers-perks h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 24px; }
+.careers-perks__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+.careers-perk {
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px 20px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.careers-perk__icon { font-size: 2rem; }
+.careers-perk strong { font-size: 15px; color: #1e293b; }
+.careers-perk p { font-size: 13px; color: #64748b; margin: 0; line-height: 1.5; }
+
+/* CTA */
+.careers-cta {
+  background: linear-gradient(135deg, #1e2a3a, #0f1923);
+  border-radius: 16px;
+  padding: 40px 32px;
+  text-align: center;
+  margin-bottom: 60px;
+  color: #fff;
+}
+.careers-cta h2 { font-size: 1.4rem; margin-bottom: 10px; color: #fff; }
+.careers-cta p  { color: #94a3b8; font-size: 15px; }
+.careers-cta a  { color: var(--amazon-orange); text-decoration: none; font-weight: 600; }
+.careers-cta a:hover { text-decoration: underline; }

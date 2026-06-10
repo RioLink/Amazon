@@ -35,6 +35,7 @@ namespace Amazon.Controllers
         public IActionResult Terms() => View();
         public IActionResult Disclaimer() => View();
         public IActionResult AboutUs() => View();
+        public IActionResult Careers() => View();
 
         [HttpGet]
         public IActionResult SetLanguage(string culture, string? returnUrl)

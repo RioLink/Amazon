@@ -269,29 +269,16 @@
                     </ul>
                 </div>
 
-                <!-- Account column -->
-                <div class="site-footer__col">
-                    <h4 class="site-footer__col-title">
-                        @(isEn ? "Account" : "Акаунт")
-                    </h4>
-                    <ul class="site-footer__col-list">
-                        <li><a asp-controller="Auth" asp-action="Login">@(isEn ? "Sign In" : "Увійти")</a></li>
-                        <li><a asp-controller="Auth" asp-action="Register">@(isEn ? "Register" : "Реєстрація")</a></li>
-                        <li><a asp-controller="Profile" asp-action="Index">@(isEn ? "Profile" : "Профіль")</a></li>
-                        <li><a asp-controller="Auth" asp-action="ForgotPassword">@(isEn ? "Forgot Password" : "Забули пароль?")</a></li>
-                    </ul>
-                </div>
-
                 <!-- Company column -->
                 <div class="site-footer__col">
                     <h4 class="site-footer__col-title">
                         @(isEn ? "Company" : "Компанія")
                     </h4>
                     <ul class="site-footer__col-list">
-                        <li><a asp-controller="Home" asp-action="About">@(isEn ? "About Us" : "Про нас")</a></li>
+                        <li><a asp-controller="Home" asp-action="AboutUs">@(isEn ? "About Us" : "Про нас")</a></li>
                         <li><a href="mailto:support@amazon-itstep.com">@(isEn ? "Contact Us" : "Контакти")</a></li>
-                        <li><a asp-controller="Home" asp-action="About">#ITStep</a></li>
-                        <li><a asp-controller="Home" asp-action="About">@(isEn ? "Careers" : "Кар'єра")</a></li>
+                        <li><a href="#" onclick="return false;">#ITStep</a></li>
+                        <li><a asp-controller="Home" asp-action="Careers">@(isEn ? "Careers" : "Кар'єра")</a></li>
                     </ul>
                 </div>
 
@@ -304,7 +291,6 @@
                         <li><a asp-controller="Home" asp-action="PrivacyPolicy">@(isEn ? "Privacy Policy" : "Політика конфіденційності")</a></li>
                         <li><a asp-controller="Home" asp-action="Terms">@(isEn ? "Terms & Conditions" : "Умови використання")</a></li>
                         <li><a asp-controller="Home" asp-action="Disclaimer">@(isEn ? "Disclaimer" : "Відмова від відповідальності")</a></li>
-                        <li><a asp-controller="Home" asp-action="AboutUs">@(isEn ? "About" : "Про нас")</a></li>
                     </ul>
                 </div>
 
