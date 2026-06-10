@@ -86,8 +86,10 @@
             <span>@subtotal.ToString("F2") ₴</span>
         </div>
 
-        <a class="amazon-button amazon-button--primary cart-summary__checkout-btn" asp-controller="Checkout" asp-action="Index">
-            Оформити замовлення →
-        </a>
+        <form asp-controller="Order" asp-action="Create" method="post">
+            <button type="submit" class="amazon-button amazon-button--primary cart-summary__checkout-btn">
+                Оформити замовлення →
+            </button>
+        </form>
     </aside>
 </div>

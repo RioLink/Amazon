@@ -12,24 +12,49 @@ namespace BLL.Services
     public class OrderService : IOrderService
     {
         private readonly IGenericRepository<Order> _orderRepository;
+        private readonly ICartService _cardService;
+        private readonly IProductService _productService;
 
-        public OrderService(IGenericRepository<Order> orderRepository)
+        public OrderService(IGenericRepository<Order> orderRepository, ICartService cardService, IProductService productService)
         {
             _orderRepository = orderRepository;
+            _cardService = cardService;
+            _productService = productService;
         }
 
-        public async Task<Order> CreateOrderAsync(string userId, IEnumerable<OrderItem> items, decimal totalAmount)
+        public async Task CreateOrderAsync(string userId, IEnumerable<CartItem> items)
         {
+            if (items == null) return;
+
+            var orderItems = items.Select(i => new OrderItem
+            {
+                ProductId = i.ProductId,
+                Quantity = i.Quantity,
+                Price = i.Product.Price
+            }).ToList();
+
+            var totalAmount = orderItems.Sum(oi => oi.Price * oi.Quantity);
+
             var newOrder = new Order
             {
                 UserId = userId,
                 Date = DateTime.UtcNow,
                 TotalAmount = totalAmount,
-                Items = (ICollection<OrderItem>)items
+                Items = orderItems
             };
 
             await _orderRepository.AddAsync(newOrder);
-            return newOrder;
+
+            foreach(var item in items) 
+            {
+                var product = await _productService.GetProductByIdAsync(item.ProductId);
+                if (product != null)
+                {
+                    var newQuantity = product.Quantity - item.Quantity;
+                    await _productService.UpdateProductAsync(product.Id, product.Name, product.Price, product.CategoryId, product.Description, product.ImageUrl, newQuantity);
+                }   
+                await _cardService.RemoveFromCartAsync(userId, item.ProductId);
+            }
         }
 
         public async Task<IEnumerable<Order>> GetUserOrdersAsync(string userId)

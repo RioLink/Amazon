@@ -1,9 +1,12 @@
+using Amazon.Models;
+using BLL.Services;
+using BLL.Interfaces;
+using DAL.Data;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using DAL.Data;
 
 namespace Amazon.Controllers;
 
@@ -13,25 +16,39 @@ public class ProfileController : Controller
     private readonly UserManager<User> _userManager;
     private readonly AppDbContext      _db;
     private readonly IWebHostEnvironment _env;
+    private readonly IOrderService _orderService;
 
-    public ProfileController(UserManager<User> userManager, AppDbContext db, IWebHostEnvironment env)
+    public ProfileController(UserManager<User> userManager, AppDbContext db, IWebHostEnvironment env, IOrderService orderService)
     {
         _userManager = userManager;
         _db          = db;
         _env         = env;
+        _orderService = orderService;
     }
 
     public async Task<IActionResult> Index()
     {
+        var userId = _userManager.GetUserId(User);
+
+        var orders = (await _orderService.GetUserOrdersAsync(userId))
+            .Select(o => new OrderViewModel
+            {
+                Id = o.Id,
+                Date = o.Date,
+                TotalAmount = o.TotalAmount,
+                Status = o.Status
+            })
+            .ToList();
+
         var user = await _userManager.Users
             .Include(u => u.Addresses)
             .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
 
-        ViewData["UserEmail"]    = user?.Email ?? "";
-        ViewData["AvatarPath"]   = user?.AvatarPath ?? "";
-        ViewData["Addresses"]    = user?.Addresses.OrderByDescending(a => a.IsDefault).ThenBy(a => a.CreatedAt).ToList()
-                                   ?? new List<Address>();
-        return View();
+        ViewData["UserEmail"] = user?.Email ?? "";
+        ViewData["AvatarPath"] = user?.AvatarPath ?? "";
+        ViewData["Addresses"] = user?.Addresses.OrderByDescending(a => a.IsDefault).ThenBy(a => a.CreatedAt).ToList() ?? new List<Address>();
+
+        return View(orders);
     }
 
     [HttpPost]

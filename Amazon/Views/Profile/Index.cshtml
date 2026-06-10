@@ -1,5 +1,8 @@
+@model IEnumerable<Amazon.Models.OrderViewModel>
 @using Domain.Entities
 @{
+    Console.WriteLine(string.Join(" ", Model.Select(p => p.TotalAmount).ToList()));
+
     ViewData["Title"] = "Профіль";
     var username   = User.Identity?.Name ?? "Гість";
     var email      = ViewData["UserEmail"]?.ToString() ?? "";
@@ -77,14 +80,29 @@
         <!-- Orders -->
         <section class="profile-section">
             <div class="profile-section__header">
-                <h2>Мої замовлення <span class="profile-section__count">(<span id="orders-count">0</span>)</span></h2>
+                <h2>Мої замовлення <span class="profile-section__count">(@Model.Count())</span></h2>
             </div>
             <div id="orders-container">
-                <div class="orders-empty">
-                    <div class="orders-empty__icon">📦</div>
-                    <p>Ви ще не зробили жодного замовлення.</p>
-                    <a class="profile-catalog-btn" asp-controller="Product" asp-action="Index">Перейти до каталогу</a>
-                </div>
+                @if (!Model.Any())
+                {
+                    <div class="orders-empty">
+                        <div class="orders-empty__icon">📦</div>
+                        <p>Ви ще не зробили жодного замовлення.</p>
+                        <a class="profile-catalog-btn" asp-controller="Product" asp-action="Index">Перейти до каталогу</a>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var order in Model)
+                    {
+                        <div class="order-card">
+                            <span>#@order.Id</span>
+                            <span>@order.Date.ToString("dd.MM.yyyy")</span>
+                            <span>@order.TotalAmount.ToString("F2") ₴</span>
+                            <span>@order.Status</span>
+                        </div>
+                    }
+                }
             </div>
         </section>
 
