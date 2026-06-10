@@ -51,6 +51,11 @@ namespace BLL.Services
             {
                 existingItem.Quantity += quantity;
                 await _cartRepo.UpdateAsync(existingItem);
+
+                if(existingItem.Quantity <= 0)
+                {
+                    await _cartRepo.DeleteAsync(existingItem.Id);
+                }
             }
             else
             {
@@ -61,6 +66,8 @@ namespace BLL.Services
                     Quantity = quantity
                 });
             }
+
+
 
             return (true, string.Empty);
         }

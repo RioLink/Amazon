@@ -8,7 +8,7 @@ namespace BLL.Interfaces
 {
     public interface IOrderService
     {
-        Task<Order> CreateOrderAsync(string userId, IEnumerable<OrderItem> items, decimal totalAmount);
+        Task CreateOrderAsync(string userId, IEnumerable<CartItem> items);
         Task<IEnumerable<Order>> GetUserOrdersAsync(string userId);
         Task<IEnumerable<Order>> GetAllOrdersAsync();
 
