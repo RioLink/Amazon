@@ -111,6 +111,88 @@
     </div>
 </div>
 
+@* ── Reviews section ── *@
+@{
+    var reviews = ViewData["Reviews"] as List<Domain.Entities.Review> ?? new();
+}
+<section class="reviews-section" id="reviews">
+    <h2 class="reviews-section__title">
+        Відгуки
+        @if (reviews.Any())
+        {
+            <span class="reviews-section__count">(@reviews.Count)</span>
+        }
+    </h2>
+
+    @if (reviews.Any())
+    {
+        <div class="reviews-list">
+            @foreach (var r in reviews)
+            {
+                <div class="review-card">
+                    <div class="review-card__head">
+                        <span class="review-card__author">@r.AuthorName</span>
+                        <div class="review-card__stars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <span class="@(i <= r.Stars ? "star star--full" : "star star--empty")">★</span>
+                            }
+                        </div>
+                        <span class="review-card__date">@r.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")</span>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(r.Body))
+                    {
+                        <p class="review-card__body">@r.Body</p>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="reviews-section__empty">Відгуків ще немає. Будьте першим!</p>
+    }
+
+    @* ── Add review form ── *@
+    <div class="review-form-wrap">
+        <h3 class="review-form__title">Залишити відгук</h3>
+        <form class="review-form" asp-controller="Product" asp-action="AddReview" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="productId" value="@Model.Id" />
+
+            @if (!(User.Identity?.IsAuthenticated == true))
+            {
+                <div class="review-form__field">
+                    <label class="review-form__label">Ваше ім'я</label>
+                    <input class="review-form__input" type="text" name="authorName"
+                           placeholder="Ім'я або нікнейм" maxlength="60" />
+                </div>
+            }
+
+            <div class="review-form__field">
+                <label class="review-form__label">Оцінка</label>
+                <div class="star-picker" id="starPicker">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <button type="button" class="star-picker__star" data-val="@i" aria-label="@i зірок">★</button>
+                    }
+                    <input type="hidden" name="stars" id="starsInput" value="5" />
+                </div>
+            </div>
+
+            <div class="review-form__field">
+                <label class="review-form__label">Коментар</label>
+                <textarea class="review-form__textarea" name="body"
+                          placeholder="Ваші враження від товару..." rows="4" maxlength="1000"></textarea>
+            </div>
+
+            <button class="amazon-button amazon-button--primary review-form__submit" type="submit">
+                Опублікувати відгук
+            </button>
+        </form>
+    </div>
+</section>
+
 @section Scripts {
 <script>
 (function () {
@@ -122,6 +204,30 @@
 
     minus.addEventListener('click', () => { if (qty > 1) { val.textContent = --qty; qtyInput.value = qty; } });
     plus.addEventListener('click',  () => { val.textContent = ++qty; qtyInput.value = qty; });
+})();
+
+// ── Star picker ──────────────────────────────────────────────
+(function () {
+    const picker = document.getElementById('starPicker');
+    const input  = document.getElementById('starsInput');
+    if (!picker) return;
+    const stars  = picker.querySelectorAll('.star-picker__star');
+    let selected = 5;
+
+    function paint(upTo) {
+        stars.forEach((s, i) => s.classList.toggle('active', i < upTo));
+    }
+    paint(selected);
+
+    stars.forEach((s, i) => {
+        s.addEventListener('mouseenter', () => paint(i + 1));
+        s.addEventListener('mouseleave', () => paint(selected));
+        s.addEventListener('click', () => {
+            selected    = i + 1;
+            input.value = selected;
+            paint(selected);
+        });
+    });
 })();
 </script>
 }

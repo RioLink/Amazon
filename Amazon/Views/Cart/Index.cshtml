@@ -57,21 +57,11 @@ else
                         <div class="cart-item__details">
                             <span class="cart-item__name">@item.ProductName</span>
                             <span class="cart-item__unit-price">@item.Price.ToString("N0") ₴ / шт.</span>
-                            <!-- Qty stepper -->
-                            <div class="cart-item__stepper">
-                                <form asp-action="Add" method="post" style="display:inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="ProductId" value="@item.ProductId" />
-                                    <input type="hidden" name="Quantity" value="-1" />
-                                    <button type="submit" class="qty-stepper__btn" aria-label="Зменшити">−</button>
-                                </form>
-                                <span class="qty-stepper__value">@item.Quantity</span>
-                                <form asp-action="Add" method="post" style="display:inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="ProductId" value="@item.ProductId" />
-                                    <input type="hidden" name="Quantity" value="1" />
-                                    <button type="submit" class="qty-stepper__btn" aria-label="Збільшити">+</button>
-                                </form>
+                            <!-- Qty stepper (AJAX) -->
+                            <div class="cart-item__stepper" data-product-id="@item.ProductId">
+                                <button type="button" class="qty-stepper__btn js-qty-minus" aria-label="Зменшити">−</button>
+                                <span class="qty-stepper__value js-qty-val">@item.Quantity</span>
+                                <button type="button" class="qty-stepper__btn js-qty-plus" aria-label="Збільшити">+</button>
                             </div>
                         </div>
                         <div class="cart-item__actions">
@@ -140,4 +130,91 @@ else
             </div>
         </aside>
     </div>
+}
+
+@section Scripts {
+<script>
+(function () {
+    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value
+               ?? document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? '';
+
+    async function updateQty(productId, delta, stepperEl) {
+        const res = await fetch('/Cart/UpdateQuantity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({ productId, delta })
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // Update cart count badge in header
+        const badge = document.querySelector('.cart-count');
+        if (badge) badge.textContent = data.cartCount;
+
+        // Update displayed qty or remove row
+        const valEl = stepperEl.querySelector('.js-qty-val');
+        const curQty = parseInt(valEl.textContent);
+        const newQty = curQty + delta;
+
+        if (newQty <= 0) {
+            // Remove the row and refresh totals
+            const li = stepperEl.closest('li.cart-item');
+            if (li) li.remove();
+            recalcTotals();
+            checkEmpty();
+        } else {
+            valEl.textContent = newQty;
+            // Update price cell
+            const priceEl = stepperEl.closest('li.cart-item')?.querySelector('.cart-item__price');
+            if (priceEl) {
+                const unitPriceText = stepperEl.closest('li.cart-item')?.querySelector('.cart-item__unit-price')?.textContent;
+                const unitPrice = parseFloat(unitPriceText?.replace(/[^\d.]/g, '') || '0');
+                priceEl.textContent = (unitPrice * newQty).toLocaleString('uk-UA') + ' ₴';
+            }
+            recalcTotals();
+        }
+    }
+
+    function recalcTotals() {
+        const FREE = 500;
+        let subtotal = 0;
+        document.querySelectorAll('li.cart-item').forEach(li => {
+            const priceText = li.querySelector('.cart-item__price')?.textContent ?? '0';
+            subtotal += parseFloat(priceText.replace(/[^\d.]/g, '')) || 0;
+        });
+        const shipping = subtotal >= FREE ? 0 : 99;
+        const total    = subtotal + shipping;
+
+        const fmt = n => Math.round(n).toLocaleString('uk-UA') + ' ₴';
+
+        document.querySelectorAll('.cart-summary__row span:last-child')[0]
+            && (document.querySelectorAll('.cart-summary__row')[0].querySelector('span:last-child').textContent = fmt(subtotal));
+        const shipRow = document.querySelectorAll('.cart-summary__row')[1];
+        if (shipRow) shipRow.querySelector('span:last-child').textContent = shipping === 0 ? 'Безкоштовно' : fmt(shipping);
+        const totalEl = document.querySelector('.cart-summary__total span:last-child');
+        if (totalEl) totalEl.textContent = fmt(total);
+
+        // Update qty count in header
+        const totalQty = Array.from(document.querySelectorAll('.js-qty-val'))
+            .reduce((sum, el) => sum + parseInt(el.textContent || '0'), 0);
+        const countEl = document.querySelector('.cart-panel__count');
+        if (countEl) countEl.textContent = totalQty + (totalQty === 1 ? ' товар' : totalQty < 5 ? ' товари' : ' товарів');
+    }
+
+    function checkEmpty() {
+        if (document.querySelectorAll('li.cart-item').length === 0) {
+            location.reload();
+        }
+    }
+
+    document.querySelectorAll('.cart-item__stepper').forEach(stepper => {
+        const productId = parseInt(stepper.dataset.productId);
+        stepper.querySelector('.js-qty-minus').addEventListener('click', () => updateQty(productId, -1, stepper));
+        stepper.querySelector('.js-qty-plus').addEventListener('click',  () => updateQty(productId,  1, stepper));
+    });
+})();
+</script>
 }

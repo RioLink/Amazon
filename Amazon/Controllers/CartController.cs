@@ -94,6 +94,38 @@ public class CartController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    public async Task<IActionResult> UpdateQuantity([FromBody] UpdateQtyRequest req)
+    {
+        var userId = _userManager.GetUserId(User);
+        if (userId != null)
+        {
+            var cartItems = await _cartService.GetCartByUserIdAsync(userId);
+            var item = cartItems.FirstOrDefault(c => c.ProductId == req.ProductId);
+            if (item != null)
+            {
+                int newQty = item.Quantity + req.Delta;
+                if (newQty <= 0)
+                    await _cartService.RemoveFromCartAsync(userId, req.ProductId);
+                else
+                    await _cartService.AddToCartAsync(userId, req.ProductId, req.Delta);
+            }
+        }
+        else
+        {
+            if (req.Delta > 0)
+                GuestCartService.Add(HttpContext.Session, req.ProductId, "", 0, req.Delta);
+            else
+                GuestCartService.Remove(HttpContext.Session, req.ProductId);
+        }
+
+        var count = userId != null
+            ? await _cartService.GetCartSizeByUserIdAsync(userId)
+            : GuestCartService.GetCount(HttpContext.Session);
+
+        return Json(new { success = true, cartCount = count });
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetCount()
     {
