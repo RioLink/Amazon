@@ -1,6 +1,9 @@
 @using Domain.Entities
 @{
     ViewData["Title"] = "Профіль";
+}
+@await Html.PartialAsync("_Breadcrumb", new Amazon.Models.BreadcrumbItem[] { new("Головна", "/"), new("Профіль", "") })
+@{
     var username   = User.Identity?.Name ?? "Гість";
     var email      = ViewData["UserEmail"]?.ToString() ?? "";
     var avatarPath = ViewData["AvatarPath"]?.ToString() ?? "";

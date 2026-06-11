@@ -3,6 +3,9 @@
 
 @{
     ViewData["Title"] = "Мої замовлення";
+}
+@await Html.PartialAsync("_Breadcrumb", new Amazon.Models.BreadcrumbItem[] { new("Головна", "/"), new("Профіль", "/Profile"), new("Мої замовлення", "") })
+@{
 
     var totalSpent = Model.Where(o => o.Status != OrderStatus.Cancelled).Sum(o => o.TotalAmount);
     var deliveredCount = Model.Count(o => o.Status == OrderStatus.Delivered);

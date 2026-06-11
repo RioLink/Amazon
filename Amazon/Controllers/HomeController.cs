@@ -1,8 +1,10 @@
 using Amazon.Models;
 using BLL.Services;
 using BLL.Interfaces;
+using DAL.Data;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace Amazon.Controllers
@@ -10,24 +12,57 @@ namespace Amazon.Controllers
     public class HomeController : Controller
     {
         private readonly IProductService _productService;
+        private readonly AppDbContext _db;
 
-        public HomeController(IProductService productService) 
+        public HomeController(IProductService productService, AppDbContext db)
         {
             _productService = productService;
+            _db = db;
         }
 
         public async Task<IActionResult> Index()
         {
-            var products = (await _productService.GetMostPopularProductsAsync()).Select(p => new ProductCardViewModel {
+            var popular = (await _productService.GetMostPopularProductsAsync()).Select(p => new ProductCardViewModel {
                 Id = p.Id,
                 Name = p.Name,
                 Category = p.Category.Name,
+                CategoryId = p.CategoryId,
                 Price = p.Price,
+                OldPrice = p.OldPrice,
                 Description = p.Description,
                 ImageUrl = p.ImageUrl
             }).ToList();
 
-            return View(products);
+            // 4 товари з різних категорій, не Техніка — по одному з кожної
+            var otherProducts = (await _db.Products
+                .Include(p => p.Category)
+                .Where(p => p.Category.Name != "Техніка")
+                .OrderBy(p => p.Id)
+                .ToListAsync())
+                .GroupBy(p => p.CategoryId)
+                .Select(g => g.First())
+                .OrderBy(_ => Guid.NewGuid())   // рандом вже в пам'яті
+                .Take(4)
+                .Select(p => new ProductCardViewModel {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Category = p.Category.Name,
+                    CategoryId = p.CategoryId,
+                    Price = p.Price,
+                    Description = p.Description,
+                    ImageUrl = p.ImageUrl
+                })
+                .ToList();
+
+            ViewData["OtherProducts"] = otherProducts;
+
+            var categories = await _db.Categories
+                .Include(c => c.Products)
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+            ViewData["Categories"] = categories;
+
+            return View(popular);
         }
 
         public IActionResult Privacy() => View();

@@ -11,7 +11,8 @@
 </div>
 
 <div class="admin-form-wrap">
-    <form asp-action="Edit" method="post" class="admin-form">
+    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="admin-form">
+        @Html.AntiForgeryToken()
         <div asp-validation-summary="ModelOnly" class="admin-form__errors"></div>
         <input type="hidden" asp-for="Id" />
 
@@ -22,30 +23,54 @@
                 <span asp-validation-for="Name" class="admin-form__field-error"></span>
             </div>
             <div class="admin-form__group">
-                <label asp-for="Price" class="admin-form__label">Ціна (₴)</label>
-                <input asp-for="Price" class="admin-form__input" type="number" step="0.01" min="0" />
-                <span asp-validation-for="Price" class="admin-form__field-error"></span>
-            </div>
-        </div>
-
-        <div class="admin-form__row admin-form__row--two">
-            <div class="admin-form__group">
                 <label asp-for="CategoryId" class="admin-form__label">Категорія</label>
                 <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="admin-form__input admin-form__select">
                     <option value="">-- Оберіть категорію --</option>
                 </select>
                 <span asp-validation-for="CategoryId" class="admin-form__field-error"></span>
             </div>
+        </div>
+
+        <div class="admin-form__row admin-form__row--two">
             <div class="admin-form__group">
-                <label asp-for="Quantity" class="admin-form__label">Кількість (шт.)</label>
-                <input asp-for="Quantity" class="admin-form__input" type="number" min="0" />
-                <span asp-validation-for="Quantity" class="admin-form__field-error"></span>
+                <label asp-for="Price" class="admin-form__label">Ціна (₴)</label>
+                <input asp-for="Price" class="admin-form__input" type="number" step="0.01" min="0" />
+                <span asp-validation-for="Price" class="admin-form__field-error"></span>
+            </div>
+            <div class="admin-form__group">
+                <label asp-for="OldPrice" class="admin-form__label">Стара ціна (₴) <span class="admin-form__optional">— для знижки</span></label>
+                <input asp-for="OldPrice" class="admin-form__input" type="number" step="0.01" min="0" placeholder="(необов'язково)" />
             </div>
         </div>
 
         <div class="admin-form__group">
-            <label asp-for="ImageUrl" class="admin-form__label">Посилання на зображення</label>
-            <input asp-for="ImageUrl" class="admin-form__input" />
+            <label asp-for="Quantity" class="admin-form__label">Кількість (шт.)</label>
+            <input asp-for="Quantity" class="admin-form__input" type="number" min="0" style="max-width:200px" />
+        </div>
+
+        <div class="admin-form__group">
+            <label class="admin-form__label">Зображення</label>
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <div class="admin-current-image">
+                    <img src="@Model.ImageUrl" alt="Поточне зображення" class="admin-current-image__img" />
+                    <span class="admin-current-image__label">Поточне зображення</span>
+                </div>
+            }
+            <div class="admin-image-upload" id="imageUploadWrap">
+                <div class="admin-image-upload__preview" id="imgPreview" style="display:none">
+                    <img id="imgPreviewImg" src="" alt="preview" />
+                    <button type="button" class="admin-image-upload__remove" id="removeImg">✕</button>
+                </div>
+                <label class="admin-image-upload__drop" id="dropZone">
+                    <input type="file" asp-for="ImageFile" accept="image/*" id="imageFileInput" class="admin-image-upload__file-input" />
+                    <span class="admin-image-upload__icon">🖼️</span>
+                    <span class="admin-image-upload__text">Перетягніть нове фото або <u>виберіть файл</u></span>
+                    <span class="admin-image-upload__hint">JPG, PNG, WebP — до 5 МБ</span>
+                </label>
+                <div class="admin-image-upload__or">або змініть URL</div>
+                <input asp-for="ImageUrl" class="admin-form__input" id="imageUrlInput" />
+            </div>
         </div>
 
         <div class="admin-form__group">
@@ -59,3 +84,49 @@
         </div>
     </form>
 </div>
+
+@section Scripts {
+<script>
+(function () {
+    const fileInput  = document.getElementById('imageFileInput');
+    const urlInput   = document.getElementById('imageUrlInput');
+    const preview    = document.getElementById('imgPreview');
+    const previewImg = document.getElementById('imgPreviewImg');
+    const dropZone   = document.getElementById('dropZone');
+    const removeBtn  = document.getElementById('removeImg');
+
+    function showPreview(src) {
+        previewImg.src = src;
+        preview.style.display = 'block';
+        dropZone.style.display = 'none';
+    }
+    function clearPreview() {
+        preview.style.display = 'none';
+        dropZone.style.display = 'flex';
+        fileInput.value = '';
+    }
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files[0]) { showPreview(URL.createObjectURL(fileInput.files[0])); urlInput.value = ''; }
+    });
+    urlInput.addEventListener('input', () => {
+        if (urlInput.value.trim()) { showPreview(urlInput.value.trim()); fileInput.value = ''; }
+        else clearPreview();
+    });
+    removeBtn.addEventListener('click', clearPreview);
+
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault(); dropZone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const dt = new DataTransfer(); dt.items.add(file);
+            fileInput.files = dt.files;
+            showPreview(URL.createObjectURL(file));
+            urlInput.value = '';
+        }
+    });
+})();
+</script>
+}

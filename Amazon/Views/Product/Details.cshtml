@@ -102,6 +102,17 @@
             </button>
         </form>
 
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <button class="product-details__wishlist-btn js-wishlist-btn"
+                    data-product-id="@Model.Id"
+                    type="button"
+                    aria-label="До обраного">
+                <span class="product-details__wishlist-icon">♡</span>
+                <span class="product-details__wishlist-label">До обраного</span>
+            </button>
+        }
+
         <!-- Trust -->
         <div class="product-details__trust">
             <div class="product-details__trust-item">🔒 Безпечна оплата</div>

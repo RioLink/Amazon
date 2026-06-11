@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Кошик";
+}
+@await Html.PartialAsync("_Breadcrumb", new Amazon.Models.BreadcrumbItem[] { new("Головна", "/"), new("Кошик", "") })
+@{
     var items       = Model?.ToList() ?? new List<Amazon.Models.CartItemViewModel>();
     var hasItems    = items.Any();
     var subtotal    = items.Sum(x => x.TotalPrice);
@@ -57,14 +60,14 @@ else
                         <div class="cart-item__details">
                             <span class="cart-item__name">@item.ProductName</span>
                             <span class="cart-item__unit-price">@item.Price.ToString("N0") ₴ / шт.</span>
+                        </div>
+                        <div class="cart-item__actions">
                             <!-- Qty stepper (AJAX) -->
                             <div class="cart-item__stepper" data-product-id="@item.ProductId">
                                 <button type="button" class="qty-stepper__btn js-qty-minus" aria-label="Зменшити">−</button>
                                 <span class="qty-stepper__value js-qty-val">@item.Quantity</span>
                                 <button type="button" class="qty-stepper__btn js-qty-plus" aria-label="Збільшити">+</button>
                             </div>
-                        </div>
-                        <div class="cart-item__actions">
                             <span class="cart-item__price">@item.TotalPrice.ToString("N0") ₴</span>
                             <form asp-action="Remove" method="post">
                                 @Html.AntiForgeryToken()

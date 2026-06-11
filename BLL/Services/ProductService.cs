@@ -28,7 +28,7 @@ namespace BLL.Services
             return await _productRepo.GetByIdWithCategoryAsync(id);
         }
 
-        public async Task<(bool Success, string Message)> AddProductAsync(string name, decimal price, int categoryId, string description, string imageUrl, int quantity)
+        public async Task<(bool Success, string Message)> AddProductAsync(string name, decimal price, int categoryId, string description, string imageUrl, int quantity, decimal? oldPrice = null)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return (false, "Назва не може бути порожньою");
@@ -54,10 +54,11 @@ namespace BLL.Services
             if (quantity < 0)
                 return (false, "Кількість не може бути від'ємною");
 
-            var newProduct = new Product 
+            var newProduct = new Product
             {
                 Name = name.Trim(),
                 Price = price,
+                OldPrice = oldPrice,
                 Category = category,
                 Description = description.Trim(),
                 ImageUrl = imageUrl.Trim(),
@@ -73,7 +74,7 @@ namespace BLL.Services
             return await _productRepo.GetMostPopularProductsAsync();
         }
 
-        public async Task<(bool Success, string Message)> UpdateProductAsync(int id, string name, decimal price, int categoryId, string description, string imageUrl, int quantity)
+        public async Task<(bool Success, string Message)> UpdateProductAsync(int id, string name, decimal price, int categoryId, string description, string imageUrl, int quantity, decimal? oldPrice = null)
         {
             var product = await _productRepo.GetByIdAsync(id);
 
@@ -106,6 +107,7 @@ namespace BLL.Services
 
             product.Name = name.Trim();
             product.Price = price;
+            product.OldPrice = oldPrice;
             product.Category = category;
             product.CategoryId = categoryId;
             product.Description = description.Trim();

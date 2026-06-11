@@ -26,13 +26,17 @@ public class ProductController : Controller
         _userManager     = userManager;
     }
 
-    public async Task<IActionResult> Index(int? categoryId, string? search, int page = 1)
+    public async Task<IActionResult> Index(int? categoryId, string? search, int page = 1,
+        decimal? minPrice = null, decimal? maxPrice = null, string? sort = null)
     {
         var categories = (await _categoryService.GetAllCategoriesAsync()).ToList();
         ViewData["Categories"] = categories;
         ViewData["Search"]     = search;
         ViewData["CategoryId"] = categoryId;
         ViewData["Page"]       = page;
+        ViewData["MinPrice"]   = minPrice;
+        ViewData["MaxPrice"]   = maxPrice;
+        ViewData["Sort"]       = sort;
 
         bool isSearch   = !string.IsNullOrWhiteSpace(search);
         bool isCategory = categoryId.HasValue;
@@ -43,8 +47,12 @@ public class ProductController : Controller
         var query = _db.Products.Include(p => p.Category).AsQueryable();
 
         if (isSearch)
+        {
+            var lower = search!.ToLower();
             query = query.Where(p =>
-                p.Name.Contains(search!) || p.Category.Name.Contains(search!));
+                p.Name.ToLower().Contains(lower) ||
+                p.Category.Name.ToLower().Contains(lower));
+        }
 
         if (isCategory)
         {
@@ -53,10 +61,20 @@ public class ProductController : Controller
             query = query.Where(p => p.CategoryId == categoryId);
         }
 
+        if (minPrice.HasValue) query = query.Where(p => p.Price >= minPrice.Value);
+        if (maxPrice.HasValue) query = query.Where(p => p.Price <= maxPrice.Value);
+
+        query = sort switch
+        {
+            "price_asc"  => query.OrderBy(p => p.Price),
+            "price_desc" => query.OrderByDescending(p => p.Price),
+            "newest"     => query.OrderByDescending(p => p.Id),
+            _            => query.OrderBy(p => p.Name)
+        };
+
         var total      = await query.CountAsync();
         var totalPages = (int)Math.Ceiling(total / (double)PageSize);
         var items      = await query
-            .OrderBy(p => p.Name)
             .Skip((page - 1) * PageSize)
             .Take(PageSize)
             .Select(p => new ProductCardViewModel
@@ -66,6 +84,7 @@ public class ProductController : Controller
                 Category    = p.Category.Name,
                 CategoryId  = p.CategoryId,
                 Price       = p.Price,
+                OldPrice    = p.OldPrice,
                 Description = p.Description,
                 ImageUrl    = p.ImageUrl
             })
@@ -103,6 +122,7 @@ public class ProductController : Controller
             Category    = product.Category.Name,
             CategoryId  = product.CategoryId,
             Price       = product.Price,
+            OldPrice    = product.OldPrice,
             Description = product.Description,
             ImageUrl    = product.ImageUrl,
             Rating      = rating,

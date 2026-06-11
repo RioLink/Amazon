@@ -46,6 +46,30 @@ public class CartController : Controller
     }
 
     [HttpPost]
+    public async Task<IActionResult> AddAjax([FromBody] AddToCartViewModel model)
+    {
+        var userId = _userManager.GetUserId(User);
+        if (userId != null)
+        {
+            var result = await _cartService.AddToCartAsync(userId, model.ProductId, model.Quantity);
+            if (!result.Success)
+                return Json(new { success = false, message = result.Message });
+        }
+        else
+        {
+            var product = await _productService.GetProductByIdAsync(model.ProductId);
+            if (product != null)
+                GuestCartService.Add(HttpContext.Session, product.Id, product.Name, product.Price, model.Quantity, product.ImageUrl);
+        }
+
+        var count = userId != null
+            ? await _cartService.GetCartSizeByUserIdAsync(userId)
+            : GuestCartService.GetCount(HttpContext.Session);
+
+        return Json(new { success = true, cartCount = count });
+    }
+
+    [HttpPost]
     public async Task<IActionResult> Add(AddToCartViewModel model)
     {
         var userId = _userManager.GetUserId(User);

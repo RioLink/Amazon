@@ -22,7 +22,9 @@ namespace BLL.Services
             _productService = productService;
         }
 
-        public async Task CreateOrderAsync(string userId, IEnumerable<CartItem> items)
+        public async Task CreateOrderAsync(string userId, IEnumerable<CartItem> items,
+            string fullName = "", string phone = "", string city = "",
+            string address = "", string? postalCode = null, string paymentMethod = "")
         {
             if (items == null) return;
 
@@ -37,10 +39,16 @@ namespace BLL.Services
 
             var newOrder = new Order
             {
-                UserId = userId,
-                Date = DateTime.UtcNow,
-                TotalAmount = totalAmount,
-                Items = orderItems
+                UserId        = userId,
+                Date          = DateTime.UtcNow,
+                TotalAmount   = totalAmount,
+                Items         = orderItems,
+                FullName      = fullName,
+                Phone         = phone,
+                City          = city,
+                Address       = address,
+                PostalCode    = postalCode,
+                PaymentMethod = paymentMethod
             };
 
             await _orderRepository.AddAsync(newOrder);

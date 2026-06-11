@@ -64,13 +64,13 @@ public class ProfileController : Controller
                 System.IO.File.Delete(oldPath);
         }
 
-        var fileName  = $"{user.Id}{ext}";
+        var fileName   = $"{user.Id}_{Guid.NewGuid():N}{ext}";
         var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "avatars");
         Directory.CreateDirectory(uploadsDir);
-        var filePath  = Path.Combine(uploadsDir, fileName);
+        var filePath   = Path.Combine(uploadsDir, fileName);
 
-        using (var stream = new FileStream(filePath, FileMode.Create))
-            await avatar.CopyToAsync(stream);
+        await using var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read);
+        await avatar.CopyToAsync(stream);
 
         user.AvatarPath = $"/uploads/avatars/{fileName}";
         await _userManager.UpdateAsync(user);

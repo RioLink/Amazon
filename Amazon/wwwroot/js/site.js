@@ -1,16 +1,36 @@
 /**
  * Amazon ITStep — Client-side helpers
- * Cart, Checkout та Orders керуються сервером (БД).
- * Цей файл оновлює лише UI: бейдж кошика та дрібні інтерактивні елементи.
  */
 
 ;(function () {
   'use strict';
 
-  // ──────────────────────────────────────────────────────────────
-  // CART COUNT BADGE  (оновлюється через API на кожній сторінці)
-  // ──────────────────────────────────────────────────────────────
+  // ── CSRF token helper ────────────────────────────────────────────
+  function getCsrfToken() {
+    return document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+  }
 
+  // ── TOAST ────────────────────────────────────────────────────────
+  let toastContainer = null;
+
+  function showToast(message, type = 'success', duration = 3000) {
+    if (!toastContainer) {
+      toastContainer = document.createElement('div');
+      toastContainer.className = 'toast-container';
+      document.body.appendChild(toastContainer);
+    }
+    const toast = document.createElement('div');
+    toast.className = `toast toast--${type}`;
+    toast.innerHTML = `<span class="toast__icon">${type === 'success' ? '✓' : type === 'wish' ? '❤' : 'ℹ'}</span><span class="toast__msg">${message}</span>`;
+    toastContainer.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('toast--visible'));
+    setTimeout(() => {
+      toast.classList.remove('toast--visible');
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  }
+
+  // ── CART COUNT BADGE ─────────────────────────────────────────────
   const cartBadgeEl = document.querySelector('.cart-count');
 
   async function refreshCartBadge() {
@@ -19,34 +39,117 @@
       const res  = await fetch('/Cart/GetCount');
       const data = await res.json();
       cartBadgeEl.textContent = String(data.count ?? 0);
-    } catch {
-      cartBadgeEl.textContent = '0';
-    }
+    } catch { cartBadgeEl.textContent = '0'; }
   }
 
   refreshCartBadge();
 
-  // ──────────────────────────────────────────────────────────────
-  // ADD-TO-CART FORMS (product cards)
-  // Після submit форми — оновлюємо бейдж без перезавантаження
-  // ──────────────────────────────────────────────────────────────
+  // ── ADD TO CART (AJAX, product cards) ────────────────────────────
+  function getAntiForgery() {
+    // Try hidden input first, then meta tag
+    return document.querySelector('input[name="__RequestVerificationToken"]')?.value
+        ?? document.querySelector('meta[name="__RequestVerificationToken"]')?.content
+        ?? '';
+  }
 
-  document.querySelectorAll('.product-card__cart-form').forEach(form => {
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      const btn = form.querySelector('.product-card__cart-btn');
-      try {
-        await fetch(form.action, { method: 'POST', body: new FormData(form) });
-        btn && btn.classList.add('is-added');
-        setTimeout(() => btn && btn.classList.remove('is-added'), 700);
-      } catch { /* ігноруємо, сторінка все одно відкрита */ }
-      await refreshCartBadge();
-    });
+  async function addToCartAjax(productId, productName) {
+    const token = getAntiForgery();
+    try {
+      const res = await fetch('/Cart/AddAjax', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'RequestVerificationToken': token
+        },
+        body: JSON.stringify({ productId, quantity: 1 })
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (cartBadgeEl) cartBadgeEl.textContent = String(data.cartCount ?? 0);
+        showToast(`«${productName}» додано до кошика 🛒`, 'success');
+      } else {
+        showToast(data.message || 'Помилка', 'error');
+      }
+    } catch {
+      showToast('Помилка з’єднання', 'error');
+    }
+  }
+
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.js-add-cart');
+    if (!btn) return;
+    e.preventDefault();
+    const productId   = parseInt(btn.dataset.productId);
+    const productName = btn.dataset.productName || 'Товар';
+    btn.classList.add('is-added');
+    setTimeout(() => btn.classList.remove('is-added'), 700);
+    addToCartAjax(productId, productName);
   });
 
-  // ──────────────────────────────────────────────────────────────
-  // PROFILE PAGE — аватар / email / пароль / адреси (без змін)
-  // ──────────────────────────────────────────────────────────────
+  // ── WISHLIST (AJAX toggle) ────────────────────────────────────────
+  let wishlistIds = new Set();
+
+  async function loadWishlistIds() {
+    try {
+      const res  = await fetch('/Wishlist/GetIds');
+      const ids  = await res.json();
+      wishlistIds = new Set(ids);
+      paintWishlistBtns();
+    } catch { /* not logged in */ }
+  }
+
+  function paintWishlistBtns() {
+    document.querySelectorAll('.js-wishlist-btn').forEach(btn => {
+      const id = parseInt(btn.dataset.productId);
+      const wished = wishlistIds.has(id);
+      btn.classList.toggle('is-wished', wished);
+      // product card: button contains only text
+      // product details: button contains .product-details__wishlist-icon + .product-details__wishlist-label
+      const iconEl = btn.querySelector('.product-details__wishlist-icon');
+      const labelEl = btn.querySelector('.product-details__wishlist-label');
+      if (iconEl) {
+        iconEl.textContent = wished ? '♥' : '♡';
+        if (labelEl) labelEl.textContent = wished ? 'В обраному' : 'До обраного';
+      } else {
+        btn.textContent = wished ? '♥' : '♡';
+      }
+    });
+  }
+
+  document.addEventListener('click', async e => {
+    const btn = e.target.closest('.js-wishlist-btn');
+    if (!btn) return;
+    const productId = parseInt(btn.dataset.productId);
+    const token = getAntiForgery();
+    try {
+      const fd = new FormData();
+      fd.append('productId', productId);
+      fd.append('__RequestVerificationToken', token);
+      const res  = await fetch('/Wishlist/Toggle', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: fd
+      });
+      const data = await res.json();
+      if (data.added) {
+        wishlistIds.add(productId);
+        showToast('Додано до обраного ❤', 'wish');
+      } else {
+        wishlistIds.delete(productId);
+        showToast('Видалено з обраного', 'success');
+      }
+      paintWishlistBtns();
+    } catch { showToast('Помилка', 'error'); }
+  });
+
+  // Load wishlist ids only if logged in (button exists)
+  if (document.querySelector('.js-wishlist-btn')) {
+    loadWishlistIds();
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // PROFILE PAGE helpers
+  // ──────────────────────────────────────────────────────────────────
 
   // Avatar upload
   const avatarWrap  = document.getElementById('avatarWrap');
@@ -63,7 +166,7 @@
       const res = await fetch(avatarForm.action, { method: 'POST', body: fd });
       const data = await res.json();
       if (data.success) {
-        const img = document.getElementById('avatarImg');
+        const img    = document.getElementById('avatarImg');
         const letter = document.getElementById('avatarLetter');
         if (img) {
           img.src = data.avatarPath + '?t=' + Date.now();
@@ -82,7 +185,7 @@
     });
   }
 
-  // Change email modal
+  // Modal helper
   function setupModal(triggerId, modalId, cancelId, formId, hintId, submitUrl) {
     const trigger = document.getElementById(triggerId);
     const modal   = document.getElementById(modalId);
@@ -133,7 +236,6 @@
     });
   }
 
-  // Delete / set default address
   document.querySelectorAll('[data-delete-address]').forEach(btn => {
     btn.addEventListener('click', async () => {
       if (!confirm('Видалити адресу?')) return;

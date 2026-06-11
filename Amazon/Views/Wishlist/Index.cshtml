@@ -1,0 +1,41 @@
+@model List<Domain.Entities.WishlistItem>
+@{
+    ViewData["Title"] = "Обране";
+}
+
+<nav class="page-breadcrumb" aria-label="Breadcrumb">
+    <a asp-controller="Home" asp-action="Index">Головна</a>
+    <span>›</span>
+    <span>Обране</span>
+</nav>
+
+<div class="page-heading">
+    <span class="section-heading__eyebrow">Мій список</span>
+    <h1>Обране ❤️</h1>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <span class="empty-state__icon">💔</span>
+        <h2>Список бажань порожній</h2>
+        <p>Натисніть ❤️ на будь-якому товарі, щоб зберегти його тут.</p>
+        <a class="amazon-button amazon-button--primary" asp-controller="Product" asp-action="Index">
+            Перейти до каталогу
+        </a>
+    </div>
+}
+else
+{
+    <div class="product-grid">
+        @foreach (var item in Model)
+        {
+            var p = item.Product;
+            <partial name="_ProductCard" model="@(new Amazon.Models.ProductCardViewModel {
+                Id = p.Id, Name = p.Name, Category = p.Category.Name,
+                CategoryId = p.CategoryId, Price = p.Price,
+                Description = p.Description, ImageUrl = p.ImageUrl
+            })" />
+        }
+    </div>
+}

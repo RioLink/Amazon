@@ -1,0 +1,20 @@
+@using Amazon.Models
+@model BreadcrumbItem[]
+
+<nav class="page-breadcrumb" aria-label="Breadcrumb">
+    @for (int i = 0; i < Model.Length; i++)
+    {
+        string label = Model[i].Label;
+        string url   = Model[i].Url;
+        bool isLast  = i == Model.Length - 1;
+        if (isLast)
+        {
+            <span class="page-breadcrumb__current">@label</span>
+        }
+        else
+        {
+            <a href="@url">@label</a>
+            <span aria-hidden="true">›</span>
+        }
+    }
+</nav>

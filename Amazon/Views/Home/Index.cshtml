@@ -1,3 +1,4 @@
+@using Domain.Entities
 @model IReadOnlyList<ProductCardViewModel>
 
 @{
@@ -49,55 +50,79 @@
     </div>
 </section>
 
+@{
+    var other = ViewData["OtherProducts"] as List<ProductCardViewModel> ?? new();
+}
+@if (other.Any())
+{
+<section class="home-section" aria-labelledby="other-title">
+    <div class="section-heading">
+        <div>
+            <span class="section-heading__eyebrow">Різні категорії</span>
+            <h2 id="other-title">Може зацікавити</h2>
+        </div>
+        <a class="section-heading__link" asp-controller="Product" asp-action="Index">
+            Дивитися всі <span aria-hidden="true">→</span>
+        </a>
+    </div>
+    <div class="product-grid">
+        @foreach (var product in other)
+        {
+            <partial name="_ProductCard" model="product" />
+        }
+    </div>
+</section>
+}
+
+@{
+    var homeCategories = ViewData["Categories"] as List<Domain.Entities.Category> ?? new();
+    string CatIcon(string name) => name switch {
+        "Електроніка"      => "💻",
+        "Телефони"         => "📱",
+        "Аудіо"            => "🎧",
+        "Фото та відео"    => "📷",
+        "Розумний дім"     => "🏠",
+        "Ігри та консолі"  => "🎮",
+        "Аксесуари"        => "🔌",
+        "Побутова техніка" => "🏷️",
+        "Іграшки"          => "🧸",
+        "Зоотовари"        => "🐾",
+        "Спорт"            => "🏋️",
+        "Книги"            => "📚",
+        "Косметика"        => "💄",
+        "Одяг"             => "👗",
+        "Взуття"           => "👟",
+        "Меблі"            => "🛋️",
+        _                  => "📦"
+    };
+}
 <section id="categories" class="home-section" aria-labelledby="categories-title">
     <div class="section-heading">
         <div>
             <span class="section-heading__eyebrow">Знайдіть своє</span>
-            <h2 id="categories-title">Популярні категорії</h2>
+            <h2 id="categories-title">Категорії товарів</h2>
         </div>
+        <a class="section-heading__link" asp-controller="Product" asp-action="Index">
+            Всі категорії <span aria-hidden="true">→</span>
+        </a>
     </div>
 
     <div class="category-grid category-grid--home">
-        <a class="category-card category-card--electronics"
-           asp-controller="Product" asp-action="Index" asp-route-search="Техніка">
-            <span class="category-card__icon" aria-hidden="true">⌁</span>
-            <span>
-                <strong>Техніка</strong>
-                <small>Телевізори, ноутбуки, смартфони тощо</small>
-            </span>
-        </a>
-        <a class="category-card category-card--computers"
-           asp-controller="Product" asp-action="Index" asp-route-search="Одяг">
-            <span class="category-card__icon" aria-hidden="true">🝔</span>
-            <span>
-                <strong>Одяг</strong>
-                <small>Весь можливий одяг у світі</small>
-            </span>
-        </a>
-        <a class="category-card category-card--home"
-           asp-controller="Product" asp-action="Index" asp-route-search="Меблі">
-            <span class="category-card__icon" aria-hidden="true">⌂</span>
-            <span>
-                <strong>Для дому</strong>
-                <small>Меблі та аксесуари для дому</small>
-            </span>
-        </a>
-        <a class="category-card category-card--sport"
-           asp-controller="Product" asp-action="Index" asp-route-search="Спорт">
-            <span class="category-card__icon" aria-hidden="true">◎</span>
-            <span>
-                <strong>Спорт</strong>
-                <small>Товари для активного способу життя</small>
-            </span>
-        </a>
-        <a class="category-card category-card--games"
-           asp-controller="Product" asp-action="Index" asp-route-search="Ігри">
-            <span class="category-card__icon" aria-hidden="true">🎮</span>
-            <span>
-                <strong>Ігри</strong>
-                <small>Консолі, ігри та аксесуари</small>
-            </span>
-        </a>
+        @foreach (var cat in homeCategories)
+        {
+            var count = cat.Products?.Count ?? 0;
+            <a class="category-card"
+               asp-controller="Product" asp-action="Index" asp-route-categoryId="@cat.Id">
+                <div class="category-card__icon">@CatIcon(cat.Name)</div>
+                <div class="category-card__info">
+                    <span class="category-card__name">@cat.Name</span>
+                    <span class="category-card__count">@count товар@(count == 1 ? "" : count is >= 2 and <= 4 ? "и" : "ів")</span>
+                </div>
+                <svg class="category-card__arrow" viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                    <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"/>
+                </svg>
+            </a>
+        }
     </div>
 </section>
 

@@ -14,6 +14,8 @@ namespace Domain.Entities
         public int Quantity { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
 
+        public decimal? OldPrice { get; set; }
+
         public int CategoryId { get; set; }
         public Category Category { get; set; } = null!;
     }

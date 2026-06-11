@@ -11,7 +11,6 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
     <!-- Google Translate -->
     <style>
         /* Hide the native widget — we use a custom button */
@@ -69,6 +68,7 @@
     </style>
 </head>
 <body>
+    @Html.AntiForgeryToken()
     <header class="site-header">
         <nav class="main-navigation" aria-label="Головна навігація">
 
@@ -199,6 +199,10 @@
                         <a class="header-link" asp-controller="Profile" asp-action="Index">
                             <span class="header-link__hint">Вітаємо,</span>
                             <span class="header-link__title">@User.Identity.Name</span>
+                        </a>
+                        <a class="header-link header-link--wishlist" asp-controller="Wishlist" asp-action="Index" title="Обране">
+                            <span class="header-link__hint">Список</span>
+                            <span class="header-link__title">❤ Обране</span>
                         </a>
                         <form asp-controller="Auth" asp-action="Logout" method="post" class="header-logout-form">
                             @Html.AntiForgeryToken()

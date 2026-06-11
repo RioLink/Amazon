@@ -1,10 +1,12 @@
 using Amazon.Models;
 using Amazon.Services;
 using BLL.Interfaces;
+using DAL.Data;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Amazon.Controllers;
 
@@ -13,12 +15,14 @@ public class CheckoutController : Controller
     private readonly ICartService _cartService;
     private readonly IOrderService _orderService;
     private readonly UserManager<User> _userManager;
+    private readonly AppDbContext _db;
 
-    public CheckoutController(ICartService cartService, IOrderService orderService, UserManager<User> userManager)
+    public CheckoutController(ICartService cartService, IOrderService orderService, UserManager<User> userManager, AppDbContext db)
     {
         _cartService = cartService;
         _orderService = orderService;
         _userManager = userManager;
+        _db = db;
     }
 
     public async Task<IActionResult> Index()
@@ -45,6 +49,15 @@ public class CheckoutController : Controller
         if (viewModel.Count == 0)
             return RedirectToAction("Index", "Cart");
 
+        if (userId != null)
+        {
+            var addresses = await _db.Addresses
+                .Where(a => a.UserId == userId)
+                .OrderByDescending(a => a.IsDefault)
+                .ToListAsync();
+            ViewData["SavedAddresses"] = addresses;
+        }
+
         return View(viewModel);
     }
 
@@ -60,7 +73,8 @@ public class CheckoutController : Controller
         if (!cartItems.Any())
             return RedirectToAction("Index", "Cart");
 
-        await _orderService.CreateOrderAsync(userId, cartItems);
+        await _orderService.CreateOrderAsync(userId, cartItems,
+            fullName, phone, city, address, postal, payment);
         await _cartService.ClearCartAsync(userId);
 
         TempData["OrderSuccess"] = "true";

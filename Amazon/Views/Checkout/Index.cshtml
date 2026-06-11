@@ -1,7 +1,12 @@
+@using Domain.Entities
 @model List<Amazon.Models.CartItemViewModel>
 
 @{
     ViewData["Title"] = "Оформлення замовлення";
+    var savedAddresses = ViewData["SavedAddresses"] as List<Address> ?? new();
+}
+@await Html.PartialAsync("_Breadcrumb", new Amazon.Models.BreadcrumbItem[] { new("Головна", "/"), new("Кошик", "/Cart"), new("Оформлення", "") })
+@{
     var subtotal = Model.Sum(i => i.Price * i.Quantity);
     var shipping = subtotal >= 500 ? 0m : 99m;
     var total = subtotal + shipping;
@@ -25,6 +30,28 @@
                 <span class="checkout-section__num" aria-hidden="true">1</span>
                 Дані для доставки
             </h2>
+
+            @if (savedAddresses.Any())
+            {
+                <div class="checkout-saved-addresses">
+                    <p class="checkout-saved-addresses__label">📍 Ваші збережені адреси:</p>
+                    <div class="checkout-saved-addresses__list">
+                        @foreach (var addr in savedAddresses)
+                        {
+                            <button type="button" class="checkout-saved-addr-btn @(addr.IsDefault ? "checkout-saved-addr-btn--default" : "")"
+                                    data-fullname="@addr.FullName"
+                                    data-phone="@addr.Phone"
+                                    data-city="@addr.City"
+                                    data-address="@addr.Street @addr.Building@(addr.Apartment != null ? ", кв. " + addr.Apartment : "")"
+                                    data-postal="@addr.PostalCode">
+                                <span class="checkout-saved-addr-btn__city">@addr.City</span>
+                                <span class="checkout-saved-addr-btn__street">@addr.Street @addr.Building</span>
+                                @if (addr.IsDefault) { <span class="checkout-saved-addr-btn__badge">За замовч.</span> }
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
 
             <div class="form-group">
                 <label for="fullName">Повне ім'я *</label>
@@ -138,3 +165,19 @@
     </aside>
 
 </div>
+
+@section Scripts {
+<script>
+document.querySelectorAll('.checkout-saved-addr-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.getElementById('fullName').value = btn.dataset.fullname || '';
+        document.getElementById('phone').value    = btn.dataset.phone   || '';
+        document.getElementById('city').value     = btn.dataset.city    || '';
+        document.getElementById('address').value  = btn.dataset.address || '';
+        document.getElementById('postal').value   = btn.dataset.postal  || '';
+        document.querySelectorAll('.checkout-saved-addr-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    });
+});
+</script>
+}
