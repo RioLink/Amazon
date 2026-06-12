@@ -257,4 +257,19 @@
     });
   });
 
+  // ── Skeleton loader ──────────────────────────────────────────────
+  (function () {
+    const grid     = document.querySelector('.js-product-grid');
+    const skeleton = document.querySelector('.js-skeleton-grid');
+    if (!grid || !skeleton) return;
+
+    // Show skeletons on navigation away (pagination / category click)
+    document.querySelectorAll('.pagination__btn, .catalog-category-card, .catalog-back-link').forEach(el => {
+      el.addEventListener('click', () => {
+        grid.style.display     = 'none';
+        skeleton.style.display = '';
+      });
+    });
+  })();
+
 })();

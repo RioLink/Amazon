@@ -1,7 +1,14 @@
 @model ProductCardViewModel
 
 @{
-    ViewData["Title"] = Model.Name;
+    ViewData["Title"]           = Model.Name;
+    ViewData["OgTitle"]         = $"{Model.Name} — Amazon ITStep";
+    ViewData["MetaDescription"] = string.IsNullOrWhiteSpace(Model.Description)
+        ? $"Купити {Model.Name} за ціною {Model.Price:N0} ₴. Доставка по Україні."
+        : (Model.Description.Length > 160 ? Model.Description[..157] + "…" : Model.Description);
+    ViewData["OgImage"]         = Model.ImageUrl?.StartsWith("http") == true
+        ? Model.ImageUrl
+        : $"https://localhost:7179{Model.ImageUrl}";
     var hasDiscount = Model.OldPrice.HasValue;
     var discount    = hasDiscount ? (int)Math.Round((1 - (double)Model.Price / (double)Model.OldPrice!.Value) * 100) : 0;
     var saving      = hasDiscount ? Model.OldPrice!.Value - Model.Price : 0;

@@ -1,0 +1,21 @@
+@{
+    var code = ViewData["StatusCode"] as int? ?? 0;
+    var (illustration, title, sub) = code switch {
+        404 => ("🔍", "Сторінку не знайдено", "Схоже, ця сторінка переїхала або ніколи не існувала. Перевірте адресу або поверніться на головну."),
+        403 => ("🚫", "Доступ заборонено", "У вас немає прав для перегляду цієї сторінки."),
+        500 => ("⚙️", "Помилка сервера", "Щось пішло не так з нашого боку. Ми вже працюємо над виправленням."),
+        _   => ("😕", $"Помилка {code}", "Сталася неочікувана помилка. Спробуйте ще раз.")
+    };
+    ViewData["Title"] = title;
+}
+
+<div class="error-page">
+    <div class="error-page__illustration">@illustration</div>
+    <div class="error-page__code">@(code > 0 ? code : "")</div>
+    <h1 class="error-page__title">@title</h1>
+    <p class="error-page__sub">@sub</p>
+    <div class="error-page__actions">
+        <a href="/" class="error-page__btn error-page__btn--primary">🏠 На головну</a>
+        <a asp-controller="Product" asp-action="Index" class="error-page__btn error-page__btn--secondary">🛍️ Каталог</a>
+    </div>
+</div>

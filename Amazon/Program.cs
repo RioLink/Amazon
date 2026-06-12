@@ -85,6 +85,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}");
+
 var supportedCultures = new[] { "uk", "en" };
 app.UseRequestLocalization(new RequestLocalizationOptions()
     .SetDefaultCulture("uk")

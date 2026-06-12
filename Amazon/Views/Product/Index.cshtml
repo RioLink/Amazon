@@ -142,10 +142,25 @@ else if (Model != null && Model.Items.Count > 0)
         <a class="catalog-back-link" asp-action="Index">← Всі категорії</a>
     }
 
-    <div class="product-grid">
+    <div class="product-grid js-product-grid">
         @foreach (var product in Model.Items)
         {
             <partial name="_ProductCard" model="product" />
+        }
+    </div>
+
+    <div class="product-grid product-grid--skeleton js-skeleton-grid" aria-hidden="true" style="display:none">
+        @for (int i = 0; i < 8; i++)
+        {
+            <div class="skeleton-card">
+                <div class="skeleton skeleton--img"></div>
+                <div class="skeleton-card__body">
+                    <div class="skeleton skeleton--title"></div>
+                    <div class="skeleton skeleton--text"></div>
+                    <div class="skeleton skeleton--price"></div>
+                    <div class="skeleton skeleton--btn"></div>
+                </div>
+            </div>
         }
     </div>
 

@@ -6,8 +6,25 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Amazon ITStep — навчальний інтернет-магазин на ASP.NET Core MVC" />
     <title>@ViewData["Title"] - Amazon ITStep</title>
+
+    @{
+        var metaDesc  = ViewData["MetaDescription"] as string ?? "Amazon ITStep — навчальний інтернет-магазин на ASP.NET Core MVC";
+        var ogImage   = ViewData["OgImage"]         as string ?? "/images/og-default.png";
+        var ogTitle   = ViewData["OgTitle"]         as string ?? ViewData["Title"]?.ToString() ?? "Amazon ITStep";
+        var canonical = ViewData["Canonical"]       as string;
+    }
+    <meta name="description" content="@metaDesc" />
+    <meta property="og:type"        content="website" />
+    <meta property="og:site_name"   content="Amazon ITStep" />
+    <meta property="og:title"       content="@ogTitle" />
+    <meta property="og:description" content="@metaDesc" />
+    <meta property="og:image"       content="@ogImage" />
+    <meta name="twitter:card"       content="summary_large_image" />
+    <meta name="twitter:title"      content="@ogTitle" />
+    <meta name="twitter:description" content="@metaDesc" />
+    <meta name="twitter:image"      content="@ogImage" />
+    @if (canonical != null) { <link rel="canonical" href="@canonical" /> }
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />

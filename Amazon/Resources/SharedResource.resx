@@ -36,7 +36,7 @@
   <data name="AuthSignInHint" xml:space="preserve"><value>Вже маєте акаунт?</value></data>
   <data name="AuthRegister" xml:space="preserve"><value>Зареєструватися</value></data>
   <data name="AuthRegisterHint" xml:space="preserve"><value>Ще немає акаунту?</value></data>
-  <data name="AuthBackHome" xml:space="preserve"><value>← На головну</value></data>
+  <data name="AuthBackHome" xml:space="preserve"><value>На головну</value></data>
 
   <!-- Delivery oblasts -->
   <data name="Oblast_All" xml:space="preserve"><value>Вся Україна</value></data>

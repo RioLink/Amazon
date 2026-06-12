@@ -36,7 +36,7 @@
   <data name="AuthSignInHint" xml:space="preserve"><value>Already have an account?</value></data>
   <data name="AuthRegister" xml:space="preserve"><value>Create account</value></data>
   <data name="AuthRegisterHint" xml:space="preserve"><value>New to Amazon ITStep?</value></data>
-  <data name="AuthBackHome" xml:space="preserve"><value>← Back to home</value></data>
+  <data name="AuthBackHome" xml:space="preserve"><value>Back to home</value></data>
 
   <!-- Delivery oblasts (English names) -->
   <data name="Oblast_All" xml:space="preserve"><value>All Ukraine</value></data>

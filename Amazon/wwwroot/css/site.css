@@ -6420,3 +6420,75 @@ input:focus-visible {
   font-size:.7rem; background:#f0a500; color:#fff;
   border-radius:4px; padding:1px 5px; width:fit-content; margin-top:2px;
 }
+
+/* ── Skeleton loader ──────────────────────────────────────────── */
+@keyframes skeleton-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  border-radius: 6px;
+}
+.skeleton-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,.07);
+}
+.skeleton--img   { height: 200px; border-radius: 0; }
+.skeleton-card__body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.skeleton--title { height: 18px; width: 80%; }
+.skeleton--text  { height: 13px; width: 60%; }
+.skeleton--price { height: 22px; width: 45%; margin-top: 4px; }
+.skeleton--btn   { height: 38px; border-radius: 8px; margin-top: 4px; }
+
+/* ── Error pages (404 / 500) ──────────────────────────────────── */
+.error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 40px 20px;
+}
+.error-page__code {
+  font-size: clamp(6rem, 20vw, 10rem);
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, #f0a500 0%, #ff6b35 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+.error-page__title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 12px;
+}
+.error-page__sub {
+  font-size: 1rem;
+  color: #64748b;
+  max-width: 420px;
+  margin: 0 auto 32px;
+  line-height: 1.6;
+}
+.error-page__actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.error-page__btn {
+  display: inline-block;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: opacity .15s;
+}
+.error-page__btn:hover { opacity: .85; }
+.error-page__btn--primary { background: #f0a500; color: #fff; }
+.error-page__btn--secondary { background: #f1f5f9; color: #334155; }
+.error-page__illustration { font-size: 5rem; margin-bottom: 16px; }
