@@ -39,7 +39,22 @@ namespace Amazon.Controllers
             var (success, message) = await _authService.RegisterAsync(
                 user.Username, user.Email, user.Password, user.ConfirmPassword);
 
-            if (success) return RedirectToAction("Index", "Home");
+            if (success)
+            {
+                var guestCart = GuestCartService.GetCart(HttpContext.Session);
+                if (guestCart.Count > 0)
+                {
+                    var registeredUser = await _userManager.FindByNameAsync(user.Username);
+                    if (registeredUser != null)
+                    {
+                        foreach (var item in guestCart)
+                            await _cartService.AddToCartAsync(registeredUser.Id, item.ProductId, item.Quantity);
+                    }
+                    GuestCartService.Clear(HttpContext.Session);
+                }
+
+                return RedirectToAction("Index", "Home"); 
+            }
 
             ModelState.AddModelError("", message);
             return View(user);
