@@ -521,6 +521,7 @@
         msg.style.display  = 'block';
         msg.innerHTML = `
             <div class="newsletter-success">
+                <button class="newsletter-success__close" onclick="this.closest('#newsletterMsg').style.display='none'" aria-label="Закрити">&times;</button>
                 <span class="newsletter-success__icon">🎉</span>
                 <div>
                     <strong>Дякуємо за підписку!</strong>
@@ -546,5 +547,7 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <button id="js-back-top" aria-label="Вгору">↑</button>
 </body>
 </html>

@@ -137,6 +137,29 @@
       } else {
         wishlistIds.delete(productId);
         showToast('Видалено з обраного', 'success');
+        // якщо ми на сторінці Wishlist — анімовано прибираємо картку
+        if (window.location.pathname.toLowerCase().startsWith('/wishlist')) {
+          const card = btn.closest('.product-card');
+          if (card) {
+            card.style.transition = 'opacity .3s ease, transform .3s ease';
+            card.style.opacity    = '0';
+            card.style.transform  = 'scale(.92)';
+            setTimeout(() => {
+              card.remove();
+              // якщо сітка порожня — показати empty-state
+              const grid = document.querySelector('.product-grid');
+              if (grid && !grid.querySelector('.product-card')) {
+                grid.innerHTML = `
+                  <div class="empty-state" style="grid-column:1/-1">
+                    <span class="empty-state__icon">💔</span>
+                    <h2>Список бажань порожній</h2>
+                    <p>Натисніть ❤️ на будь-якому товарі, щоб зберегти його тут.</p>
+                    <a class="amazon-button amazon-button--primary" href="/Product">Перейти до каталогу</a>
+                  </div>`;
+              }
+            }, 320);
+          }
+        }
       }
       paintWishlistBtns();
     } catch { showToast('Помилка', 'error'); }
@@ -263,13 +286,101 @@
     const skeleton = document.querySelector('.js-skeleton-grid');
     if (!grid || !skeleton) return;
 
-    // Show skeletons on navigation away (pagination / category click)
     document.querySelectorAll('.pagination__btn, .catalog-category-card, .catalog-back-link').forEach(el => {
       el.addEventListener('click', () => {
         grid.style.display     = 'none';
         skeleton.style.display = '';
       });
     });
+  })();
+
+  // ── Scroll-reveal (Intersection Observer) ────────────────────────
+  (function () {
+    const els = document.querySelectorAll(
+      '.product-card, .category-card, .benefit, .home-section, .section-heading'
+    );
+    if (!els.length || !('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          // stagger siblings in the same grid
+          const siblings = entry.target.parentElement?.querySelectorAll('.product-card, .category-card') ?? [];
+          const idx = Array.from(siblings).indexOf(entry.target);
+          const delay = idx >= 0 ? Math.min(idx * 60, 400) : 0;
+          setTimeout(() => {
+            entry.target.classList.add('is-revealed');
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    els.forEach(el => {
+      el.classList.add('will-reveal');
+      observer.observe(el);
+    });
+  })();
+
+  // ── Ripple effect on buttons ──────────────────────────────────────
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.amazon-button, .js-add-cart, .admin-status-save');
+    if (!btn) return;
+    const r = document.createElement('span');
+    r.className = 'btn-ripple';
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+    btn.style.position = btn.style.position || 'relative';
+    btn.appendChild(r);
+    r.addEventListener('animationend', () => r.remove());
+  });
+
+  // ── Animated counter for stat numbers ────────────────────────────
+  (function () {
+    const els = document.querySelectorAll('[data-count-to]');
+    if (!els.length) return;
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el    = entry.target;
+        const end   = parseFloat(el.dataset.countTo);
+        const dur   = 1400;
+        const step  = 16;
+        const steps = dur / step;
+        let cur = 0;
+        const inc = end / steps;
+        const suffix = el.dataset.countSuffix ?? '';
+        const timer = setInterval(() => {
+          cur += inc;
+          if (cur >= end) { cur = end; clearInterval(timer); }
+          el.textContent = (Number.isInteger(end) ? Math.round(cur) : cur.toFixed(1)) + suffix;
+        }, step);
+        observer.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+    els.forEach(el => observer.observe(el));
+  })();
+
+  // ── Back-to-top button ───────────────────────────────────────────
+  (function () {
+    const btn = document.getElementById('js-back-top');
+    if (!btn) return;
+    window.addEventListener('scroll', () => {
+      btn.classList.toggle('is-visible', window.scrollY > 400);
+    }, { passive: true });
+    btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  })();
+
+  // ── Hero parallax (subtle) ───────────────────────────────────────
+  (function () {
+    const visual = document.querySelector('.hero__visual');
+    if (!visual) return;
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      if (y > 600) return;
+      visual.style.transform = `translateY(${y * 0.12}px)`;
+    }, { passive: true });
   })();
 
 })();
