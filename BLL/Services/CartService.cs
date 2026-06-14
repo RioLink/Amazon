@@ -33,9 +33,6 @@ namespace BLL.Services
 
         public async Task<(bool Success, string Message)> AddToCartAsync(string userId, int productId, int quantity)
         {
-            //if (quantity <= 0)
-            //    return (false, "Кількість має бути більше 0");
-
             var product = await _productRepo.GetByIdAsync(productId);
             if (product == null)
                 return (false, "Товар не знайдено");
@@ -43,7 +40,6 @@ namespace BLL.Services
             if (product.Quantity < quantity)
                 return (false, "На складі недостатньо товару");
 
-            // Логика добавления
             var items = await _cartRepo.GetAllAsync();
             var existingItem = items.FirstOrDefault(c => c.UserId == userId && c.ProductId == productId);
 

@@ -15,7 +15,6 @@ namespace Domain.Entities
         public string UserId { get; set; } = string.Empty;
         public User User { get; set; } = null!;
 
-        // Delivery details
         public string FullName      { get; set; } = string.Empty;
         public string Phone         { get; set; } = string.Empty;
         public string City          { get; set; } = string.Empty;

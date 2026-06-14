@@ -9,6 +9,6 @@ public class Review
     public string? UserId { get; set; }
     public string AuthorName { get; set; } = "Анонім";
     public string Body { get; set; } = string.Empty;
-    public int Stars { get; set; } // 1–5
+    public int Stars { get; set; } 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

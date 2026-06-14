@@ -33,7 +33,6 @@ namespace Amazon.Controllers
                 ImageUrl = p.ImageUrl
             }).ToList();
 
-            // 4 товари з різних категорій, не Техніка — по одному з кожної
             var otherProducts = (await _db.Products
                 .Include(p => p.Category)
                 .Where(p => p.Category.Name != "Техніка")
@@ -41,7 +40,7 @@ namespace Amazon.Controllers
                 .ToListAsync())
                 .GroupBy(p => p.CategoryId)
                 .Select(g => g.First())
-                .OrderBy(_ => Guid.NewGuid())   // рандом вже в пам'яті
+                .OrderBy(_ => Guid.NewGuid()) 
                 .Take(4)
                 .Select(p => new ProductCardViewModel {
                     Id = p.Id,

@@ -10,7 +10,6 @@ namespace BLL.Interfaces
         Task<int> GetCartSizeByUserIdAsync(string userId);
         Task<(bool Success, string Message)> AddToCartAsync(string userId, int productId, int quantity);
         Task<(bool Success, string Message)> RemoveFromCartAsync(string userId, int productId);
-        //Очистка
         Task ClearCartAsync(string userId);
     }
 }

@@ -25,6 +25,7 @@ public class CheckoutController : Controller
         _db = db;
     }
 
+    [Authorize]
     public async Task<IActionResult> Index()
     {
         var userId = _userManager.GetUserId(User);
@@ -62,7 +63,7 @@ public class CheckoutController : Controller
     }
 
     [HttpPost]
-    [Authorize]  // Оформлення замовлення — тільки для авторизованих
+    [Authorize] 
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> PlaceOrder(string fullName, string email, string phone,
         string city, string postal, string address, string payment)
@@ -74,7 +75,7 @@ public class CheckoutController : Controller
             return RedirectToAction("Index", "Cart");
 
         await _orderService.CreateOrderAsync(userId, cartItems,
-            fullName, phone, city, address, postal, payment);
+            fullName, phone, city, address, postal, payment, 0);
         await _cartService.ClearCartAsync(userId);
 
         TempData["OrderSuccess"] = "true";

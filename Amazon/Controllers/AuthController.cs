@@ -57,7 +57,6 @@ namespace Amazon.Controllers
 
             if (success)
             {
-                // Merge guest session cart → DB cart
                 var guestCart = GuestCartService.GetCart(HttpContext.Session);
                 if (guestCart.Count > 0)
                 {

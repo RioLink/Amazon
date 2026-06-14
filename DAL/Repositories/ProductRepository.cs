@@ -26,7 +26,6 @@ namespace DAL.Repositories
 
         public async Task<IEnumerable<Product>> GetMostPopularProductsAsync()
         {
-            // Get top products by order volume, padded with newest products to always return 4
             var popularIds = await _context.Orders
                 .SelectMany(o => o.Items)
                 .GroupBy(oi => oi.ProductId)
@@ -46,7 +45,6 @@ namespace DAL.Repositories
                     .ToListAsync();
             }
 
-            // Pad with newest products if fewer than 4 popular ones
             if (result.Count < 4)
             {
                 var existingIds = result.Select(p => p.Id).ToList();

@@ -10,7 +10,6 @@ namespace DAL.Seeders
         {
             if (await context.Products.AnyAsync()) return;
 
-            // Ensure categories exist
             await CategoriesSeeder.SeedAsync(context);
 
             var cats = await context.Categories.ToListAsync();
@@ -18,7 +17,6 @@ namespace DAL.Seeders
 
             var products = new List<Product>
             {
-                // ── Техніка ──────────────────────────────────────────────
                 new() {
                     Name = "Смартфон Samsung Galaxy S24",
                     Price = 32999, Description = "6.2\" Dynamic AMOLED, Snapdragon 8 Gen 3, 50 МП камера, 4000 мАг.",
@@ -62,7 +60,6 @@ namespace DAL.Seeders
                     CategoryId = CatId("Техніка"), Quantity = 30
                 },
 
-                // ── Комп'ютери ───────────────────────────────────────────
                 new() {
                     Name = "Ноутбук ASUS ROG Zephyrus G14",
                     Price = 62999, Description = "AMD Ryzen 9 8945HS, RTX 4070, 32 ГБ RAM, 1 ТБ SSD, 165 Гц.",
@@ -94,7 +91,6 @@ namespace DAL.Seeders
                     CategoryId = CatId("Техніка"), Quantity = 7
                 },
 
-                // ── Одяг ─────────────────────────────────────────────────
                 new() {
                     Name = "Куртка Nike Windrunner",
                     Price = 3299, Description = "Легка вітрозахисна куртка з капюшоном, 100% нейлон.",
@@ -132,7 +128,6 @@ namespace DAL.Seeders
                     CategoryId = CatId("Одяг"), Quantity = 38
                 },
 
-                // ── Взуття ───────────────────────────────────────────────
                 new() {
                     Name = "Кросівки Nike Air Max 270",
                     Price = 4599, Description = "Підошва Air Max 270, сітчастий верх, амортизація на весь день.",
@@ -164,7 +159,6 @@ namespace DAL.Seeders
                     CategoryId = CatId("Взуття"), Quantity = 27
                 },
 
-                // ── Книги ────────────────────────────────────────────────
                 new() {
                     Name = "Чистий код — Роберт Мартін",
                     Price = 649, Description = "Настільна книга кожного розробника про написання якісного коду.",
@@ -196,7 +190,6 @@ namespace DAL.Seeders
                     CategoryId = CatId("Книги"), Quantity = 90
                 },
 
-                // ── Спорт ────────────────────────────────────────────────
                 new() {
                     Name = "Гантелі в наборі 2×20 кг",
                     Price = 3899, Description = "Покриті гумою, ергономічна рукоятка, набір 2+2+4+6+8+10×2 кг.",
@@ -228,7 +221,6 @@ namespace DAL.Seeders
                     CategoryId = CatId("Спорт"), Quantity = 12
                 },
 
-                // ── Косметика ────────────────────────────────────────────
                 new() {
                     Name = "Сироватка CeraVe з гіалуроновою кислотою",
                     Price = 899, Description = "3 типи гіалуронової кислоти, ніацинамід, зволожує 24 год.",
@@ -254,7 +246,6 @@ namespace DAL.Seeders
                     CategoryId = CatId("Косметика"), Quantity = 14
                 },
 
-                // ── Меблі ────────────────────────────────────────────────
                 new() {
                     Name = "Офісне крісло Herman Miller Aeron",
                     Price = 42999, Description = "Постуральна підтримка, 8Z Pellicle, налаштування під тіло.",

@@ -52,8 +52,6 @@ namespace Amazon.Controllers
             return View(products);
         }
 
-        // ── Create ────────────────────────────────────────────────────
-
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -88,8 +86,6 @@ namespace Amazon.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-
-        // ── Edit ──────────────────────────────────────────────────────
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
@@ -140,7 +136,6 @@ namespace Amazon.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ── Helper: save uploaded file or keep URL ────────────────────
         private async Task<string> SaveImageAsync(IFormFile? file, string? existingUrl)
         {
             if (file != null && file.Length > 0)
@@ -160,9 +155,8 @@ namespace Amazon.Controllers
             return existingUrl ?? "";
         }
 
-        // ── Delete / Detailed ─────────────────────────────────────────
-
-        [HttpGet]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             await _productService.DeleteProductAsync(id);
@@ -188,7 +182,6 @@ namespace Amazon.Controllers
             return View(model);
         }
 
-        // ── Orders ────────────────────────────────────────────────────
 
         [HttpGet]
         public async Task<IActionResult> Orders()
@@ -215,7 +208,6 @@ namespace Amazon.Controllers
                     PaymentMethod = o.PaymentMethod
                 });
 
-            // Sales chart data — last 30 days
             var since = DateTime.UtcNow.AddDays(-29).Date;
             var dailyRevenue = await _db.Orders
                 .Where(o => o.Date >= since && o.Status != OrderStatus.Cancelled)
@@ -241,7 +233,6 @@ namespace Amazon.Controllers
             return RedirectToAction(nameof(Orders));
         }
 
-        // ── Categories ────────────────────────────────────────────────
 
         [HttpGet]
         public async Task<IActionResult> Categories()
@@ -294,7 +285,6 @@ namespace Amazon.Controllers
             return RedirectToAction(nameof(Categories));
         }
 
-        // ── Users ─────────────────────────────────────────────────────
 
         [HttpGet]
         public async Task<IActionResult> Users()

@@ -24,7 +24,6 @@ namespace BLL.Services
             if (password != confirmPassword)
                 return (false, "Паролі не збігаються.");
 
-            // Check if email already taken
             var existingEmail = await _userManager.FindByEmailAsync(email);
             if (existingEmail != null)
                 return (false, "Ця пошта вже використовується.");
@@ -45,7 +44,6 @@ namespace BLL.Services
 
         public async Task<(bool success, string message)> LoginAsync(string usernameOrEmail, string password)
         {
-            // Support login by email or username
             string username = usernameOrEmail;
             if (usernameOrEmail.Contains('@'))
             {

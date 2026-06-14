@@ -74,6 +74,7 @@ public class ProductController : Controller
 
         var total      = await query.CountAsync();
         var totalPages = (int)Math.Ceiling(total / (double)PageSize);
+        
         var items      = await query
             .Skip((page - 1) * PageSize)
             .Take(PageSize)

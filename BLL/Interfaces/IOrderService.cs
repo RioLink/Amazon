@@ -10,18 +10,9 @@ namespace BLL.Interfaces
     {
         Task CreateOrderAsync(string userId, IEnumerable<CartItem> items,
             string fullName = "", string phone = "", string city = "",
-            string address = "", string? postalCode = null, string paymentMethod = "");
+            string address = "", string? postalCode = null, string paymentMethod = "", decimal shippingCost = 0);
         Task<IEnumerable<Order>> GetUserOrdersAsync(string userId);
         Task<IEnumerable<Order>> GetAllOrdersAsync();
-
-    //    public async Task<IEnumerable<Order>> GetAllOrdersAsync()
-    //    {
-    //        return new List<Order>
-    //{
-    //    new Order { Id = 1, TotalAmount = 150.00m, Status = OrderStatus.Pending },
-    //    new Order { Id = 2, TotalAmount = 250.50m, Status = OrderStatus.Shipped }
-    //};
-    //    }
         Task ChangeOrderStatusAsync(int orderId, OrderStatus newStatus);
     }
 }

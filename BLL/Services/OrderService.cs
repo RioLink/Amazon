@@ -24,18 +24,27 @@ namespace BLL.Services
 
         public async Task CreateOrderAsync(string userId, IEnumerable<CartItem> items,
             string fullName = "", string phone = "", string city = "",
-            string address = "", string? postalCode = null, string paymentMethod = "")
+            string address = "", string? postalCode = null, string paymentMethod = "", decimal shippingCost = 0)
         {
             if (items == null) return;
 
-            var orderItems = items.Select(i => new OrderItem
+            var itemsList = items.ToList();
+
+            foreach (var item in itemsList)
+            {
+                var product = await _productService.GetProductByIdAsync(item.ProductId);
+                if (product == null) return;
+                if (product.Quantity < item.Quantity) return;
+            }
+
+            var orderItems = itemsList.Select(i => new OrderItem
             {
                 ProductId = i.ProductId,
                 Quantity = i.Quantity,
                 Price = i.Product.Price
             }).ToList();
 
-            var totalAmount = orderItems.Sum(oi => oi.Price * oi.Quantity);
+            var totalAmount = orderItems.Sum(oi => oi.Price * oi.Quantity) + shippingCost;
 
             var newOrder = new Order
             {
@@ -53,7 +62,7 @@ namespace BLL.Services
 
             await _orderRepository.AddAsync(newOrder);
 
-            foreach(var item in items) 
+            foreach(var item in itemsList) 
             {
                 var product = await _productService.GetProductByIdAsync(item.ProductId);
                 if (product != null)
